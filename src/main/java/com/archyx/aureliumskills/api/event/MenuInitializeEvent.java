@@ -1,38 +1,36 @@
 package com.archyx.aureliumskills.api.event;
 
-import com.archyx.aureliumskills.skills.Skill;
+import com.archyx.aureliumskills.menu.MenuType;
+import fr.minuskube.inv.content.InventoryContents;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Called when a player levels up a skill
- */
-public class SkillLevelUpEvent extends Event {
+public class MenuInitializeEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
 
     private final Player player;
-    private final Skill skill;
-    private final int level;
+    private final MenuType type;
+    private final InventoryContents contents;
 
-    public SkillLevelUpEvent(Player player, Skill skill, int level) {
+    public MenuInitializeEvent(Player player, MenuType type, InventoryContents contents) {
         this.player = player;
-        this.skill = skill;
-        this.level = level;
+        this.type = type;
+        this.contents = contents;
     }
 
     public Player getPlayer() {
         return player;
     }
 
-    public Skill getSkill() {
-        return skill;
+    public MenuType getType() {
+        return type;
     }
 
-    public int getLevel() {
-        return level;
+    public InventoryContents getContents() {
+        return contents;
     }
 
     @NotNull
@@ -44,5 +42,4 @@ public class SkillLevelUpEvent extends Event {
     public static HandlerList getHandlerList() {
         return handlers;
     }
-
 }

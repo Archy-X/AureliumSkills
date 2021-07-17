@@ -4,6 +4,7 @@ import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
 import com.archyx.aureliumskills.ability.AbilityManager;
 import com.archyx.aureliumskills.api.AureliumAPI;
+import com.archyx.aureliumskills.api.AureliumSkillsProvider;
 import com.archyx.aureliumskills.commands.ManaCommand;
 import com.archyx.aureliumskills.commands.SkillCommands;
 import com.archyx.aureliumskills.commands.SkillsCommand;
@@ -320,6 +321,8 @@ public class AureliumSkills extends JavaPlugin {
 			checkUpdates();
 		}
 		MinecraftVersion.disableUpdateCheck();
+		// Register instance to API provider
+		AureliumSkillsProvider.register(this);
 	}
 	
 	public void onDisable() {

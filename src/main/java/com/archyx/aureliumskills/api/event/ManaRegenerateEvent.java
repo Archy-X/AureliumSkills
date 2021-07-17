@@ -5,6 +5,9 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Calls when a player regenerates any amount of mana
+ */
 public class ManaRegenerateEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();

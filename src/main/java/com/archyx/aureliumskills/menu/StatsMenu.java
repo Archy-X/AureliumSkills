@@ -1,6 +1,7 @@
 package com.archyx.aureliumskills.menu;
 
 import com.archyx.aureliumskills.AureliumSkills;
+import com.archyx.aureliumskills.api.event.MenuInitializeEvent;
 import com.archyx.aureliumskills.data.PlayerData;
 import com.archyx.aureliumskills.lang.Lang;
 import com.archyx.aureliumskills.lang.MenuMessage;
@@ -13,6 +14,7 @@ import fr.minuskube.inv.ClickableItem;
 import fr.minuskube.inv.SmartInventory;
 import fr.minuskube.inv.content.InventoryContents;
 import fr.minuskube.inv.content.InventoryProvider;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.Locale;
@@ -46,6 +48,9 @@ public class StatsMenu implements InventoryProvider{
 			contents.set(statTemplate.getPos(Stats.LUCK), ClickableItem.empty(statTemplate.getItem(Stats.LUCK, playerData, player, locale)));
 			contents.set(statTemplate.getPos(Stats.WISDOM), ClickableItem.empty(statTemplate.getItem(Stats.WISDOM, playerData, player, locale)));
 			contents.set(statTemplate.getPos(Stats.TOUGHNESS), ClickableItem.empty(statTemplate.getItem(Stats.TOUGHNESS, playerData, player, locale)));
+			// Call API event
+			MenuInitializeEvent event = new MenuInitializeEvent(player, MenuType.STATS, contents);
+			Bukkit.getPluginManager().callEvent(event);
 		}
 	}
 
@@ -53,7 +58,7 @@ public class StatsMenu implements InventoryProvider{
 	public void update(Player player, InventoryContents contents) {
 
 	}
-	
+
 	public static SmartInventory getInventory(Player player, AureliumSkills plugin) {
 		Locale locale = plugin.getLang().getLocale(player);
 		MenuOption menuOption = plugin.getMenuLoader().getMenu(MenuType.STATS);

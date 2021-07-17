@@ -1,6 +1,8 @@
 package com.archyx.aureliumskills.menu;
 
 import com.archyx.aureliumskills.AureliumSkills;
+import com.archyx.aureliumskills.api.event.MenuInitializeEvent;
+import com.archyx.aureliumskills.api.event.MenuOpenEvent;
 import com.archyx.aureliumskills.configuration.OptionL;
 import com.archyx.aureliumskills.data.PlayerData;
 import com.archyx.aureliumskills.lang.Lang;
@@ -16,10 +18,10 @@ import fr.minuskube.inv.SmartInventory;
 import fr.minuskube.inv.content.InventoryContents;
 import fr.minuskube.inv.content.InventoryProvider;
 import fr.minuskube.inv.content.Pagination;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +68,14 @@ public class LevelProgressionMenu implements InventoryProvider {
 		contents.set(skillItem.getPos(), ClickableItem.empty(skillItem.getItem(skill, playerData, player, locale)));
 
 		BackItem backItem = (BackItem) options.getItem(ItemType.BACK);
-		contents.set(backItem.getPos(), ClickableItem.of(backItem.getItem(player, locale), e -> SkillsMenu.getInventory(player, plugin).open(player)));
+		contents.set(backItem.getPos(), ClickableItem.of(backItem.getItem(player, locale), e -> {
+			SmartInventory inventory = SkillsMenu.getInventory(player, plugin);
+			if (inventory == null) return;
+			MenuOpenEvent event = new MenuOpenEvent(player, MenuType.SKILLS);
+			Bukkit.getPluginManager().callEvent(event);
+			if (event.isCancelled()) return;
+			inventory.open(player);
+		}));
 
 		CloseItem closeItem = (CloseItem) options.getItem(ItemType.CLOSE);
 		contents.set(closeItem.getPos(), ClickableItem.of(closeItem.getItem(player, locale), e -> player.closeInventory()));
@@ -122,10 +131,8 @@ public class LevelProgressionMenu implements InventoryProvider {
 		if (pagination.getPage() + 1 < pages) {
 			contents.set(nextPageItem.getPos(), ClickableItem.of(nextPageItem.getItem(player, locale), e -> {
 				int page = pagination.next().getPage();
-				SmartInventory inventory = getInventory(player, skill, page, plugin);
-				if (inventory != null) {
-					inventory.open(player, page);
-				}
+				SmartInventory inventory = getInventory(playerData, skill, page, plugin);
+				inventory.open(player, page);
 			}));
 		}
 
@@ -133,12 +140,14 @@ public class LevelProgressionMenu implements InventoryProvider {
 		if (pagination.getPage() - 1 >= 0) {
 			contents.set(previousPageItem.getPos(), ClickableItem.of(previousPageItem.getItem(player, locale), e -> {
 				int previous = pagination.previous().getPage();
-				SmartInventory inventory = getInventory(player, skill, previous, plugin);
-				if (inventory != null) {
-					inventory.open(player, previous);
-				}
+				SmartInventory inventory = getInventory(playerData, skill, previous, plugin);
+				inventory.open(player, previous);
 			}));
 		}
+
+		// Call API event
+		MenuInitializeEvent event = new MenuInitializeEvent(player, MenuType.LEVEL_PROGRESSION, contents);
+		Bukkit.getPluginManager().callEvent(event);
 	}
 
 	@Override
@@ -147,12 +156,7 @@ public class LevelProgressionMenu implements InventoryProvider {
 		
 	}
 
-	@Nullable
-	public static SmartInventory getInventory(Player player, Skill skill, int page, AureliumSkills plugin) {
-		PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
-		if (playerData == null) {
-			return null;
-		}
+	public static SmartInventory getInventory(PlayerData playerData, Skill skill, int page, AureliumSkills plugin) {
 		Locale locale = playerData.getLocale();
 		MenuOption menuOption = plugin.getMenuLoader().getMenu(MenuType.LEVEL_PROGRESSION);
 		return SmartInventory.builder()
