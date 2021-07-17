@@ -5,18 +5,8 @@ import com.archyx.aureliumskills.ability.Ability;
 import com.archyx.aureliumskills.ability.AbilityManager;
 import com.archyx.aureliumskills.ability.AbilityProvider;
 import com.archyx.aureliumskills.configuration.OptionL;
-import com.archyx.aureliumskills.data.AbilityData;
 import com.archyx.aureliumskills.data.PlayerData;
-import com.archyx.aureliumskills.lang.Lang;
-import com.archyx.aureliumskills.lang.ManaAbilityMessage;
-import com.archyx.aureliumskills.mana.ChargedShot;
-import com.archyx.aureliumskills.mana.MAbility;
-import com.archyx.aureliumskills.mana.ManaAbilityManager;
 import com.archyx.aureliumskills.skills.Skills;
-import com.archyx.aureliumskills.util.math.NumberUtil;
-import com.archyx.aureliumskills.util.text.TextUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
@@ -26,16 +16,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityShootBowEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.Locale;
 import java.util.Random;
 
 public class ArcheryAbilities extends AbilityProvider implements Listener {
@@ -44,7 +29,6 @@ public class ArcheryAbilities extends AbilityProvider implements Listener {
 
     public ArcheryAbilities(AureliumSkills plugin) {
         super(plugin, Skills.ARCHERY);
-        tickChargedShotCooldown();
     }
 
     public void bowMaster(EntityDamageByEntityEvent event, Player player, PlayerData playerData) {
@@ -139,87 +123,4 @@ public class ArcheryAbilities extends AbilityProvider implements Listener {
             }
         }
     }
-
-    @EventHandler
-    public void chargedShotToggle(PlayerInteractEvent event) {
-        if (blockDisabled(MAbility.CHARGED_SHOT)) return;
-        Player player = event.getPlayer();
-        if (blockAbility(player)) return;
-        ItemStack item = event.getItem();
-        if (item != null) {
-            if (item.getType() == Material.BOW) {
-                if (event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_AIR) {
-                    PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
-                    if (playerData == null) return;
-                    if (playerData.getManaAbilityLevel(MAbility.CHARGED_SHOT) == 0) return;
-                    Locale locale = playerData.getLocale();
-                    AbilityData abilityData = playerData.getAbilityData(MAbility.CHARGED_SHOT);
-                    if (abilityData.getInt("cooldown") == 0) {
-                        if (!abilityData.getBoolean("enabled")) { // Toggle on
-                            abilityData.setData("enabled", true);
-                            plugin.getAbilityManager().sendMessage(player, Lang.getMessage(ManaAbilityMessage.CHARGED_SHOT_ENABLE, locale));
-                        } else { // Toggle off
-                            abilityData.setData("enabled", false);
-                            plugin.getAbilityManager().sendMessage(player, Lang.getMessage(ManaAbilityMessage.CHARGED_SHOT_DISABLE, locale));
-                        }
-                        abilityData.setData("cooldown", 8);
-                    }
-                }
-            }
-        }
-    }
-
-    private void tickChargedShotCooldown() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
-                    if (playerData != null) {
-                        if (playerData.containsAbilityData(MAbility.CHARGED_SHOT)) {
-                            AbilityData abilityData = playerData.getAbilityData(MAbility.CHARGED_SHOT);
-                            int cooldown = abilityData.getInt("cooldown");
-                            if (cooldown != 0) {
-                                abilityData.setData("cooldown", cooldown - 1);
-                            }
-                        }
-                    }
-                }
-            }
-        }.runTaskTimer(plugin, 3L, 5L);
-    }
-
-    @EventHandler
-    public void chargedShotActivate(EntityShootBowEvent event) {
-        if (blockDisabled(MAbility.CHARGED_SHOT)) return;
-        if (event.getEntity() instanceof Player) {
-            Player player = (Player) event.getEntity();
-            if (blockAbility(player)) return;
-            PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
-            if (playerData == null) return;
-            if (playerData.getAbilityData(MAbility.CHARGED_SHOT).getBoolean("enabled")) {
-                if (playerData.getManaAbilityLevel(MAbility.CHARGED_SHOT) == 0) return;
-                ManaAbilityManager manager = plugin.getManaAbilityManager();
-                int cooldown = manager.getPlayerCooldown(player.getUniqueId(), MAbility.SHARP_HOOK);
-                if (cooldown == 0) {
-                    manager.activateAbility(player, MAbility.CHARGED_SHOT, (int) (manager.getCooldown(MAbility.CHARGED_SHOT, playerData) * 20)
-                            , new ChargedShot(plugin, event.getProjectile(), event.getForce()));
-                } else {
-                    if (manager.getErrorTimer(player.getUniqueId(), MAbility.SHARP_HOOK) == 0) {
-                        Locale locale = playerData.getLocale();
-                        plugin.getAbilityManager().sendMessage(player, TextUtil.replace(Lang.getMessage(ManaAbilityMessage.NOT_READY, locale), "{cooldown}", NumberUtil.format1((double) (cooldown) / 20)));
-                        manager.setErrorTimer(player.getUniqueId(), MAbility.SHARP_HOOK, 2);
-                    }
-                }
-            }
-        }
-    }
-
-    public void applyChargedShot(EntityDamageByEntityEvent event) {
-        if (event.getDamager().hasMetadata("ChargedShotMultiplier")) {
-            double multiplier = event.getDamager().getMetadata("ChargedShotMultiplier").get(0).asDouble();
-            event.setDamage(event.getDamage() * multiplier);
-        }
-    }
-
 }

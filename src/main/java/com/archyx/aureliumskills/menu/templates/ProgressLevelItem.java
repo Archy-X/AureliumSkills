@@ -1,10 +1,10 @@
 package com.archyx.aureliumskills.menu.templates;
 
 import com.archyx.aureliumskills.AureliumSkills;
-import com.archyx.aureliumskills.configuration.Option;
-import com.archyx.aureliumskills.configuration.OptionL;
 import com.archyx.aureliumskills.ability.Ability;
 import com.archyx.aureliumskills.ability.AbilityManager;
+import com.archyx.aureliumskills.configuration.Option;
+import com.archyx.aureliumskills.configuration.OptionL;
 import com.archyx.aureliumskills.lang.Lang;
 import com.archyx.aureliumskills.lang.MenuMessage;
 import com.archyx.aureliumskills.mana.MAbility;
@@ -12,9 +12,9 @@ import com.archyx.aureliumskills.mana.ManaAbilityManager;
 import com.archyx.aureliumskills.rewards.MoneyReward;
 import com.archyx.aureliumskills.rewards.Reward;
 import com.archyx.aureliumskills.skills.Skill;
-import com.archyx.aureliumskills.util.text.TextUtil;
 import com.archyx.aureliumskills.util.math.NumberUtil;
 import com.archyx.aureliumskills.util.math.RomanNumber;
+import com.archyx.aureliumskills.util.text.TextUtil;
 import com.google.common.collect.ImmutableList;
 
 import java.util.Locale;
@@ -91,7 +91,8 @@ public class ProgressLevelItem {
                             , "{mana_ability}", mAbility.getDisplayName(locale)
                             , "{desc}", TextUtil.replace(mAbility.getDescription(locale)
                                     , "{value}", NumberUtil.format1(manager.getDisplayValue(mAbility, 1))
-                                    , "{duration}", NumberUtil.format1(getDuration(mAbility, 1)))));
+                                    , "{duration}", NumberUtil.format1(getDuration(mAbility, 1))
+                                    , "{haste_level}", String.valueOf(manager.getOptionAsInt(MAbility.SPEED_MINE, "haste_level", 10)))));
                 }
                 else {
                     int manaAbilityLevel = ((level - manager.getUnlock(mAbility)) / manager.getLevelUp(mAbility)) + 1;
@@ -101,7 +102,8 @@ public class ProgressLevelItem {
                                 , "{level}", RomanNumber.toRoman(manaAbilityLevel)
                                 , "{desc}", TextUtil.replace(mAbility.getDescription(locale)
                                         , "{value}", NumberUtil.format1(manager.getDisplayValue(mAbility, manaAbilityLevel))
-                                        , "{duration}", NumberUtil.format1(getDuration(mAbility, manaAbilityLevel)))));
+                                        , "{duration}", NumberUtil.format1(getDuration(mAbility, manaAbilityLevel))
+                                        , "{haste_level}", String.valueOf(manager.getOptionAsInt(MAbility.SPEED_MINE, "haste_level", 10)))));
                     }
                 }
             }

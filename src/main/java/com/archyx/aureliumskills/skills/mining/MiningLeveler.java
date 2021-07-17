@@ -54,9 +54,6 @@ public class MiningLeveler extends SkillLeveler implements Listener {
 				if (hasTag(source, SourceTag.LUCKY_MINER_APPLICABLE)) {
 					miningAbilities.luckyMiner(player, block);
 				}
-				if (hasTag(source, SourceTag.SPEED_MINE_APPLICABLE)) {
-					miningAbilities.applySpeedMine(player);
-				}
 				break; // Stop searching if matched
 			}
 			// Check custom blocks

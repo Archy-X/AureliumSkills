@@ -1,7 +1,7 @@
 package com.archyx.aureliumskills.data.converter;
 
 import com.archyx.aureliumskills.AureliumSkills;
-import org.apache.commons.lang.math.NumberUtils;
+import com.archyx.aureliumskills.util.file.FileUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -63,34 +63,9 @@ public class LegacyFileToYamlConverter extends DataConverter {
                     }
                 }
             }
-            // Prevent renaming to existing file
-            int duplicates = 0;
-            File[] subFiles = plugin.getDataFolder().listFiles();
-            if (subFiles != null) {
-                for (File subFile : subFiles) {
-                    if (subFile.getName().equals("data-OLD.yml")) {
-                        if (1 > duplicates) {
-                            duplicates = 1;
-                        }
-                        break;
-                    } else if (subFile.getName().startsWith("data-OLD (")) {
-                        int fileNameNumber = NumberUtils.toInt(subFile.getName().substring(10, 11)) + 1;
-                        if (fileNameNumber > duplicates) {
-                            duplicates = fileNameNumber;
-                        }
-                    }
-                }
-            }
-            // Rename old file
-            boolean renamed;
-            String renamedName;
-            if (duplicates == 0) {
-                renamedName = "data-OLD.yml";
-            } else {
-                renamedName = "data-OLD (" + duplicates + ").yml";
-            }
-            renamed = file.renameTo(new File(plugin.getDataFolder(), renamedName));
-            if (renamed) {
+            // TODO Test FileUtil renaming works
+            String renamedName = FileUtil.renameNoDuplicates(file, "data-OLD.yml", plugin.getDataFolder());
+            if (renamedName != null) {
                 Bukkit.getLogger().info("[AureliumSkills] Successfully renamed data.yml to " + renamedName);
             } else {
                 Bukkit.getLogger().warning("[AureliumSkills] Failed to rename old data.yml file");

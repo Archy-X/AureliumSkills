@@ -322,6 +322,13 @@ tags:
     speed_mine_applicable:
       - '*'
   excavation:
+    dirts:
+      - dirt
+      - podzol
+      - coarse_dirt
+      - rooted_dirt
+      - mycelium
+      - grass_block
     bigger_scoop_applicable:
       - '*'
     metal_detector_applicable:
@@ -330,4 +337,4 @@ tags:
       - '*'
     terraform_applicable:
       - '*'
-file_version: 6
+file_version: 7

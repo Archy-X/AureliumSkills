@@ -8,25 +8,13 @@ import com.archyx.aureliumskills.data.AbilityData;
 import com.archyx.aureliumskills.data.PlayerData;
 import com.archyx.aureliumskills.lang.AbilityMessage;
 import com.archyx.aureliumskills.lang.Lang;
-import com.archyx.aureliumskills.lang.ManaAbilityMessage;
-import com.archyx.aureliumskills.mana.LightningBlade;
-import com.archyx.aureliumskills.mana.MAbility;
-import com.archyx.aureliumskills.mana.ManaAbilityManager;
 import com.archyx.aureliumskills.skills.Skills;
-import com.archyx.aureliumskills.util.math.NumberUtil;
-import com.archyx.aureliumskills.util.text.TextUtil;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -171,7 +159,6 @@ public class FightingAbilities extends AbilityProvider implements Listener {
                         if (isEnabled(Ability.BLEED)) {
                             if (event.getEntity() instanceof LivingEntity) {
                                 bleed(event, playerData, (LivingEntity) event.getEntity());
-                                applyLightningBlade(player);
                             }
                         }
                     }
@@ -179,54 +166,4 @@ public class FightingAbilities extends AbilityProvider implements Listener {
             }
         }
     }
-
-    public void applyLightningBlade(Player player) {
-        // Checks if already activated
-        ManaAbilityManager manager = plugin.getManaAbilityManager();
-        if (manager.isActivated(player.getUniqueId(), MAbility.LIGHTNING_BLADE)) {
-            return;
-        }
-        // Checks if ready
-        if (manager.isReady(player.getUniqueId(), MAbility.LIGHTNING_BLADE)) {
-            PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
-            if (playerData == null) return;
-            Locale locale = playerData.getLocale();
-            if (playerData.getMana() >= getManaCost(MAbility.LIGHTNING_BLADE, playerData)) {
-                // Calculate duration
-                double baseDuration = plugin.getManaAbilityManager().getOptionAsDouble(MAbility.LIGHTNING_BLADE, "base_duration");
-                double durationPerLevel = plugin.getManaAbilityManager().getOptionAsDouble(MAbility.LIGHTNING_BLADE, "duration_per_level");
-                double durationSeconds = baseDuration + (durationPerLevel * (playerData.getManaAbilityLevel(MAbility.LIGHTNING_BLADE) - 1));
-                manager.activateAbility(player, MAbility.LIGHTNING_BLADE, (int) Math.round(durationSeconds * 20), new LightningBlade(plugin));
-            }
-            else {
-                plugin.getAbilityManager().sendMessage(player, TextUtil.replace(Lang.getMessage(ManaAbilityMessage.NOT_ENOUGH_MANA, locale)
-                        ,"{mana}", NumberUtil.format0(plugin.getManaAbilityManager().getManaCost(MAbility.LIGHTNING_BLADE, playerData))
-                        , "{current_mana}", String.valueOf(Math.round(playerData.getMana()))
-                        , "{max_mana}", String.valueOf(Math.round(playerData.getMaxMana()))));
-            }
-        }
-    }
-
-    @EventHandler
-    public void readyLightningBlade(PlayerInteractEvent event) {
-        plugin.getManaAbilityManager().getActivator().readyAbility(event, Skills.FIGHTING, new String[] {"SWORD"}, Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR);
-    }
-
-    @EventHandler
-    public void lightningBladeJoin(PlayerJoinEvent event) {
-        // Only remove if not activated
-        Player player = event.getPlayer();
-        if (plugin.getManaAbilityManager().isActivated(player.getUniqueId(), MAbility.LIGHTNING_BLADE)) {
-            return;
-        }
-        // Remove attack speed attribute modifier
-        AttributeInstance attribute = player.getAttribute(Attribute.GENERIC_ATTACK_SPEED);
-        if (attribute == null) return;
-        for (AttributeModifier modifier : attribute.getModifiers()) {
-            if (modifier.getName().equals("AureliumSkills-LightningBlade")) {
-                attribute.removeModifier(modifier);
-            }
-        }
-    }
-
 }

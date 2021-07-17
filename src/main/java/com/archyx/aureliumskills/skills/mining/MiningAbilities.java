@@ -7,17 +7,10 @@ import com.archyx.aureliumskills.api.event.LootDropCause;
 import com.archyx.aureliumskills.api.event.PlayerLootDropEvent;
 import com.archyx.aureliumskills.configuration.OptionL;
 import com.archyx.aureliumskills.data.PlayerData;
-import com.archyx.aureliumskills.lang.Lang;
-import com.archyx.aureliumskills.lang.ManaAbilityMessage;
-import com.archyx.aureliumskills.mana.MAbility;
-import com.archyx.aureliumskills.mana.ManaAbilityManager;
-import com.archyx.aureliumskills.mana.SpeedMine;
 import com.archyx.aureliumskills.modifier.StatModifier;
 import com.archyx.aureliumskills.skills.Skills;
 import com.archyx.aureliumskills.stats.Stats;
 import com.archyx.aureliumskills.util.item.ItemUtils;
-import com.archyx.aureliumskills.util.math.NumberUtil;
-import com.archyx.aureliumskills.util.text.TextUtil;
 import com.archyx.aureliumskills.util.version.VersionUtils;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
@@ -29,14 +22,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
-import java.util.Locale;
 import java.util.Random;
 
 public class MiningAbilities extends AbilityProvider implements Listener {
@@ -127,38 +117,5 @@ public class MiningAbilities extends AbilityProvider implements Listener {
 
 	public void removeStamina(PlayerData playerData) {
 		playerData.removeStatModifier("mining-stamina");
-	}
-
-
-	public void applySpeedMine(Player player) {
-		// Checks if speed mine is already activated
-		ManaAbilityManager manager = plugin.getManaAbilityManager();
-		if (manager.isActivated(player.getUniqueId(), MAbility.SPEED_MINE)) {
-			return;
-		}
-		// Checks if speed mine is ready
-		if (manager.isReady(player.getUniqueId(), MAbility.SPEED_MINE)) {
-			//Checks if holding pickaxe
-			Material mat = player.getInventory().getItemInMainHand().getType();
-			if (mat.name().toUpperCase().contains("PICKAXE")) {
-				PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
-				if (playerData == null) return;
-				Locale locale = playerData.getLocale();
-				if (playerData.getMana() >= getManaCost(MAbility.SPEED_MINE, playerData)) {
-					manager.activateAbility(player, MAbility.SPEED_MINE, (int) (getValue(MAbility.SPEED_MINE, playerData) * 20), new SpeedMine(plugin));
-				}
-				else {
-					plugin.getAbilityManager().sendMessage(player, TextUtil.replace(Lang.getMessage(ManaAbilityMessage.NOT_ENOUGH_MANA, locale)
-							,"{mana}", NumberUtil.format0(plugin.getManaAbilityManager().getManaCost(MAbility.SPEED_MINE, playerData))
-							, "{current_mana}", String.valueOf(Math.round(playerData.getMana()))
-							, "{max_mana}", String.valueOf(Math.round(playerData.getMaxMana()))));
-				}
-			}
-		}
-	}
-
-	@EventHandler
-	public void readySpeedMine(PlayerInteractEvent event) {
-		plugin.getManaAbilityManager().getActivator().readyAbility(event, Skills.MINING, new String[] {"PICKAXE"}, Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR);
 	}
 }

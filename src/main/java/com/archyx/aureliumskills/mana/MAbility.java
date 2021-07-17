@@ -6,6 +6,7 @@ import com.archyx.aureliumskills.lang.Lang;
 import com.archyx.aureliumskills.lang.ManaAbilityMessage;
 import com.archyx.aureliumskills.skills.Skill;
 import com.archyx.aureliumskills.skills.Skills;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -15,21 +16,29 @@ import java.util.function.Supplier;
 public enum MAbility implements AbstractAbility {
 
     REPLENISH(() -> Skills.FARMING, 5.0, 5.0, 200, -5, 20, 20,
-            new String[] {"require_sneak", "check_offhand", "sneak_offhand_bypass", "replant_delay"}, new Object[] {false, true, true, 4}),
+            new String[] {"require_sneak", "check_offhand", "sneak_offhand_bypass", "replant_delay", "show_particles", "prevent_unripe_break"}, new Object[] {false, true, true, 4, true, true},
+            Replenish.class),
     TREECAPITATOR(() -> Skills.FORAGING, 5.0, 5.0, 200, -5, 20, 20,
-            new String[] {"require_sneak", "check_offhand", "sneak_offhand_bypass"}, new Object[] {false, true, true}),
+            new String[] {"require_sneak", "check_offhand", "sneak_offhand_bypass"}, new Object[] {false, true, true},
+            Treecapitator.class),
     SPEED_MINE(() -> Skills.MINING, 5.0, 5.0, 200, -5, 20 ,20,
-            new String[] {"require_sneak", "check_offhand", "sneak_offhand_bypass"}, new Object[] {false, true, true}),
+            new String[] {"require_sneak", "check_offhand", "sneak_offhand_bypass", "haste_level"}, new Object[] {false, true, true, 10},
+            SpeedMine.class),
     SHARP_HOOK(() -> Skills.FISHING, 0.5, 0.5, 2, -0.1, 5, 2,
-            new String[] {"display_damage_with_scaling", "enable_sound"}, new Object[] {true, true}),
+            new String[] {"display_damage_with_scaling", "enable_sound"}, new Object[] {true, true},
+            SharpHook.class),
     TERRAFORM(() -> Skills.EXCAVATION, 5.0, 4.0, 200, -5, 20, 20,
-            new String[] {"require_sneak", "check_offhand", "sneak_offhand_bypass"}, new Object[] {false, true, true}),
+            new String[] {"require_sneak", "check_offhand", "sneak_offhand_bypass"}, new Object[] {false, true, true},
+            Terraform.class),
     CHARGED_SHOT(() -> Skills.ARCHERY, 0.5, 0.3, 0, 0, 5, 5,
-            new String[] {"enable_message", "enable_sound"}, new Object[] {true, true}),
+            new String[] {"enable_message", "enable_sound"}, new Object[] {true, true},
+            ChargedShot.class),
     ABSORPTION(() -> Skills.DEFENSE, 2.0, 3.0, 200, -5, 10, 10,
-            new String[] {"enable_particles"}, new Object[] {true}),
+            new String[] {"enable_particles"}, new Object[] {true},
+            Absorption.class),
     LIGHTNING_BLADE(() -> Skills.FIGHTING, 5.0, 5.0, 200, -5, 20, 20,
-            new String[] {"base_duration", "duration_per_level"}, new Object[] {5.0, 4.0});
+            new String[] {"base_duration", "duration_per_level"}, new Object[] {5.0, 4.0},
+            LightningBlade.class);
 
     private final Supplier<Skill> skill;
     private final double baseValue;
@@ -39,6 +48,7 @@ public enum MAbility implements AbstractAbility {
     private final int baseManaCost;
     private final int manaCostPerLevel;
     private Map<String, OptionValue> options;
+    private Class<? extends ManaAbilityProvider> provider;
 
     MAbility(Supplier<Skill> skill, double baseValue, double valuePerLevel, double baseCooldown, double cooldownPerLevel, int baseManaCost, int manaCostPerLevel) {
         this.skill = skill;
@@ -58,6 +68,11 @@ public enum MAbility implements AbstractAbility {
                 options.put(optionKeys[i], new OptionValue(optionValues[i]));
             }
         }
+    }
+
+    MAbility(Supplier<Skill> skill, double baseValue, double valuePerLevel, double baseCooldown, double cooldownPerLevel, int baseManaCost, int manaCostPerLevel, String[] optionKeys, Object[] optionValues, Class<? extends ManaAbilityProvider> provider) {
+        this(skill, baseValue, valuePerLevel, baseCooldown, cooldownPerLevel, baseManaCost, manaCostPerLevel, optionKeys, optionValues);
+        this.provider = provider;
     }
 
     @Override
@@ -124,5 +139,9 @@ public enum MAbility implements AbstractAbility {
         return options;
     }
 
+    @Nullable
+    public Class<? extends ManaAbilityProvider> getProvider() {
+        return provider;
+    }
 
 }

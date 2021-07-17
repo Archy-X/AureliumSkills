@@ -539,6 +539,8 @@ mana_abilities:
     check_offhand: true
     sneak_offhand_bypass: true
     replant_delay: 4
+    show_particles: true
+    prevent_unripe_break: true
   treecapitator:
     enabled: true
     base_value: 5.0
@@ -567,6 +569,7 @@ mana_abilities:
     require_sneak: false
     check_offhand: true
     sneak_offhand_bypass: true
+    haste_level: 10
   sharp_hook:
     enabled: true
     base_value: 0.5
@@ -635,4 +638,4 @@ mana_abilities:
     require_sneak: false
     check_offhand: true
     sneak_offhand_bypass: true
-file_version: 6
+file_version: 7

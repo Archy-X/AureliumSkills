@@ -2,65 +2,67 @@ package com.archyx.aureliumskills.mana;
 
 import com.archyx.aureliumskills.AureliumSkills;
 import com.archyx.aureliumskills.data.PlayerData;
-import com.archyx.aureliumskills.lang.Lang;
 import com.archyx.aureliumskills.lang.ManaAbilityMessage;
-import com.archyx.aureliumskills.skills.sorcery.SorceryLeveler;
-import com.archyx.aureliumskills.util.math.NumberUtil;
-import com.archyx.aureliumskills.util.text.TextUtil;
 import com.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.particles.ParticleDisplay;
+import com.cryptomorin.xseries.particles.XParticle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
-import java.util.Locale;
+import java.awt.*;
 
-public class Absorption implements ManaAbility {
-
-    private final AureliumSkills plugin;
-    private final SorceryLeveler sorceryLeveler;
+public class Absorption extends ReadiedManaAbility {
 
     public Absorption(AureliumSkills plugin) {
-        this.plugin = plugin;
-        this.sorceryLeveler = plugin.getSorceryLeveler();
+        super(plugin, MAbility.ABSORPTION, ManaAbilityMessage.ABSORPTION_START, ManaAbilityMessage.ABSORPTION_END,
+                new String[] {"SHIELD"}, new Action[] {Action.LEFT_CLICK_AIR, Action.LEFT_CLICK_BLOCK});
     }
 
     @Override
-    public AureliumSkills getPlugin() {
-        return plugin;
+    public void onActivate(Player player, PlayerData playerData) {
+        playerData.getAbilityData(MAbility.ABSORPTION).setData("activated", true); // Register as absorption activated
+        // Play sound
+        if (XMaterial.isNewVersion()) {
+            player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 1);
+        } else {
+            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
+        }
     }
 
     @Override
-    public MAbility getManaAbility() {
-        return MAbility.ABSORPTION;
+    public void onStop(Player player, PlayerData playerData) {
+        playerData.getAbilityData(MAbility.ABSORPTION).setData("activated", false);
     }
 
-    @Override
-    public void activate(Player player) {
-        PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
-        if (playerData != null) {
-            Locale locale = playerData.getLocale();
-            playerData.getAbilityData(MAbility.ABSORPTION).setData("activated", true); // Register as absorption activated
-            // Play sound
-            if (XMaterial.isNewVersion()) {
-                player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 1);
-            } else {
-                player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
+    public void handleAbsorption(EntityDamageByEntityEvent event, Player player, PlayerData playerData) {
+        if (playerData.getAbilityData(MAbility.ABSORPTION).getBoolean("activated") && isActivated(player)) {
+            handleAbsorbedHit(event, player, playerData);
+        } else if (isReady(player)) {
+            // Activate ability if ready
+            if (isActivated(player)) {
+                return;
             }
-            // Consume mana
-            double manaConsumed = plugin.getManaAbilityManager().getManaCost(MAbility.ABSORPTION, playerData);
-            playerData.setMana(playerData.getMana() - manaConsumed);
-            // Level Sorcery
-            sorceryLeveler.level(player, manaConsumed);
-            plugin.getAbilityManager().sendMessage(player, TextUtil.replace(Lang.getMessage(ManaAbilityMessage.ABSORPTION_START, locale)
-                    ,"{mana}", NumberUtil.format0(manaConsumed)));
+            if (hasEnoughMana(player)) {
+                activate(player);
+                handleAbsorbedHit(event, player, playerData);
+            }
         }
     }
 
-    @Override
-    public void stop(Player player) {
-        PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
-        if (playerData != null) {
-            playerData.getAbilityData(MAbility.ABSORPTION).setData("activated", false);
+    private void handleAbsorbedHit(EntityDamageByEntityEvent event, Player player, PlayerData playerData) {
+        // Decrease mana and cancel event
+        double mana = playerData.getMana() - event.getDamage() * 2;
+        if (mana > 0) {
+            playerData.setMana(mana);
+            event.setCancelled(true);
+            // Particle effects and sound
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GUARDIAN_HURT, 1f, 1f);
+            if (plugin.getManaAbilityManager().getOptionAsBooleanElseTrue(MAbility.ABSORPTION, "enable_particles")) {
+                XParticle.circle(1, 1, 1, 20, 0, ParticleDisplay.colored(player.getLocation().add(0, 1, 0), Color.MAGENTA, 1));
+            }
         }
-        plugin.getAbilityManager().sendMessage(player, Lang.getMessage(ManaAbilityMessage.ABSORPTION_END, plugin.getLang().getLocale(player)));
     }
+
 }

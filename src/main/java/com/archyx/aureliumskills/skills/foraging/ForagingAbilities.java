@@ -7,37 +7,24 @@ import com.archyx.aureliumskills.api.event.LootDropCause;
 import com.archyx.aureliumskills.api.event.PlayerLootDropEvent;
 import com.archyx.aureliumskills.configuration.OptionL;
 import com.archyx.aureliumskills.data.PlayerData;
-import com.archyx.aureliumskills.lang.Lang;
-import com.archyx.aureliumskills.lang.ManaAbilityMessage;
-import com.archyx.aureliumskills.mana.MAbility;
-import com.archyx.aureliumskills.mana.Treecapitator;
 import com.archyx.aureliumskills.modifier.StatModifier;
 import com.archyx.aureliumskills.skills.Skills;
 import com.archyx.aureliumskills.stats.Stats;
 import com.archyx.aureliumskills.util.item.ItemUtils;
-import com.archyx.aureliumskills.util.math.NumberUtil;
-import com.archyx.aureliumskills.util.text.TextUtil;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Locale;
 import java.util.Random;
 
 public class ForagingAbilities extends AbilityProvider implements Listener {
@@ -131,129 +118,5 @@ public class ForagingAbilities extends AbilityProvider implements Listener {
 
 	public void removeValor(PlayerData playerData) {
 		playerData.removeStatModifier("foraging-valor");
-	}
-
-
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void applyTreecapitator(BlockBreakEvent event) {
-		if (!event.isCancelled()) {
-			//Checks if block broken is log
-			Material blockMat = event.getBlock().getType();
-			if (blockMat.equals(XMaterial.OAK_LOG.parseMaterial()) || blockMat.equals(XMaterial.BIRCH_LOG.parseMaterial()) || blockMat.equals(XMaterial.SPRUCE_LOG.parseMaterial())
-					|| blockMat.equals(XMaterial.JUNGLE_LOG.parseMaterial()) || blockMat.equals(XMaterial.ACACIA_LOG.parseMaterial()) || blockMat.equals(XMaterial.DARK_OAK_LOG.parseMaterial())) {
-				Player player = event.getPlayer();
-				//Checks if treecapitator is already activated
-				if (plugin.getManaAbilityManager().isActivated(player.getUniqueId(), MAbility.TREECAPITATOR)) {
-					return;
-				}
-				//Checks if treecaptitator is ready
-				if (plugin.getManaAbilityManager().isReady(player.getUniqueId(), MAbility.TREECAPITATOR)) {
-					//Checks if holding axe
-					Material mat = player.getInventory().getItemInMainHand().getType();
-					if (mat.name().toUpperCase().contains("_AXE")) {
-						PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
-						if (playerData == null) return;
-						Locale locale = playerData.getLocale();
-						if (playerData.getMana() >= getManaCost(MAbility.TREECAPITATOR, playerData)) {
-							plugin.getManaAbilityManager().activateAbility(player, MAbility.TREECAPITATOR, (int) (getValue(MAbility.TREECAPITATOR, playerData) * 20), new Treecapitator(plugin));
-							treeCapitator(event);
-						}
-						else {
-							plugin.getAbilityManager().sendMessage(player, Lang.getMessage(ManaAbilityMessage.NOT_ENOUGH_MANA, locale).replace("{mana}", String.valueOf(getManaCost(MAbility.TREECAPITATOR, playerData))));plugin.getAbilityManager().sendMessage(player, TextUtil.replace(Lang.getMessage(ManaAbilityMessage.NOT_ENOUGH_MANA, locale)
-									,"{mana}", NumberUtil.format0(plugin.getManaAbilityManager().getManaCost(MAbility.TREECAPITATOR, playerData))
-									, "{current_mana}", String.valueOf(Math.round(playerData.getMana()))
-									, "{max_mana}", String.valueOf(Math.round(playerData.getMaxMana()))));
-						}
-					}
-				}
-			}
-		}
-	}
-	
-	@EventHandler
-	public void treeCapitator(BlockBreakEvent event) {
-		//Checks if block broken is ore/stone
-		Material blockMat = event.getBlock().getType();
-		if (blockMat.equals(XMaterial.OAK_LOG.parseMaterial()) || blockMat.equals(XMaterial.BIRCH_LOG.parseMaterial()) || blockMat.equals(XMaterial.SPRUCE_LOG.parseMaterial())
-				|| blockMat.equals(XMaterial.JUNGLE_LOG.parseMaterial()) || blockMat.equals(XMaterial.ACACIA_LOG.parseMaterial()) || blockMat.equals(XMaterial.DARK_OAK_LOG.parseMaterial())) {
-			Player player = event.getPlayer();
-			//Checks if speed mine is already activated
-			if (plugin.getManaAbilityManager().isActivated(player.getUniqueId(), MAbility.TREECAPITATOR)) {
-				breakBlock(player, event.getBlock().getState(), 0);
-			}
-		}
-	}
-	
-	private void breakBlock(Player player, BlockState state, int num) {
-		if (num > 20) {
-			return;
-		}
-		BlockState above = state.getBlock().getRelative(BlockFace.UP).getState();
-		Material matAbove = above.getType();
-		if (matAbove.equals(XMaterial.OAK_LOG.parseMaterial()) || matAbove.equals(XMaterial.SPRUCE_LOG.parseMaterial()) || matAbove.equals(XMaterial.BIRCH_LOG.parseMaterial())
-				|| matAbove.equals(XMaterial.JUNGLE_LOG.parseMaterial()) || matAbove.equals(XMaterial.ACACIA_LOG.parseMaterial()) || matAbove.equals(XMaterial.DARK_OAK_LOG.parseMaterial())) {
-			// Break log and give XP
-			ForagingSource source = ForagingSource.getSource(above.getBlock());
-			above.getBlock().breakNaturally();
-			plugin.getLeveler().addXp(player, Skills.FORAGING, getXp(player, source, Ability.FORAGER));
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					breakBlock(player, above, num + 1);
-				}
-			}.runTaskLater(plugin, 1L);
-		}
-		else {
-			checkLeaf(player, above);
-			checkLeaf(player, above.getBlock().getRelative(BlockFace.NORTH).getState());
-			checkLeaf(player, above.getBlock().getRelative(BlockFace.SOUTH).getState());
-			checkLeaf(player, above.getBlock().getRelative(BlockFace.EAST).getState());
-			checkLeaf(player, above.getBlock().getRelative(BlockFace.WEST).getState());
-
-		}
-		checkLeaf(player, state.getBlock().getRelative(BlockFace.NORTH).getState());
-		checkLeaf(player, state.getBlock().getRelative(BlockFace.EAST).getState());
-		checkLeaf(player, state.getBlock().getRelative(BlockFace.SOUTH).getState());
-		checkLeaf(player, state.getBlock().getRelative(BlockFace.WEST).getState());
-		checkLeaf(player, state.getBlock().getRelative(BlockFace.NORTH_EAST).getState());
-		checkLeaf(player, state.getBlock().getRelative(BlockFace.NORTH_WEST).getState());
-		checkLeaf(player, state.getBlock().getRelative(BlockFace.SOUTH_EAST).getState());
-		checkLeaf(player, state.getBlock().getRelative(BlockFace.SOUTH_WEST).getState());
-		checkLeaf(player, state.getBlock().getRelative(BlockFace.NORTH_NORTH_EAST).getState());
-		checkLeaf(player, state.getBlock().getRelative(BlockFace.NORTH_NORTH_WEST).getState());
-		checkLeaf(player, state.getBlock().getRelative(BlockFace.EAST_NORTH_EAST).getState());
-		checkLeaf(player, state.getBlock().getRelative(BlockFace.EAST_SOUTH_EAST).getState());
-		checkLeaf(player, state.getBlock().getRelative(BlockFace.SOUTH_SOUTH_EAST).getState());
-		checkLeaf(player, state.getBlock().getRelative(BlockFace.SOUTH_SOUTH_WEST).getState());
-		checkLeaf(player, state.getBlock().getRelative(BlockFace.WEST_NORTH_WEST).getState());
-		checkLeaf(player, state.getBlock().getRelative(BlockFace.WEST_SOUTH_WEST).getState());
-		checkLeaf(player, state.getBlock().getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH).getState());
-		checkLeaf(player, state.getBlock().getRelative(BlockFace.EAST).getRelative(BlockFace.EAST).getState());
-		checkLeaf(player, state.getBlock().getRelative(BlockFace.SOUTH).getRelative(BlockFace.SOUTH).getState());
-		checkLeaf(player, state.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.WEST).getState());
-		checkLeaf(player, state.getBlock().getRelative(BlockFace.NORTH_NORTH_EAST).getRelative(BlockFace.EAST).getState());
-		checkLeaf(player, state.getBlock().getRelative(BlockFace.SOUTH_SOUTH_EAST).getRelative(BlockFace.EAST).getState());
-		checkLeaf(player, state.getBlock().getRelative(BlockFace.NORTH_NORTH_WEST).getRelative(BlockFace.WEST).getState());
-		checkLeaf(player, state.getBlock().getRelative(BlockFace.SOUTH_SOUTH_WEST).getRelative(BlockFace.WEST).getState());
-	}
-
-	private void checkLeaf(Player player, BlockState state) {
-		Material material = state.getType();
-		if (material.equals(XMaterial.OAK_LEAVES.parseMaterial()) || material.equals(XMaterial.SPRUCE_LEAVES.parseMaterial()) || material.equals(XMaterial.BIRCH_LEAVES.parseMaterial())
-			|| material.equals(XMaterial.JUNGLE_LEAVES.parseMaterial()) || material.equals(XMaterial.ACACIA_LEAVES.parseMaterial()) || material.equals(XMaterial.DARK_OAK_LEAVES.parseMaterial())) {
-			ForagingSource source = ForagingSource.getSource(state.getBlock());
-			state.getBlock().breakNaturally();
-			plugin.getLeveler().addXp(player, Skills.FORAGING, getXp(player, source, Ability.FORAGER));
-		}
-	}
-	
-	@EventHandler
-	public void readyTreecapitator(PlayerInteractEvent event) {
-		if (event.getPlayer().getInventory().getItemInMainHand().getType().equals(XMaterial.WOODEN_AXE.parseMaterial())) {
-			if (plugin.getServer().getPluginManager().isPluginEnabled("WorldEdit")) {
-				return;
-			}
-		}
-		plugin.getManaAbilityManager().getActivator().readyAbility(event, Skills.FORAGING, new String[]{"_AXE"}, Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK);
 	}
 }

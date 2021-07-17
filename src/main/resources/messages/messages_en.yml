@@ -66,7 +66,7 @@ abilities:
   fishing:
     lucky_catch:
       name: Lucky Catch
-      desc: '{value}% chance to get double drops\n&7  from fishing.'
+      desc: '{value}% added chance to get double drops\n&7  from fishing.'
       info: '{value}% 2x Drops'
     fisher:
       name: Fisher
@@ -74,21 +74,21 @@ abilities:
       info: '+{value}% XP'
     treasure_hunter:
       name: Treasure Hunter
-      desc: '{value}% chance to get rare loot from fishing.'
-      info: '{value}% Rare Loot'
+      desc: '{value}% higher chance to get rare loot from fishing.'
+      info: '+{value}% Rare Loot'
     grappler:
       name: Grappler
       desc: 'Hook entities with {value}% more speed.'
       info: '+{value}% Hook Speed'
     epic_catch:
       name: Epic Catch
-      desc: '{value}% chance to get epic loot\n&7  from fishing.'
-      info: '{value}% Epic Loot'
+      desc: '{value}% added chance to get epic loot\n&7  from fishing.'
+      info: '+{value}% Epic Loot'
   excavation:
     metal_detector:
       name: Metal Detector
-      desc: '{value}% chance to get rare loot from digging.'
-      info: '{value}% Rare Loot'
+      desc: '{value}% added chance to get rare loot from digging.'
+      info: '+{value}% Rare Loot'
     excavator:
       name: Excavator
       desc: 'Earn {value}% more Excavation XP'
@@ -103,8 +103,8 @@ abilities:
       info: '{value}% 3x Drops'
     lucky_spades:
       name: Lucky Spades
-      desc: '{value}% chance to get epic loot from digging.'
-      info: '{value}% Epic Loot'
+      desc: '{value}% added chance to get epic loot from digging.'
+      info: '+{value}% Epic Loot'
   archery:
     crit_chance:
       name: Crit Chance
@@ -605,7 +605,7 @@ mana_abilities:
     end: '&7Treecapitator has worn off'
   speed_mine:
     name: Speed Mine
-    desc: '&7Gives Haste 10 for {value} seconds.\n&e  [Right click pickaxe and mine\n&e  block to activate]'
+    desc: '&7Gives Haste {haste_level} for {value} seconds.\n&e  [Right click pickaxe and mine\n&e  block to activate]'
     raise: '&7You raise your pickaxe'
     lower: '&7You lower your pickaxe'
     start: '&6Speed Mine Activated! &7(-{mana} {mana_unit})'

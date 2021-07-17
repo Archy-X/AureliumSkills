@@ -1,61 +1,44 @@
 package com.archyx.aureliumskills.loot;
 
-import org.bukkit.inventory.ItemStack;
+import com.archyx.aureliumskills.AureliumSkills;
+import com.archyx.aureliumskills.source.Source;
 
-import java.util.Random;
+import java.util.Set;
 
-public class Loot {
+public abstract class Loot {
 
-	private ItemStack item;
-	private String command;
-	private int minAmount;
-	private int maxAmount;
-	private final Random r = new Random();
-	
-	public Loot(ItemStack item, int minAmount, int maxAmount) {
-		this.item = item;
-		this.minAmount = minAmount;
-		this.maxAmount = maxAmount;
-	}
+    protected final AureliumSkills plugin;
+    protected final int weight;
+    protected final String message;
+    protected final double xp;
+    protected final Set<Source> sources;
 
-	public Loot(String command) {
-		this.command = command;
-	}
+    public Loot(AureliumSkills plugin, int weight, String message, double xp, Set<Source> sources) {
+        this.plugin = plugin;
+        this.weight = weight;
+        this.message = message;
+        this.xp = xp;
+        this.sources = sources;
+    }
 
-	public ItemStack getItem() {
-		return item;
-	}
-	
-	public int getMinAmount() {
-		return minAmount;
-	}
-	
-	public int getMaxAmount() {
-		return maxAmount;
-	}
-	
-	public ItemStack getDrop() {
-		ItemStack drop = item.clone();
-		int amount = r.nextInt(maxAmount - minAmount + 1) + minAmount;
-		if (amount != 0) {
-			drop.setAmount(amount);
-			return drop;
-		}
-		else {
-			return null;
-		}
-	}
+    public int getWeight() {
+        return weight;
+    }
 
-	public boolean hasItem() {
-		return item != null;
-	}
+    public String getMessage() {
+        return message;
+    }
 
-	public String getCommand() {
-		return command;
-	}
+    /**
+     * Gets the amount of Skill XP to reward
+     * @return The amount of XP, -1 if not specified
+     */
+    public double getXp() {
+        return xp;
+    }
 
-	public boolean hasCommand() {
-		return command != null;
-	}
+    public Set<Source> getSources() {
+        return sources;
+    }
 
 }

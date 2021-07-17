@@ -58,20 +58,24 @@ import com.archyx.aureliumskills.skills.endurance.EnduranceAbilities;
 import com.archyx.aureliumskills.skills.endurance.EnduranceLeveler;
 import com.archyx.aureliumskills.skills.excavation.ExcavationAbilities;
 import com.archyx.aureliumskills.skills.excavation.ExcavationLeveler;
+import com.archyx.aureliumskills.skills.excavation.ExcavationLootHandler;
 import com.archyx.aureliumskills.skills.farming.FarmingAbilities;
 import com.archyx.aureliumskills.skills.farming.FarmingLeveler;
 import com.archyx.aureliumskills.skills.fighting.FightingAbilities;
 import com.archyx.aureliumskills.skills.fighting.FightingLeveler;
 import com.archyx.aureliumskills.skills.fishing.FishingAbilities;
 import com.archyx.aureliumskills.skills.fishing.FishingLeveler;
+import com.archyx.aureliumskills.skills.fishing.FishingLootHandler;
 import com.archyx.aureliumskills.skills.foraging.ForagingAbilities;
 import com.archyx.aureliumskills.skills.foraging.ForagingLeveler;
+import com.archyx.aureliumskills.skills.foraging.ForagingLootHandler;
 import com.archyx.aureliumskills.skills.forging.ForgingAbilities;
 import com.archyx.aureliumskills.skills.forging.ForgingLeveler;
 import com.archyx.aureliumskills.skills.healing.HealingAbilities;
 import com.archyx.aureliumskills.skills.healing.HealingLeveler;
 import com.archyx.aureliumskills.skills.mining.MiningAbilities;
 import com.archyx.aureliumskills.skills.mining.MiningLeveler;
+import com.archyx.aureliumskills.skills.mining.MiningLootHandler;
 import com.archyx.aureliumskills.skills.sorcery.SorceryLeveler;
 import com.archyx.aureliumskills.source.SourceManager;
 import com.archyx.aureliumskills.source.SourceRegistry;
@@ -149,6 +153,7 @@ public class AureliumSkills extends JavaPlugin {
 	private RegionManager regionManager;
 	private StatRegistry statRegistry;
 	private SkillRegistry skillRegistry;
+	private ExcavationAbilities excavationAbilities;
 	private LuckPermsSupport luckPermsSupport;
 	private SourceRegistry sourceRegistry;
 	private ItemRegistry itemRegistry;
@@ -525,7 +530,8 @@ public class AureliumSkills extends JavaPlugin {
 		pm.registerEvents(new ForagingAbilities(this), this);
 		pm.registerEvents(new MiningAbilities(this), this);
 		pm.registerEvents(new FishingAbilities(this), this);
-		pm.registerEvents(new ExcavationAbilities(this), this);
+		excavationAbilities = new ExcavationAbilities(this);
+		pm.registerEvents(excavationAbilities, this);
 		pm.registerEvents(new ArcheryAbilities(this), this);
 		DefenseAbilities defenseAbilities = new DefenseAbilities(this);
 		pm.registerEvents(defenseAbilities, this);
@@ -552,6 +558,10 @@ public class AureliumSkills extends JavaPlugin {
 		this.actionBar = new ActionBar(this);
 		pm.registerEvents(actionBar, this);
 		pm.registerEvents(new RegionListener(this), this);
+		pm.registerEvents(new FishingLootHandler(this), this);
+		pm.registerEvents(new ExcavationLootHandler(this), this);
+		pm.registerEvents(new MiningLootHandler(this), this);
+		pm.registerEvents(new ForagingLootHandler(this), this);
 	}
 
 	private boolean setupEconomy() {
@@ -751,6 +761,10 @@ public class AureliumSkills extends JavaPlugin {
 
 	public SkillRegistry getSkillRegistry() {
 		return skillRegistry;
+	}
+
+	public ExcavationAbilities getExcavationAbilities() {
+		return excavationAbilities;
 	}
 
 	public LuckPermsSupport getLuckPermsSupport() {

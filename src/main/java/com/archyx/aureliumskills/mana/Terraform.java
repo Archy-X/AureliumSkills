@@ -1,54 +1,102 @@
 package com.archyx.aureliumskills.mana;
 
 import com.archyx.aureliumskills.AureliumSkills;
+import com.archyx.aureliumskills.api.event.TerraformBlockBreakEvent;
+import com.archyx.aureliumskills.configuration.OptionL;
 import com.archyx.aureliumskills.data.PlayerData;
-import com.archyx.aureliumskills.lang.Lang;
 import com.archyx.aureliumskills.lang.ManaAbilityMessage;
-import com.archyx.aureliumskills.skills.sorcery.SorceryLeveler;
-import com.archyx.aureliumskills.util.math.NumberUtil;
+import com.archyx.aureliumskills.skills.Skills;
+import com.archyx.aureliumskills.skills.excavation.ExcavationSource;
+import com.archyx.aureliumskills.source.SourceTag;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 
-import java.util.Locale;
+import java.util.LinkedList;
 
-public class Terraform implements ManaAbility {
-
-    private final AureliumSkills plugin;
-    private final SorceryLeveler sorceryLeveler;
+public class Terraform extends ReadiedManaAbility {
 
     public Terraform(AureliumSkills plugin) {
-        this.plugin = plugin;
-        this.sorceryLeveler = plugin.getSorceryLeveler();
+        super(plugin, MAbility.TERRAFORM, ManaAbilityMessage.TERRAFORM_START, ManaAbilityMessage.TERRAFORM_END,
+                new String[]{"SHOVEL", "SPADE"}, new Action[]{Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR});
     }
 
     @Override
-    public AureliumSkills getPlugin() {
-        return plugin;
+    public void onActivate(Player player, PlayerData playerData) {
+        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
     }
 
     @Override
-    public MAbility getManaAbility() {
-        return MAbility.TERRAFORM;
+    public void onStop(Player player, PlayerData playerData) {
+
     }
 
-    @Override
-    public void activate(Player player) {
-        PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
-        if (playerData != null) {
-            Locale locale = playerData.getLocale();
-            //Play sound
-            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-            //Consume mana
-            double manaConsumed = plugin.getManaAbilityManager().getManaCost(MAbility.TERRAFORM, playerData);
-            playerData.setMana(playerData.getMana() - manaConsumed);
-            // Level Sorcery
-            sorceryLeveler.level(player, manaConsumed);
-            plugin.getAbilityManager().sendMessage(player, Lang.getMessage(ManaAbilityMessage.TERRAFORM_START, locale).replace("{mana}", NumberUtil.format0(manaConsumed)));
+    @EventHandler
+    public void onBreak(BlockBreakEvent event) {
+        if (!OptionL.isEnabled(Skills.EXCAVATION)) return;
+        if (event.isCancelled()) return;
+        Player player = event.getPlayer();
+        Block block = event.getBlock();
+        if (blockAbility(player)) return;
+        if (!plugin.getAbilityManager().isEnabled(MAbility.TERRAFORM)) return;
+        if (!block.hasMetadata("AureliumSkills-Terraform") && event.getClass() == BlockBreakEvent.class) {
+            applyTerraform(player, block);
         }
     }
 
-    @Override
-    public void stop(Player player) {
-        plugin.getAbilityManager().sendMessage(player, Lang.getMessage(ManaAbilityMessage.TERRAFORM_END, plugin.getLang().getLocale(player)));
+    private void applyTerraform(Player player, Block block) {
+        // Check if block is applicable to ability
+        ExcavationSource source = ExcavationSource.getSource(block);
+        if (source == null) return;
+        if (!hasTag(source, SourceTag.TERRAFORM_APPLICABLE)) return;
+        // Apply if activated
+        if (isActivated(player)) {
+            terraformBreak(player, block);
+            return;
+        }
+        //Checks if speed mine is ready
+        if (isReady(player) && isHoldingMaterial(player) && hasEnoughMana(player)) {
+            activate(player);
+            terraformBreak(player, block);
+        }
     }
+
+    private void terraformBreak(Player player, Block block) {
+        Material material = block.getType();
+        BlockFace[] faces = new BlockFace[] {BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
+        LinkedList<Block> toCheck = new LinkedList<>();
+        toCheck.add(block);
+        int count = 0;
+        while ((block = toCheck.poll()) != null && count < 61) {
+            if (block.getType() == material) {
+                block.setMetadata("AureliumSkills-Terraform", new FixedMetadataValue(plugin, true));
+                breakBlock(player, block);
+                for (BlockFace face : faces) {
+                    toCheck.add(block.getRelative(face));
+                }
+                count++;
+            }
+        }
+    }
+
+    private void breakBlock(Player player, Block block) {
+        if (!plugin.getTownySupport().canBreak(player, block)) {
+            block.removeMetadata("AureliumSkills-Terraform", plugin);
+            return;
+        }
+        TerraformBlockBreakEvent event = new TerraformBlockBreakEvent(block, player);
+        Bukkit.getPluginManager().callEvent(event);
+        if (!event.isCancelled()) {
+            block.breakNaturally(player.getInventory().getItemInMainHand());
+        }
+        block.removeMetadata("AureliumSkills-Terraform", plugin);
+    }
+
 }

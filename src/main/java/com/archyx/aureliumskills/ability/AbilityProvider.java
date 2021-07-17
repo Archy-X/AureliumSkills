@@ -16,10 +16,12 @@ import java.util.Locale;
 public abstract class AbilityProvider {
 
     public final AureliumSkills plugin;
+    protected final Skill skill;
     private final String skillName;
 
     public AbilityProvider(AureliumSkills plugin, Skill skill) {
         this.plugin = plugin;
+        this.skill = skill;
         this.skillName = skill.toString().toLowerCase(Locale.ENGLISH);
     }
 

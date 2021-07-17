@@ -1,7 +1,7 @@
 package com.archyx.aureliumskills.rewards.parser;
 
 import com.archyx.aureliumskills.AureliumSkills;
-import com.archyx.aureliumskills.rewards.CommandReward.CommandExecutor;
+import com.archyx.aureliumskills.commands.CommandExecutor;
 import com.archyx.aureliumskills.rewards.Reward;
 import com.archyx.aureliumskills.rewards.builder.CommandRewardBuilder;
 

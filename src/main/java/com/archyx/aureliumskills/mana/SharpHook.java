@@ -1,57 +1,137 @@
 package com.archyx.aureliumskills.mana;
 
 import com.archyx.aureliumskills.AureliumSkills;
+import com.archyx.aureliumskills.configuration.OptionL;
 import com.archyx.aureliumskills.data.PlayerData;
 import com.archyx.aureliumskills.lang.Lang;
 import com.archyx.aureliumskills.lang.ManaAbilityMessage;
-import com.archyx.aureliumskills.skills.sorcery.SorceryLeveler;
+import com.archyx.aureliumskills.skills.Skills;
 import com.archyx.aureliumskills.util.math.NumberUtil;
 import com.archyx.aureliumskills.util.text.TextUtil;
 import com.cryptomorin.xseries.XMaterial;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.FishHook;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.Locale;
 
-public class SharpHook implements ManaAbility {
-
-    private final SorceryLeveler sorceryLeveler;
-    private final AureliumSkills plugin;
+public class SharpHook extends ManaAbilityProvider {
 
     public SharpHook(AureliumSkills plugin) {
-        this.plugin = plugin;
-        this.sorceryLeveler = plugin.getSorceryLeveler();
+        super(plugin, MAbility.SHARP_HOOK, ManaAbilityMessage.SHARP_HOOK_USE, null);
     }
 
     @Override
-    public AureliumSkills getPlugin() {
-        return plugin;
-    }
-
-    @Override
-    public MAbility getManaAbility() {
-        return MAbility.SHARP_HOOK;
-    }
-
-    @Override
-    public void activate(Player player) {
-        PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
-        if (playerData != null) {
-            Locale locale = playerData.getLocale();
-            //Consume mana
-            double manaConsumed = plugin.getManaAbilityManager().getManaCost(MAbility.SHARP_HOOK, playerData);
-            playerData.setMana(playerData.getMana() - manaConsumed);
-            // Level Sorcery
-            sorceryLeveler.level(player, manaConsumed);
-            plugin.getAbilityManager().sendMessage(player, TextUtil.replace(Lang.getMessage(ManaAbilityMessage.SHARP_HOOK_USE, locale), "{mana}", NumberUtil.format0(manaConsumed)));
-            if (plugin.getManaAbilityManager().getOptionAsBooleanElseTrue(MAbility.SHARP_HOOK, "enable_sound")) {
-                if (XMaterial.isNewVersion()) {
-                    player.playSound(player.getLocation(), Sound.ENTITY_FISHING_BOBBER_RETRIEVE, 1f, 1.5f);
-                } else {
-                    player.playSound(player.getLocation(), "entity.bobber.retrieve", 1f, 1.5f);
-                }
+    public void onActivate(Player player, PlayerData playerData) {
+        if (plugin.getManaAbilityManager().getOptionAsBooleanElseTrue(MAbility.SHARP_HOOK, "enable_sound")) {
+            if (XMaterial.isNewVersion()) {
+                player.playSound(player.getLocation(), Sound.ENTITY_FISHING_BOBBER_RETRIEVE, 1f, 1.5f);
+            } else {
+                player.playSound(player.getLocation(), "entity.bobber.retrieve", 1f, 1.5f);
             }
         }
     }
 
+    @Override
+    public void onStop(Player player, PlayerData playerData) {
+
+    }
+
+    @EventHandler
+    public void sharpHook(PlayerInteractEvent event) {
+        if (!OptionL.isEnabled(Skills.FISHING) || !plugin.getAbilityManager().isEnabled(MAbility.SHARP_HOOK)) return;
+        Player player = event.getPlayer();
+        if (blockAbility(player)) return;
+        PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+        if (playerData == null) {
+            return;
+        }
+        if (playerData.getManaAbilityLevel(MAbility.SHARP_HOOK) <= 0) {
+            return;
+        }
+        // If left click
+        if (event.getAction() != Action.LEFT_CLICK_AIR && event.getAction() != Action.LEFT_CLICK_BLOCK) return;
+        ItemStack item = event.getItem();
+        if (item == null || item.getType() != Material.FISHING_ROD) return;
+        // Check for player just casting rod
+        for (Entity entity : player.getNearbyEntities(0.1, 0.1, 0.1)) {
+            if (entity instanceof FishHook) {
+                FishHook fishHook = (FishHook) entity;
+                ProjectileSource source = fishHook.getShooter();
+                if (fishHook.isValid() && source instanceof Player) {
+                    if (source.equals(player)) {
+                        return;
+                    }
+                }
+            }
+        }
+        // Check entities
+        for (Entity entity : player.getNearbyEntities(33, 33 ,33)) {
+            if (!(entity instanceof FishHook)) continue;
+            FishHook fishHook = (FishHook) entity;
+            ProjectileSource source = fishHook.getShooter();
+            if (fishHook.isValid() && source instanceof Player) {
+                if (!source.equals(player)) continue;
+                for (Entity hooked : fishHook.getNearbyEntities(0.1, 0.1, 0.1)) {
+                    if (hooked instanceof LivingEntity) {
+                        LivingEntity livingEntity = (LivingEntity) hooked;
+                        if (!livingEntity.isDead() && livingEntity.isValid()) {
+                            int cooldown = manager.getPlayerCooldown(player.getUniqueId(), MAbility.SHARP_HOOK);
+                            if (cooldown == 0) {
+                                if (areValidLocations(player, livingEntity)) { // Check that the locations of the entities are valid
+                                    activateSharpHook(player, playerData, livingEntity);
+                                }
+                            } else {
+                                if (manager.getErrorTimer(player.getUniqueId(), MAbility.SHARP_HOOK) == 0) {
+                                    Locale locale = playerData.getLocale();
+                                    plugin.getAbilityManager().sendMessage(player, TextUtil.replace(Lang.getMessage(ManaAbilityMessage.NOT_READY, locale), "{cooldown}", NumberUtil.format1((double) (cooldown) / 20)));
+                                    manager.setErrorTimer(player.getUniqueId(), MAbility.SHARP_HOOK, 2);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    private void activateSharpHook(Player player, PlayerData playerData, LivingEntity caught) {
+        if (hasEnoughMana(player)) {
+            double damage = plugin.getManaAbilityManager().getValue(MAbility.SHARP_HOOK, playerData);
+            caught.damage(damage, player);
+            activate(player);
+        }
+    }
+
+    private boolean areValidLocations(Player damager, LivingEntity hooked) {
+        Location damagerLocation = damager.getLocation();
+        Location hookedLocation = hooked.getLocation();
+        // Disallow if in different worlds
+        World damagerWorld = damagerLocation.getWorld();
+        World hookedWorld = hookedLocation.getWorld();
+        if (damagerWorld != null & hookedWorld != null) {
+            if (!damagerWorld.equals(hookedWorld)) {
+                return false;
+            }
+        }
+        // Disallow if more than 33 blocks away
+        return !(damagerLocation.distanceSquared(hookedLocation) > 1089);
+    }
+
+    @Override
+    protected int getDuration(PlayerData playerData) {
+        return 0;
+    }
 }

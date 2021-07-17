@@ -1,7 +1,6 @@
 package com.archyx.aureliumskills.mana;
 
 import com.archyx.aureliumskills.AureliumSkills;
-import com.archyx.aureliumskills.api.event.ManaAbilityActivateEvent;
 import com.archyx.aureliumskills.configuration.Option;
 import com.archyx.aureliumskills.configuration.OptionL;
 import com.archyx.aureliumskills.configuration.OptionValue;
@@ -15,6 +14,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class ManaAbilityManager implements Listener {
@@ -24,8 +25,7 @@ public class ManaAbilityManager implements Listener {
     private final Map<UUID, Map<MAbility, Boolean>> activated;
     private final Map<UUID, Map<MAbility, Integer>> errorTimer;
 
-    private final Map<UUID, List<ManaAbility>> activeAbilities;
-    private final ManaAbilityActivator activator;
+    private final Map<MAbility, ManaAbilityProvider> providers;
 
     private final AureliumSkills plugin;
 
@@ -35,17 +35,42 @@ public class ManaAbilityManager implements Listener {
         ready = new HashMap<>();
         activated = new HashMap<>();
         errorTimer = new HashMap<>();
-        activeAbilities = new HashMap<>();
-        activator = new ManaAbilityActivator(plugin);
+        providers = new HashMap<>();
     }
 
     public void init() {
+        registerProviders();
         startTimer();
-        startUpdating();
     }
 
-    public ManaAbilityActivator getActivator() {
-        return activator;
+    private void registerProviders() {
+        for (MAbility mAbility : MAbility.values()) {
+            Class<? extends ManaAbilityProvider> providerClass = mAbility.getProvider();
+            if (providerClass != null) {
+                try {
+                    Constructor<? extends ManaAbilityProvider> constructor = providerClass.getConstructor(AureliumSkills.class);
+                    ManaAbilityProvider provider = constructor.newInstance(plugin);
+                    register(provider);
+                    providers.put(mAbility, provider);
+                } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                    plugin.getLogger().warning("Failed to register mana ability provider for " + mAbility.toString().toLowerCase(Locale.ROOT));
+                }
+            }
+        }
+    }
+
+    private void register(ManaAbilityProvider provider) {
+        Bukkit.getPluginManager().registerEvents(provider, plugin);
+    }
+
+    @Nullable
+    public ManaAbilityProvider getProvider(MAbility mAbility) {
+        return providers.get(mAbility);
+    }
+
+    public void setActivated(Player player, MAbility mAbility, boolean isActivated) {
+        Map<MAbility, Boolean> map = activated.computeIfAbsent(player.getUniqueId(), k -> new HashMap<>());
+        map.put(mAbility, isActivated);
     }
 
     //Sets cooldown
@@ -140,56 +165,10 @@ public class ManaAbilityManager implements Listener {
         }
     }
 
-    //Activates an ability
-    public void activateAbility(Player player, MAbility ability, int durationTicks, ManaAbility manaAbility) {
-        ManaAbilityActivateEvent event = new ManaAbilityActivateEvent(player, ability, durationTicks);
-        Bukkit.getPluginManager().callEvent(event);
-        if (!event.isCancelled()) {
-            activated.computeIfAbsent(player.getUniqueId(), k -> new HashMap<>()).put(ability, true);
-            activeAbilities.computeIfAbsent(player.getUniqueId(), k -> new LinkedList<>()).add(manaAbility);
-            manaAbility.activate(player);
-            int duration = event.getDuration();
-            if (duration != 0) {
-                //Schedules stop
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        manaAbility.onStop(player);
-                        activeAbilities.computeIfAbsent(player.getUniqueId(), k -> new LinkedList<>()).remove(manaAbility);
-                        activated.computeIfAbsent(player.getUniqueId(), k -> new HashMap<>()).put(ability, false);
-                        ready.computeIfAbsent(player.getUniqueId(), k -> new HashMap<>()).put(ability, false);
-                    }
-                }.runTaskLater(plugin, duration);
-            } else {
-                manaAbility.onStop(player);
-                activeAbilities.computeIfAbsent(player.getUniqueId(), k -> new LinkedList<>()).remove(manaAbility);
-                activated.computeIfAbsent(player.getUniqueId(), k -> new HashMap<>()).put(ability, false);
-                ready.computeIfAbsent(player.getUniqueId(), k -> new HashMap<>()).put(ability, false);
-            }
-        }
-    }
-
     //Sets ability ready status
     public void setReady(UUID id, MAbility ability, boolean isReady) {
         Map<MAbility, Boolean> readyMap = ready.computeIfAbsent(id, k -> new HashMap<>());
         readyMap.put(ability, isReady);
-    }
-
-    private void startUpdating() {
-        //Updates active abilities
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (UUID id : activeAbilities.keySet()) {
-                    for (ManaAbility ab : activeAbilities.get(id)) {
-                        Player player = Bukkit.getPlayer(id);
-                        if (player != null) {
-                            ab.update(player);
-                        }
-                    }
-                }
-            }
-        }.runTaskTimer(plugin, 0L, 1L);
     }
 
     private void startTimer() {
@@ -245,9 +224,6 @@ public class ManaAbilityManager implements Listener {
         }
         if (!errorTimer.containsKey(id)) {
             errorTimer.put(id, new HashMap<>());
-        }
-        if (!activeAbilities.containsKey(id)) {
-            activeAbilities.put(id, new LinkedList<>());
         }
     }
 

@@ -1,27 +1,29 @@
 package com.archyx.aureliumskills.loot;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
 public class LootTable {
+
+	private final List<LootPool> pools;
 	
-	private List<Loot> loot;
-	private String id;
-	
-	public LootTable(String id, List<Loot> loot) {
-		this.loot = loot;
-		this.id = id;
+	public LootTable(List<LootPool> pools) {
+		this.pools = pools;
 	}
 
-	public List<Loot> getLoot() {
-		return loot;
+	@Nullable
+	public LootPool getPool(String name) {
+		for (LootPool pool : pools) {
+			if (pool.getName().equals(name)) {
+				return pool;
+			}
+		}
+		return null;
 	}
-	
-	public String getId() {
-		return id;
+
+	public List<LootPool> getPools() {
+		return pools;
 	}
-	
-	public void setLoot(List<Loot> loot) {
-		this.loot = loot;
-	}
-	
+
 }
