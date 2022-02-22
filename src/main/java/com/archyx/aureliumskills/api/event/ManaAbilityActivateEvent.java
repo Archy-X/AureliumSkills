@@ -6,6 +6,9 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Called when a mana ability is activated by a player
+ */
 public class ManaAbilityActivateEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();

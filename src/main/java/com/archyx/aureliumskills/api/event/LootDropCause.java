@@ -1,5 +1,8 @@
 package com.archyx.aureliumskills.api.event;
 
+/**
+ * The ability or mechanic that caused item loot to be dropped on the ground
+ */
 public enum LootDropCause {
 
     BOUNTIFUL_HARVEST,

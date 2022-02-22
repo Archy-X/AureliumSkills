@@ -17,6 +17,9 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
+/**
+ * Main Aurelium Skills API class with useful static methods
+ */
 public class AureliumAPI {
 
     private static AureliumSkills plugin;

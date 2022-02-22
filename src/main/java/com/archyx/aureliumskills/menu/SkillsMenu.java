@@ -1,6 +1,8 @@
 package com.archyx.aureliumskills.menu;
 
 import com.archyx.aureliumskills.AureliumSkills;
+import com.archyx.aureliumskills.api.event.MenuInitializeEvent;
+import com.archyx.aureliumskills.api.event.MenuOpenEvent;
 import com.archyx.aureliumskills.configuration.OptionL;
 import com.archyx.aureliumskills.data.PlayerData;
 import com.archyx.aureliumskills.lang.Lang;
@@ -16,6 +18,7 @@ import fr.minuskube.inv.ClickableItem;
 import fr.minuskube.inv.SmartInventory;
 import fr.minuskube.inv.content.InventoryContents;
 import fr.minuskube.inv.content.InventoryProvider;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -95,6 +98,9 @@ public class SkillsMenu implements InventoryProvider{
 		if (OptionL.isEnabled(Skills.FORGING)) {
 			contents.set(skillTemplate.getPosition(Skills.FORGING), ClickableItem.of(skillTemplate.getItem(Skills.FORGING, playerData, player, locale), e -> open(player, playerData, Skills.FORGING)));
 		}
+		// Call API event
+		MenuInitializeEvent event = new MenuInitializeEvent(player, MenuType.SKILLS, contents);
+		Bukkit.getPluginManager().callEvent(event);
 	}
 
 	public void update(Player player, InventoryContents contents) {
@@ -113,10 +119,11 @@ public class SkillsMenu implements InventoryProvider{
 	private void open(Player player, PlayerData playerData, Skill skill) {
 		if (player.hasPermission("aureliumskills." + skill.name().toLowerCase(Locale.ENGLISH))) {
 			int page = getPage(skill, playerData);
-			SmartInventory inventory  = LevelProgressionMenu.getInventory(player, skill, page, plugin);
-			if (inventory != null) {
-				inventory.open(player, page);
-			}
+			SmartInventory inventory  = LevelProgressionMenu.getInventory(playerData, skill, page, plugin);
+			MenuOpenEvent event = new MenuOpenEvent(player, MenuType.LEVEL_PROGRESSION);
+			Bukkit.getPluginManager().callEvent(event);
+			if (event.isCancelled()) return;
+			inventory.open(player, page);
 		}
 	}
 

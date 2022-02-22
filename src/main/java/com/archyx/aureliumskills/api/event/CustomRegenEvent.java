@@ -5,6 +5,10 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Called when a player regenerates health with custom regen mechanics turned on in
+ * the config
+ */
 public class CustomRegenEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();

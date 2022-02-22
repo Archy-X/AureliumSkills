@@ -1,52 +1,43 @@
 package com.archyx.aureliumskills.api.event;
 
-import com.archyx.aureliumskills.skills.Skill;
+import com.archyx.aureliumskills.menu.MenuType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Called whenever a player gains Skill XP
+ * Event when a player opens an Aurelium Skills menu, either through commands or switching from another.
+ * Calls before the menu is actually opened. Will not call when changing pages in the same menu type.
  */
-public class XpGainEvent extends Event {
+public class MenuOpenEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
 
     private final Player player;
-    private final Skill skill;
-    private double amount;
-    private boolean isCancelled;
+    private final MenuType type;
+    private boolean cancelled;
 
-    public XpGainEvent(Player player, Skill skill, double amount) {
+    public MenuOpenEvent(Player player, MenuType type) {
         this.player = player;
-        this.skill = skill;
-        this.amount = amount;
-        this.isCancelled = false;
+        this.type = type;
+        this.cancelled = false;
     }
 
     public Player getPlayer() {
         return player;
     }
 
-    public Skill getSkill() {
-        return skill;
-    }
-
-    public double getAmount() {
-        return amount;
-    }
-
-    public void setAmount(double amount) {
-        this.amount = amount;
+    public MenuType getType() {
+        return type;
     }
 
     public boolean isCancelled() {
-        return isCancelled;
+        return cancelled;
     }
 
     public void setCancelled(boolean cancelled) {
-        this.isCancelled = cancelled;
+        this.cancelled = cancelled;
     }
 
     @NotNull
@@ -58,4 +49,5 @@ public class XpGainEvent extends Event {
     public static HandlerList getHandlerList() {
         return handlers;
     }
+
 }
