@@ -1,5 +1,7 @@
 package com.archyx.aureliumskills.region;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -8,7 +10,7 @@ public class ChunkData {
     private final Region region;
     private final byte x;
     private final byte z;
-    private final ConcurrentMap<BlockPosition, BlockPosition> placedBlocks;
+    private final @NotNull ConcurrentMap<BlockPosition, BlockPosition> placedBlocks;
 
     public ChunkData(Region region, byte x, byte z) {
         this.region = region;
@@ -33,7 +35,7 @@ public class ChunkData {
         return placedBlocks.containsKey(blockPosition);
     }
 
-    public ConcurrentMap<BlockPosition, BlockPosition> getPlacedBlocks() {
+    public @NotNull ConcurrentMap<BlockPosition, BlockPosition> getPlacedBlocks() {
         return placedBlocks;
     }
 

@@ -7,6 +7,8 @@ import com.archyx.aureliumskills.util.item.ItemUtils;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public enum EnchantingSource implements Source {
 
@@ -15,27 +17,27 @@ public enum EnchantingSource implements Source {
     TOOL_PER_LEVEL("DIAMOND_PICKAXE"),
     BOOK_PER_LEVEL("ENCHANTED_BOOK");
 
-    private final String material;
+    private final @NotNull String material;
 
-    EnchantingSource(String material) {
+    EnchantingSource(@NotNull String material) {
         this.material = material;
     }
 
     @Override
-    public Skill getSkill() {
+    public @NotNull Skill getSkill() {
         return Skills.ENCHANTING;
     }
 
     @Override
-    public String getUnitName() {
+    public @NotNull String getUnitName() {
         return "enchant_level";
     }
 
     @Override
-    public ItemStack getMenuItem() {
-        ItemStack item = ItemUtils.parseItem(material);
+    public @Nullable ItemStack getMenuItem() {
+        @Nullable ItemStack item = ItemUtils.parseItem(material);
         if (item != null) {
-            ItemMeta meta = item.getItemMeta();
+            @Nullable ItemMeta meta = item.getItemMeta();
             if (meta != null && (ItemUtils.isArmor(item.getType()) || ItemUtils.isWeapon(item.getType()) || ItemUtils.isTool(item.getType()))) {
                 meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
                 item.setItemMeta(meta);

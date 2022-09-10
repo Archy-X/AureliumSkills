@@ -7,21 +7,21 @@ import org.jetbrains.annotations.NotNull;
 
 public class CustomRegenEvent extends Event {
 
-    private static final HandlerList handlers = new HandlerList();
+    private static final @NotNull HandlerList handlers = new HandlerList();
 
-    private final Player player;
+    private final @NotNull Player player;
     private double amount;
     private boolean isCancelled;
-    private final RegenReason reason;
+    private final @NotNull RegenReason reason;
 
-    public CustomRegenEvent(Player player, double amount, RegenReason reason) {
+    public CustomRegenEvent(@NotNull Player player, double amount, @NotNull RegenReason reason) {
         this.player = player;
         this.amount = amount;
         this.reason = reason;
         this.isCancelled = false;
     }
 
-    public Player getPlayer() {
+    public @NotNull Player getPlayer() {
         return player;
     }
 
@@ -33,7 +33,7 @@ public class CustomRegenEvent extends Event {
         this.amount = amount;
     }
 
-    public RegenReason getReason() {
+    public @NotNull RegenReason getReason() {
         return reason;
     }
 
@@ -45,13 +45,12 @@ public class CustomRegenEvent extends Event {
         this.isCancelled = cancelled;
     }
 
-    @NotNull
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return handlers;
     }
 
-    public static HandlerList getHandlerList() {
+    public static @NotNull HandlerList getHandlerList() {
         return handlers;
     }
 }

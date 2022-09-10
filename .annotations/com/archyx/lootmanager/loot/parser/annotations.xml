@@ -1,0 +1,11 @@
+<root>
+    <item name='com.archyx.lootmanager.loot.parser.CustomItemParser boolean shouldUseParser(java.util.Map&lt;?,?&gt;) 0'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.lootmanager.loot.parser.CustomItemParser org.bukkit.inventory.ItemStack parseCustomItem(java.util.Map&lt;?,?&gt;)'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.lootmanager.loot.parser.CustomItemParser org.bukkit.inventory.ItemStack parseCustomItem(java.util.Map&lt;?,?&gt;) 0'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+</root>

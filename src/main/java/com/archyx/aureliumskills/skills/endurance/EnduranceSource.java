@@ -7,6 +7,8 @@ import com.archyx.aureliumskills.util.item.ItemUtils;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public enum EnduranceSource implements Source {
 
@@ -14,27 +16,27 @@ public enum EnduranceSource implements Source {
     SPRINT_PER_METER("LEATHER_BOOTS"),
     SWIM_PER_METER("WATER_BUCKET");
 
-    private final String material;
+    private final @NotNull String material;
 
-    EnduranceSource(String material) {
+    EnduranceSource(@NotNull String material) {
         this.material = material;
     }
 
     @Override
-    public Skill getSkill() {
+    public @NotNull Skill getSkill() {
         return Skills.ENDURANCE;
     }
 
     @Override
-    public String getUnitName() {
+    public @NotNull String getUnitName() {
         return "meter";
     }
 
     @Override
-    public ItemStack getMenuItem() {
-        ItemStack item = ItemUtils.parseItem(material);
+    public @Nullable ItemStack getMenuItem() {
+        @Nullable ItemStack item = ItemUtils.parseItem(material);
         if (item != null) {
-            ItemMeta meta = item.getItemMeta();
+            @Nullable ItemMeta meta = item.getItemMeta();
             if (meta != null && ItemUtils.isArmor(item.getType())) {
                 meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
                 item.setItemMeta(meta);

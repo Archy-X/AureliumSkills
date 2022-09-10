@@ -21,22 +21,24 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 public class ItemListener implements Listener {
 
-    private final AureliumSkills plugin;
-    private final Map<UUID, ItemStack> heldItems;
-    private final Map<UUID, ItemStack> offHandItems;
-    private final ForagingAbilities foragingAbilities;
-    private final MiningAbilities miningAbilities;
-    private final StatLeveler statLeveler;
-    private final Modifiers modifiers;
-    private final Requirements requirements;
-    private final Multipliers multipliers;
+    private final @NotNull AureliumSkills plugin;
+    private final @NotNull Map<UUID, ItemStack> heldItems;
+    private final @NotNull Map<UUID, ItemStack> offHandItems;
+    private final @NotNull ForagingAbilities foragingAbilities;
+    private final @NotNull MiningAbilities miningAbilities;
+    private final @NotNull StatLeveler statLeveler;
+    private final @NotNull Modifiers modifiers;
+    private final @NotNull Requirements requirements;
+    private final @NotNull Multipliers multipliers;
 
-    public ItemListener(AureliumSkills plugin) {
+    public ItemListener(@NotNull AureliumSkills plugin) {
         this.plugin = plugin;
         heldItems = new HashMap<>();
         offHandItems = new HashMap<>();
@@ -49,11 +51,11 @@ public class ItemListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOW)
-    public void onJoin(PlayerDataLoadEvent event) {
+    public void onJoin(@NotNull PlayerDataLoadEvent event) {
         Player player = event.getPlayerData().getPlayer();
         ItemStack held = player.getInventory().getItemInMainHand();
         heldItems.put(player.getUniqueId(), held);
-        PlayerData playerData = event.getPlayerData();
+        @Nullable PlayerData playerData = event.getPlayerData();
         if (!held.getType().equals(Material.AIR)) {
             if (OptionL.getBoolean(Option.MODIFIER_AUTO_CONVERT_FROM_LEGACY)) {
                 held = requirements.convertFromLegacy(modifiers.convertFromLegacy(held));
@@ -92,7 +94,7 @@ public class ItemListener implements Listener {
     }
 
     @EventHandler
-    public void onLeave(PlayerQuitEvent event) {
+    public void onLeave(@NotNull PlayerQuitEvent event) {
         Player player = event.getPlayer();
         heldItems.remove(player.getUniqueId());
         offHandItems.remove(player.getUniqueId());
@@ -111,10 +113,10 @@ public class ItemListener implements Listener {
                     if (stored != null) {
                         // If stored item is different than held
                         if (!stored.equals(held)) {
-                            Set<Stat> statsToReload = new HashSet<>();
+                            Set<@NotNull Stat> statsToReload = new HashSet<>();
                             // Remove modifiers from stored item
                             if (!stored.getType().equals(Material.AIR)) {
-                                PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+                                @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
                                 if (playerData != null) {
                                     for (StatModifier modifier : modifiers.getModifiers(ModifierType.ITEM, stored)) {
                                         playerData.removeStatModifier(modifier.getName(), false);
@@ -141,7 +143,7 @@ public class ItemListener implements Listener {
                                         player.getInventory().setItemInMainHand(held);
                                     }
                                 }
-                                PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+                                @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
                                 if (playerData != null) {
                                     if (requirements.meetsRequirements(ModifierType.ITEM, held, player)) {
                                         for (StatModifier modifier : modifiers.getModifiers(ModifierType.ITEM, held)) {
@@ -180,11 +182,11 @@ public class ItemListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onSwap(PlayerSwapHandItemsEvent event) {
+    public void onSwap(@NotNull PlayerSwapHandItemsEvent event) {
         if (!event.isCancelled()) { // Make sure event is not cancelled
             if (OptionL.getBoolean(Option.MODIFIER_ITEM_ENABLE_OFF_HAND)) { // Check off hand support is enabled
                 Player player = event.getPlayer();
-                PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+                @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
                 if (playerData != null) {
                     // Get items switched
                     ItemStack itemOffHand = event.getOffHandItem();
@@ -194,7 +196,7 @@ public class ItemListener implements Listener {
                     heldItems.put(player.getUniqueId(), itemMainHand);
                     // Things to prevent double reloads
                     Set<String> offHandModifiers = new HashSet<>();
-                    Set<Stat> statsToReload = new HashSet<>();
+                    Set<@NotNull Stat> statsToReload = new HashSet<>();
                     Set<String> offHandMultipliers = new HashSet<>();
                     // Check off hand item
                     if (itemOffHand != null) {
@@ -273,7 +275,7 @@ public class ItemListener implements Listener {
                             if (!stored.equals(held)) {
                                 //Remove modifiers from stored item
                                 if (!stored.getType().equals(Material.AIR)) {
-                                    PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+                                    @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
                                     if (playerData != null) {
                                         for (StatModifier modifier : modifiers.getModifiers(ModifierType.ITEM, stored)) {
                                             playerData.removeStatModifier(modifier.getName() + ".Offhand");
@@ -285,7 +287,7 @@ public class ItemListener implements Listener {
                                 }
                                 // Add modifiers from held item
                                 if (!held.getType().equals(Material.AIR)) {
-                                    PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+                                    @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
                                     if (playerData != null) {
                                         if (requirements.meetsRequirements(ModifierType.ITEM, held, player)) {
                                             for (StatModifier modifier : modifiers.getModifiers(ModifierType.ITEM, held)) {

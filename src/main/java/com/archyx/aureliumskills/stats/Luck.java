@@ -8,6 +8,7 @@ import com.archyx.aureliumskills.configuration.OptionL;
 import com.archyx.aureliumskills.data.PlayerData;
 import com.archyx.aureliumskills.data.PlayerDataLoadEvent;
 import com.archyx.aureliumskills.support.WorldGuardFlags;
+import com.archyx.aureliumskills.support.WorldGuardSupport;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -24,6 +25,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
@@ -37,22 +40,22 @@ public class Luck implements Listener {
 	}
 
 	@EventHandler
-	public void onJoin(PlayerDataLoadEvent event) {
+	public void onJoin(@NotNull PlayerDataLoadEvent event) {
 		setLuck(event.getPlayerData().getPlayer());
 	}
 	
-	public void reload(Player player) {
+	public void reload(@Nullable Player player) {
 		if (player != null) {
 			setLuck(player);
 		}
 	}
 
 	@EventHandler
-	public void worldChange(PlayerChangedWorldEvent event) {
+	public void worldChange(@NotNull PlayerChangedWorldEvent event) {
 		setLuck(event.getPlayer());
 	}
 
-	private void setLuck(Player player) {
+	private void setLuck(@NotNull Player player) {
 		AttributeInstance attribute = player.getAttribute(Attribute.GENERIC_LUCK);
 		if (attribute != null) {
 			boolean hasModifier = false;
@@ -79,7 +82,7 @@ public class Luck implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	@SuppressWarnings("deprecation")
-	public void onBlockBreak(BlockBreakEvent event) {
+	public void onBlockBreak(@NotNull BlockBreakEvent event) {
 		if (OptionL.getBoolean(Option.LUCK_DOUBLE_DROP_ENABLED) && !event.isCancelled()) {
 			Player player = event.getPlayer();
 			Block block = event.getBlock();
@@ -88,12 +91,13 @@ public class Luck implements Listener {
 				return;
 			}
 			//Checks if in blocked region
-			if (plugin.isWorldGuardEnabled()) {
-				if (plugin.getWorldGuardSupport().isInBlockedRegion(block.getLocation())) {
+            WorldGuardSupport worldGuardSupport = plugin.getWorldGuardSupport();
+            if (plugin.isWorldGuardEnabled() && worldGuardSupport != null) {
+				if (worldGuardSupport.isInBlockedRegion(block.getLocation())) {
 					return;
 				}
 				// Check if blocked by flags
-				else if (plugin.getWorldGuardSupport().blockedByFlag(block.getLocation(), player, WorldGuardFlags.FlagKey.XP_GAIN)) {
+				else if (worldGuardSupport.blockedByFlag(block.getLocation(), player, WorldGuardFlags.FlagKey.XP_GAIN)) {
 					return;
 				}
 			}
@@ -136,12 +140,16 @@ public class Luck implements Listener {
 										}
 									}
 								}
-								else if (mat.equals(XMaterial.GRASS_BLOCK.parseMaterial())) {
-									Material grassBlock = XMaterial.GRASS_BLOCK.parseMaterial();
-									PlayerLootDropEvent dropEvent = new PlayerLootDropEvent(player, new ItemStack(grassBlock), block.getLocation().add(0.5, 0.5, 0.5), LootDropCause.LUCK_DOUBLE_DROP);
-									Bukkit.getPluginManager().callEvent(dropEvent);
-									if (!event.isCancelled()) {
-										block.getWorld().dropItem(dropEvent.getLocation(), dropEvent.getItemStack());
+								else {
+									@Nullable Material grassBlock = XMaterial.GRASS_BLOCK.parseMaterial();
+									if (grassBlock == null)
+										return;
+									if (mat.equals(grassBlock)) {
+										PlayerLootDropEvent dropEvent = new PlayerLootDropEvent(player, new ItemStack(grassBlock), block.getLocation().add(0.5, 0.5, 0.5), LootDropCause.LUCK_DOUBLE_DROP);
+										Bukkit.getPluginManager().callEvent(dropEvent);
+										if (!event.isCancelled()) {
+											block.getWorld().dropItem(dropEvent.getLocation(), dropEvent.getItemStack());
+										}
 									}
 								}
 							}

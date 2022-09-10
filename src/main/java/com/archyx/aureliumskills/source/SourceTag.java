@@ -2,6 +2,7 @@ package com.archyx.aureliumskills.source;
 
 import com.archyx.aureliumskills.skills.Skill;
 import com.archyx.aureliumskills.skills.Skills;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
@@ -18,17 +19,17 @@ public enum SourceTag {
     LUCKY_SPADES_APPLICABLE(Skills.EXCAVATION),
     TERRAFORM_APPLICABLE(Skills.EXCAVATION);
 
-    private final Skill skill;
+    private final @NotNull Skill skill;
 
-    SourceTag(Skill skill) {
+    SourceTag(@NotNull Skill skill) {
         this.skill = skill;
     }
 
-    public Skill getSkill() {
+    public @NotNull Skill getSkill() {
         return skill;
     }
 
-    public String getPath() {
+    public @NotNull String getPath() {
         return skill.toString().toLowerCase(Locale.ROOT) + "." + toString().toLowerCase(Locale.ROOT);
     }
 

@@ -12,15 +12,15 @@ import org.jetbrains.annotations.NotNull;
  */
 public class PlayerLootDropEvent extends Event {
 
-    private static final HandlerList handlers = new HandlerList();
+    private static final @NotNull HandlerList handlers = new HandlerList();
 
     private final Player player;
-    private ItemStack itemStack;
-    private Location location;
+    private @NotNull ItemStack itemStack;
+    private @NotNull Location location;
     private final LootDropCause cause;
     private boolean isCancelled;
 
-    public PlayerLootDropEvent(Player player, ItemStack itemStack, Location location, LootDropCause cause) {
+    public PlayerLootDropEvent(Player player, @NotNull ItemStack itemStack, @NotNull Location location, LootDropCause cause) {
         this.player = player;
         this.itemStack = itemStack;
         this.location = location;
@@ -32,19 +32,19 @@ public class PlayerLootDropEvent extends Event {
         return player;
     }
 
-    public ItemStack getItemStack() {
+    public @NotNull ItemStack getItemStack() {
         return itemStack;
     }
 
-    public void setItemStack(ItemStack itemStack) {
+    public void setItemStack(@NotNull ItemStack itemStack) {
         this.itemStack = itemStack;
     }
 
-    public Location getLocation() {
+    public @NotNull Location getLocation() {
         return location;
     }
 
-    public void setLocation(Location location) {
+    public void setLocation(@NotNull Location location) {
         this.location = location;
     }
 
@@ -60,13 +60,12 @@ public class PlayerLootDropEvent extends Event {
         this.isCancelled = cancelled;
     }
 
-    @NotNull
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return handlers;
     }
 
-    public static HandlerList getHandlerList() {
+    public static @NotNull HandlerList getHandlerList() {
         return handlers;
     }
 

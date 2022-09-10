@@ -5,6 +5,7 @@ import com.archyx.aureliumskills.lang.Lang;
 import com.archyx.aureliumskills.lang.SkillMessage;
 import com.archyx.aureliumskills.mana.MAbility;
 import com.google.common.collect.ImmutableList;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -45,37 +46,38 @@ public enum Skills implements Skill {
 	FORGING(ImmutableList.of(() -> Ability.DISENCHANTER, () -> Ability.FORGER, () -> Ability.REPAIRING, () -> Ability.ANVIL_MASTER, () -> Ability.SKILL_MENDER),
 			null);
 
-	private final ImmutableList<Supplier<Ability>> abilities;
-	private final MAbility manaAbility;
+	private final @NotNull ImmutableList<@NotNull Supplier<@NotNull Ability>> abilities;
+	private final @Nullable MAbility manaAbility;
 	
-	Skills(ImmutableList<Supplier<Ability>> abilities, MAbility manaAbility) {
+	Skills(@NotNull ImmutableList<@NotNull Supplier<@NotNull Ability>> abilities, @Nullable MAbility manaAbility) {
 		this.abilities = abilities;
 		this.manaAbility = manaAbility;
 	}
 
 	@Override
-	public ImmutableList<Supplier<Ability>> getAbilities() {
+	public @NotNull ImmutableList<@NotNull Supplier<@NotNull Ability>> getAbilities() {
 		return abilities;
 	}
 
 	@Override
-	public String getDescription(Locale locale) {
-		return Lang.getMessage(SkillMessage.valueOf(this.name() + "_DESC"), locale);
+	public @NotNull String getDescription(@Nullable Locale locale) {
+	    @Nullable String description = Lang.getMessage(SkillMessage.valueOf(this.name() + "_DESC"), locale);
+		return description;
 	}
 
 	@Override
-	public String getDisplayName(Locale locale) {
-		return Lang.getMessage(SkillMessage.valueOf(this.name().toUpperCase() + "_NAME"), locale);
+	public @NotNull String getDisplayName(@Nullable Locale locale) {
+	    @Nullable String displayName = Lang.getMessage(SkillMessage.valueOf(this.name().toUpperCase() + "_NAME"), locale);
+		return displayName;
 	}
 
 	@Override
-	@Nullable
-	public MAbility getManaAbility() {
+	public @Nullable MAbility getManaAbility() {
 		return manaAbility;
 	}
 
 	@Override
-	public Ability getXpMultiplierAbility() {
+	public @NotNull Ability getXpMultiplierAbility() {
 		if (abilities.size() == 5) {
 			return abilities.get(1).get();
 		} else {
@@ -83,7 +85,7 @@ public enum Skills implements Skill {
 		}
 	}
 
-	public static List<Skills> getOrderedValues() {
+	public static @NotNull List<Skills> getOrderedValues() {
 		List<Skills> list = new ArrayList<>();
 		list.add(Skills.AGILITY);
 		list.add(Skills.ALCHEMY);

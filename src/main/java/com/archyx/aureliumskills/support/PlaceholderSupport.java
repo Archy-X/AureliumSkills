@@ -16,6 +16,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Locale;
@@ -23,7 +25,7 @@ import java.util.Locale;
 public class PlaceholderSupport extends PlaceholderExpansion {
 
     private final AureliumSkills plugin;
-    private final String[] xpIdentifiers = new String[] {"xp_required_formatted_", "xp_required_", "xp_progress_int_", "xp_progress_1_", "xp_progress_", "xp_int_", "xp_formatted_", "xp_"};
+    private final @NotNull String[] xpIdentifiers = {"xp_required_formatted_", "xp_required_", "xp_progress_int_", "xp_progress_1_", "xp_progress_", "xp_int_", "xp_formatted_", "xp_"};
 
     public PlaceholderSupport(AureliumSkills plugin) {
         this.plugin = plugin;
@@ -40,29 +42,29 @@ public class PlaceholderSupport extends PlaceholderExpansion {
     }
 
     @Override
-    public String getIdentifier() {
+    public @NotNull String getIdentifier() {
         return "aureliumskills";
     }
 
     @Override
-    public String getAuthor() {
+    public @NotNull String getAuthor() {
         return plugin.getDescription().getAuthors().toString();
     }
 
     @Override
-    public String getVersion() {
+    public @NotNull String getVersion() {
         return plugin.getDescription().getVersion();
     }
 
     @Override
-    public String onPlaceholderRequest(Player player, String identifier) {
+    public @Nullable String onPlaceholderRequest(@Nullable Player player, @NotNull String identifier) {
         if (player == null) {
             return "";
         }
 
         //Gets total combined skill level
         if (identifier.equals("power")) {
-            PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+            @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
             if (playerData != null) {
                 return String.valueOf(playerData.getPowerLevel());
             }
@@ -107,7 +109,7 @@ public class PlaceholderSupport extends PlaceholderExpansion {
 
         //Gets mana
         if (identifier.equals("mana")) {
-            PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+            @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
             if (playerData != null) {
                 return String.valueOf(playerData.getMana());
             }
@@ -115,7 +117,7 @@ public class PlaceholderSupport extends PlaceholderExpansion {
 
         // Gets mana rounded to an integer
         if (identifier.equals("mana_int")) {
-            PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+            @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
             if (playerData != null) {
                 return String.valueOf(Math.round(playerData.getMana()));
             }
@@ -123,7 +125,7 @@ public class PlaceholderSupport extends PlaceholderExpansion {
 
         // Gets max mana
         if (identifier.equals("mana_max")) {
-            PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+            @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
             if (playerData != null) {
                 return String.valueOf(playerData.getMaxMana());
             }
@@ -131,7 +133,7 @@ public class PlaceholderSupport extends PlaceholderExpansion {
 
         // Gets max mana rounded to an integer
         if (identifier.equals("mana_max_int")) {
-            PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+            @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
             if (playerData != null) {
                 return String.valueOf(Math.round(playerData.getMaxMana()));
             }
@@ -139,13 +141,14 @@ public class PlaceholderSupport extends PlaceholderExpansion {
 
         //Gets stat values
         for (Stat stat : plugin.getStatRegistry().getStats()) {
-            if (identifier.equals(stat.name().toLowerCase(Locale.ENGLISH))) {
-                PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+            String name = stat.name();
+            if (identifier.equals(name.toLowerCase(Locale.ENGLISH))) {
+                @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
                 if (playerData != null) {
                     return String.valueOf(playerData.getStatLevel(stat));
                 }
-            } else if (identifier.equals(stat.name().toLowerCase(Locale.ROOT) + "_int")) {
-                PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+            } else if (identifier.equals(name.toLowerCase(Locale.ROOT) + "_int")) {
+                @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
                 if (playerData != null) {
                     return String.valueOf(Math.round(playerData.getStatLevel(stat)));
                 }
@@ -155,13 +158,13 @@ public class PlaceholderSupport extends PlaceholderExpansion {
         //Gets skill levels
         for (Skill skill : plugin.getSkillRegistry().getSkills()) {
             if (identifier.equals(skill.name().toLowerCase(Locale.ENGLISH))) {
-                PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+                @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
                 if (playerData != null) {
                     return String.valueOf(playerData.getSkillLevel(skill));
                 }
             }
             else if (identifier.equals(skill.name().toLowerCase(Locale.ENGLISH) + "_roman")) {
-                PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+                @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
                 if (playerData != null) {
                     return RomanNumber.toRoman(playerData.getSkillLevel(skill));
                 }
@@ -265,10 +268,9 @@ public class PlaceholderSupport extends PlaceholderExpansion {
         for (String id : xpIdentifiers) {
             if (identifier.startsWith(id)) {
                 String skillName = TextUtil.replace(identifier, id, "");
-
                 Skill skill = plugin.getSkillRegistry().getSkill(skillName);
                 if (skill != null) {
-                    PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+                    @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
                     if (playerData != null) {
                         switch (id) {
                             case "xp_required_formatted_":

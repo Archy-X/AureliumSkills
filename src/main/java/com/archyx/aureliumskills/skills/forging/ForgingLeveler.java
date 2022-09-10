@@ -8,6 +8,7 @@ import com.archyx.aureliumskills.leveler.SkillLeveler;
 import com.archyx.aureliumskills.skills.Skill;
 import com.archyx.aureliumskills.skills.Skills;
 import com.archyx.aureliumskills.util.item.ItemUtils;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -23,18 +24,20 @@ import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
 
 public class ForgingLeveler extends SkillLeveler implements Listener {
 
-	public ForgingLeveler(AureliumSkills plugin) {
+	public ForgingLeveler(@NotNull AureliumSkills plugin) {
 		super(plugin, Ability.FORGER);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void onForge(InventoryClickEvent event) {
+	public void onForge(@NotNull InventoryClickEvent event) {
 		if (OptionL.isEnabled(Skills.FORGING)) {
 			//Check cancelled
 			if (OptionL.getBoolean(Option.FORGING_CHECK_CANCELLED)) {
@@ -62,8 +65,9 @@ public class ForgingLeveler extends SkillLeveler implements Listener {
 					if (event.getSlot() == 2) {
 						ItemStack addedItem = inventory.getItem(1);
 						ItemStack baseItem = inventory.getItem(0);
-						if (inventory.getLocation() != null) {
-							if (blockXpGainLocation(inventory.getLocation(), player)) return;
+						@Nullable Location location = inventory.getLocation();
+						if (location != null) {
+							if (blockXpGainLocation(location, player)) return;
 						} else {
 							if (blockXpGainLocation(event.getWhoClicked().getLocation(), player)) return;
 						}
@@ -87,8 +91,9 @@ public class ForgingLeveler extends SkillLeveler implements Listener {
 					}
 				} else if (inventory.getType().toString().equals("GRINDSTONE")) {
 					if (event.getSlotType() != InventoryType.SlotType.RESULT) return;
-					if (inventory.getLocation() != null) {
-						if (blockXpGainLocation(inventory.getLocation(), player)) return;
+					@Nullable Location location = inventory.getLocation();
+					if (location != null) {
+						if (blockXpGainLocation(location, player)) return;
 					} else {
 						if (blockXpGainLocation(event.getWhoClicked().getLocation(), player)) return;
 					}
@@ -105,33 +110,34 @@ public class ForgingLeveler extends SkillLeveler implements Listener {
 		}
 	}
 
-	private int getTotalLevel(ItemStack item) {
+	private int getTotalLevel(@Nullable ItemStack item) {
 		int totalLevel = 0;
 		if (item != null) {
-			for (Map.Entry<Enchantment, Integer> entry : item.getEnchantments().entrySet()) {
+			for (Map.Entry<@NotNull Enchantment, @NotNull Integer> entry : item.getEnchantments().entrySet()) {
 				if (isDisenchantable(entry.getKey())) {
 					totalLevel += entry.getValue();
 				}
 			}
 			if (item.getItemMeta() instanceof EnchantmentStorageMeta) {
-				EnchantmentStorageMeta esm = (EnchantmentStorageMeta) item.getItemMeta();
-				for (Map.Entry<Enchantment, Integer> entry : esm.getStoredEnchants().entrySet()) {
-					if (isDisenchantable(entry.getKey())) {
-						totalLevel += entry.getValue();
+				@Nullable EnchantmentStorageMeta esm = (EnchantmentStorageMeta) item.getItemMeta();
+				if (esm != null)
+					for (Map.Entry<@NotNull Enchantment, @NotNull Integer> entry : esm.getStoredEnchants().entrySet()) {
+						if (isDisenchantable(entry.getKey())) {
+							totalLevel += entry.getValue();
+						}
 					}
-				}
 			}
 		}
 		return totalLevel;
 	}
 
-	public boolean isDisenchantable(Enchantment enchant) {
+	public boolean isDisenchantable(@NotNull Enchantment enchant) {
 		// Block vanilla curses
 		if (enchant.equals(Enchantment.BINDING_CURSE) || enchant.equals(Enchantment.VANISHING_CURSE)) {
 			return false;
 		}
 		// Check blocked list in config
-		List<String> blockedList = OptionL.getList(Option.FORGING_BLOCKED_GRINDSTONE_ENCHANTS);
+		List<@NotNull String> blockedList = OptionL.getList(Option.FORGING_BLOCKED_GRINDSTONE_ENCHANTS);
 		for (String blockedEnchantName : blockedList) {
 			if (enchant.getKey().getKey().equalsIgnoreCase(blockedEnchantName)) {
 				return false;

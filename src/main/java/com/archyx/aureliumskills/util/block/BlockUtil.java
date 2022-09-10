@@ -9,11 +9,12 @@ import org.bukkit.block.data.Ageable;
 import org.bukkit.material.CocoaPlant;
 import org.bukkit.material.Crops;
 import org.bukkit.material.NetherWarts;
+import org.jetbrains.annotations.NotNull;
 
 public class BlockUtil {
 
     @SuppressWarnings("deprecation")
-    public static boolean isFullyGrown(Block block) {
+    public static boolean isFullyGrown(@NotNull Block block) {
         if (XMaterial.isNewVersion()) {
             if (block.getBlockData() instanceof Ageable) {
                 Ageable crop = (Ageable) block.getBlockData();
@@ -35,7 +36,7 @@ public class BlockUtil {
         return false;
     }
 
-    public static int getGrowthStage(Block block) {
+    public static int getGrowthStage(@NotNull Block block) {
         if (XMaterial.isNewVersion()) {
             if (block.getBlockData() instanceof Ageable) {
                 Ageable crop = (Ageable) block.getBlockData();
@@ -45,27 +46,27 @@ public class BlockUtil {
         return 0;
     }
 
-    public static boolean isCarrot(Material material) {
+    public static boolean isCarrot(@NotNull Material material) {
         return material == Material.CARROT || material.name().equals("CARROTS");
     }
 
-    public static boolean isPotato(Material material) {
+    public static boolean isPotato(@NotNull Material material) {
         return material == Material.POTATO || material.name().equals("POTATOES");
     }
 
-    public static boolean isBeetroot(Material material) {
+    public static boolean isBeetroot(@NotNull Material material) {
         return material == Material.BEETROOT || material.name().equals("BEETROOTS") || material.name().equals("BEETROOT_BLOCK");
     }
 
-    public static boolean isWheat(Material material) {
+    public static boolean isWheat(@NotNull Material material) {
         return material == Material.WHEAT || material.name().equals("CROPS");
     }
 
-    public static boolean isNetherWart(Material material) {
+    public static boolean isNetherWart(@NotNull Material material) {
         return material.name().equals("NETHER_WART") || material.name().equals("NETHER_WARTS") || material.name().equals("NETHER_STALK");
     }
 
-    public static boolean isReplenishable(Material material) {
+    public static boolean isReplenishable(@NotNull Material material) {
         return isWheat(material) || isCarrot(material) || isPotato(material) || isBeetroot(material) || isNetherWart(material);
     }
 }

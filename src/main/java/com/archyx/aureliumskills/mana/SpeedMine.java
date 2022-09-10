@@ -16,17 +16,18 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.NotNull;
 
 public class SpeedMine extends ReadiedManaAbility {
 
-    public SpeedMine(AureliumSkills plugin) {
+    public SpeedMine(@NotNull AureliumSkills plugin) {
         super(plugin, MAbility.SPEED_MINE, ManaAbilityMessage.SPEED_MINE_START, ManaAbilityMessage.SPEED_MINE_END,
-                new String[] {"PICKAXE"}, new Action[] {Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR});
+                new @NotNull String[] {"PICKAXE"}, new @NotNull Action[] {Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR});
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public void onActivate(Player player, PlayerData playerData) {
+    public void onActivate(@NotNull Player player, @NotNull PlayerData playerData) {
         int amplifier = manager.getOptionAsInt(mAbility, "haste_level", 10) - 1;
         player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, (int) (manager.getValue(MAbility.SPEED_MINE, playerData) * 20),
                 amplifier, false, false), true);
@@ -34,12 +35,12 @@ public class SpeedMine extends ReadiedManaAbility {
     }
 
     @Override
-    public void onStop(Player player, PlayerData playerData) {
+    public void onStop(@NotNull Player player, @NotNull PlayerData playerData) {
 
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void activationListener(BlockBreakEvent event) {
+    public void activationListener(@NotNull BlockBreakEvent event) {
         if (event.isCancelled()) return;
         Block block = event.getBlock();
         if (OptionL.getBoolean(Option.CHECK_BLOCK_REPLACE) && plugin.getRegionManager().isPlacedBlock(block)) {

@@ -11,10 +11,11 @@ import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.jetbrains.annotations.NotNull;
 
 public class EnduranceLeveler extends SkillLeveler implements Listener {
 
-	public EnduranceLeveler(AureliumSkills plugin) {
+	public EnduranceLeveler(@NotNull AureliumSkills plugin) {
 		super(plugin, Ability.RUNNER);
 	}
 	

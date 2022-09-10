@@ -11,30 +11,32 @@ import com.archyx.aureliumskills.stats.StatLeveler;
 import com.archyx.aureliumskills.util.math.NumberUtil;
 import com.archyx.aureliumskills.util.text.TextUtil;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 
 public class StatReward extends Reward {
 
-    private final Stat stat;
+    private final @NotNull Stat stat;
     private final double value;
 
-    public StatReward(AureliumSkills plugin, Stat stat, double value) {
+    public StatReward(@NotNull AureliumSkills plugin, @NotNull Stat stat, double value) {
         super(plugin);
         this.stat = stat;
         this.value = value;
     }
 
     @Override
-    public void giveReward(Player player, Skill skill, int level) {
-        PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+    public void giveReward(@NotNull Player player, @NotNull Skill skill, int level) {
+        @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
         if (playerData == null) return;
 
         playerData.addStatLevel(stat, value);
         new StatLeveler(plugin).reloadStat(player, stat);
     }
 
-    public Stat getStat() {
+    public @NotNull Stat getStat() {
         return stat;
     }
 
@@ -43,7 +45,7 @@ public class StatReward extends Reward {
     }
 
     @Override
-    public String getMenuMessage(Player player, Locale locale, Skill skill, int level) {
+    public @NotNull String getMenuMessage(@NotNull Player player, @Nullable Locale locale, @NotNull Skill skill, int level) {
         return TextUtil.replace(Lang.getMessage(MenuMessage.REWARDS_ENTRY, locale),
                 "{color}", stat.getColor(locale),
                 "{num}", NumberUtil.format1(value),
@@ -52,7 +54,7 @@ public class StatReward extends Reward {
     }
 
     @Override
-    public String getChatMessage(Player player, Locale locale, Skill skill, int level) {
+    public @NotNull String getChatMessage(@NotNull Player player, @Nullable Locale locale, @NotNull Skill skill, int level) {
         return TextUtil.replace(Lang.getMessage(LevelerMessage.STAT_LEVEL, locale),
                 "{color}", stat.getColor(locale),
                 "{num}", NumberUtil.format1(value),

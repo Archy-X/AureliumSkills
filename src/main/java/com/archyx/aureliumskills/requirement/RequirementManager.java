@@ -10,16 +10,17 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 public class RequirementManager implements Listener {
 
     private Set<GlobalRequirement> globalRequirements;
-    private final Map<UUID, Integer> errorMessageTimer;
-    private final AureliumSkills plugin;
+    private final @NotNull Map<UUID, Integer> errorMessageTimer;
+    private final @NotNull AureliumSkills plugin;
 
-    public RequirementManager(AureliumSkills plugin) {
+    public RequirementManager(@NotNull AureliumSkills plugin) {
         errorMessageTimer = new HashMap<>();
         this.plugin = plugin;
         tickTimer();
@@ -61,7 +62,7 @@ public class RequirementManager implements Listener {
         return globalRequirements;
     }
 
-    public Set<GlobalRequirement> getGlobalRequirementsType(ModifierType type) {
+    public @NotNull Set<GlobalRequirement> getGlobalRequirementsType(ModifierType type) {
         Set<GlobalRequirement> matched = new HashSet<>();
         for (GlobalRequirement requirement : globalRequirements) {
             if (requirement.getType() == type) {
@@ -72,7 +73,7 @@ public class RequirementManager implements Listener {
     }
 
     @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
+    public void onQuit(@NotNull PlayerQuitEvent event) {
         errorMessageTimer.remove(event.getPlayer().getUniqueId());
     }
 
@@ -81,16 +82,18 @@ public class RequirementManager implements Listener {
             @Override
             public void run() {
                 for (UUID id : errorMessageTimer.keySet()) {
-                    int timer = errorMessageTimer.get(id);
+                    Integer timer = errorMessageTimer.get(id);
+                    if (timer == null)
+                        throw new IllegalStateException("Invalid requirements tick timer index key: " + id);
                     if (timer != 0) {
-                        errorMessageTimer.put(id, errorMessageTimer.get(id) - 1);
+                        errorMessageTimer.put(id, timer - 1);
                     }
                 }
             }
         }.runTaskTimer(plugin, 0, 5);
     }
 
-    public Map<UUID, Integer> getErrorMessageTimer() {
+    public @NotNull Map<UUID, Integer> getErrorMessageTimer() {
         return errorMessageTimer;
     }
 

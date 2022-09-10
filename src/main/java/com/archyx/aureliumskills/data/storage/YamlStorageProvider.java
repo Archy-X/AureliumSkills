@@ -24,6 +24,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,16 +33,16 @@ import java.util.*;
 
 public class YamlStorageProvider extends StorageProvider {
 
-    public YamlStorageProvider(AureliumSkills plugin) {
+    public YamlStorageProvider(@NotNull AureliumSkills plugin) {
         super(plugin);
     }
 
     @Override
-    public void load(Player player) {
+    public void load(@NotNull Player player) {
         File file = new File(plugin.getDataFolder() + "/playerdata/" + player.getUniqueId() + ".yml");
         if (file.exists()) {
             FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-            PlayerData playerData = new PlayerData(player, plugin);
+            @Nullable PlayerData playerData = new PlayerData(player, plugin);
             try {
                 // Make sure file name and uuid match
                 UUID id = UUID.fromString(config.getString("uuid", player.getUniqueId().toString()));
@@ -67,9 +69,11 @@ public class YamlStorageProvider extends StorageProvider {
                             String statName = modifierEntry.getString("stat");
                             double value = modifierEntry.getDouble("value");
                             if (name != null && statName != null) {
-                                Stat stat = plugin.getStatRegistry().getStat(statName);
-                                StatModifier modifier = new StatModifier(name, stat, value);
-                                playerData.addStatModifier(modifier);
+                                @Nullable Stat stat = plugin.getStatRegistry().getStat(statName);
+                                if (stat != null) {
+                                    StatModifier modifier = new StatModifier(name, stat, value);
+                                    playerData.addStatModifier(modifier);
+                                }
                             }
                         }
                     }
@@ -91,6 +95,8 @@ public class YamlStorageProvider extends StorageProvider {
                                 AbilityData abilityData = playerData.getAbilityData(ability);
                                 for (String key : abilityEntry.getKeys(false)) {
                                     Object value = abilityEntry.get(key);
+                                    if (value == null)
+                                        throw new IllegalStateException("Invalid configuration index key: " + key);
                                     abilityData.setData(key, value);
                                 }
                             }
@@ -100,9 +106,9 @@ public class YamlStorageProvider extends StorageProvider {
                 // Unclaimed item rewards
                 List<String> unclaimedItemsList = config.getStringList("unclaimed_items");
                 if (unclaimedItemsList.size() > 0) {
-                    List<KeyIntPair> unclaimedItems = new ArrayList<>();
+                    List<@NotNull KeyIntPair> unclaimedItems = new ArrayList<>();
                     for (String entry : unclaimedItemsList) {
-                        String[] splitEntry = entry.split(" ");
+                        @NotNull String[] splitEntry = entry.split(" ");
                         String itemKey = splitEntry[0];
                         int amount = 1;
                         if (splitEntry.length >= 2) {
@@ -125,8 +131,8 @@ public class YamlStorageProvider extends StorageProvider {
             } catch (Exception e) {
                 Bukkit.getLogger().warning("There was an error loading player data for player " + player.getName() + " with UUID " + player.getUniqueId() + ", see below for details.");
                 e.printStackTrace();
-                PlayerData data = createNewPlayer(player);
-                data.setShouldSave(false);
+                @Nullable PlayerData newPlayerData = createNewPlayer(player);
+                newPlayerData.setShouldSave(false);
                 sendErrorMessageToPlayer(player, e);
             }
         } else {
@@ -135,8 +141,8 @@ public class YamlStorageProvider extends StorageProvider {
     }
 
     @Override
-    public void save(Player player, boolean removeFromMemory) {
-        PlayerData playerData = playerManager.getPlayerData(player);
+    public void save(@NotNull Player player, boolean removeFromMemory) {
+        @Nullable PlayerData playerData = playerManager.getPlayerData(player);
         if (playerData == null) return;
         if (playerData.shouldNotSave()) return;
         // Save lock
@@ -172,15 +178,15 @@ public class YamlStorageProvider extends StorageProvider {
             // Save ability data
             for (AbilityData abilityData : playerData.getAbilityDataMap().values()) {
                 String path = "ability_data." + abilityData.getAbility().toString().toLowerCase(Locale.ROOT) + ".";
-                for (Map.Entry<String, Object> entry : abilityData.getDataMap().entrySet()) {
+                for (Map.Entry<@NotNull String, Object> entry : abilityData.getDataMap().entrySet()) {
                     config.set(path + entry.getKey(), entry.getValue());
                 }
             }
             // Save unclaimed items
-            List<KeyIntPair> unclaimedItems = playerData.getUnclaimedItems();
+            List<@NotNull KeyIntPair> unclaimedItems = playerData.getUnclaimedItems();
             config.set("unclaimed_items", null);
-            if (unclaimedItems != null && unclaimedItems.size() > 0) {
-                List<String> stringList = new ArrayList<>();
+            if (unclaimedItems.size() > 0) {
+                List<@NotNull String> stringList = new ArrayList<>();
                 for (KeyIntPair unclaimedItem : unclaimedItems) {
                     stringList.add(unclaimedItem.getKey() + " " + unclaimedItem.getValue());
                 }
@@ -198,7 +204,7 @@ public class YamlStorageProvider extends StorageProvider {
     }
 
     @Override
-    public void loadBackup(FileConfiguration config, CommandSender sender) {
+    public void loadBackup(@NotNull FileConfiguration config, @NotNull CommandSender sender) {
         ConfigurationSection playerDataSection = config.getConfigurationSection("player_data");
         Locale locale = plugin.getLang().getLocale(sender);
         if (playerDataSection != null) {
@@ -208,7 +214,7 @@ public class YamlStorageProvider extends StorageProvider {
                     // Load levels and xp from backup
                     Map<Skill, Integer> levels = getLevelsFromBackup(playerDataSection, stringId);
                     Map<Skill, Double> xpLevels = getXpLevelsFromBackup(playerDataSection, stringId);
-                    PlayerData playerData = playerManager.getPlayerData(id);
+                    @Nullable PlayerData playerData = playerManager.getPlayerData(id);
                     if (playerData != null) {
                         applyData(playerData, levels, xpLevels);
                     } else {
@@ -228,7 +234,11 @@ public class YamlStorageProvider extends StorageProvider {
                 }
                 sender.sendMessage(AureliumSkills.getPrefix(locale) + Lang.getMessage(CommandMessage.BACKUP_LOAD_LOADED, locale));
             } catch (Exception e) {
-                sender.sendMessage(AureliumSkills.getPrefix(locale) + TextUtil.replace(Lang.getMessage(CommandMessage.BACKUP_LOAD_ERROR, locale), "{error}", e.getMessage()));
+                String message = Lang.getMessage(CommandMessage.BACKUP_LOAD_ERROR, locale);
+                @Nullable String m = e.getMessage();
+                if (m != null)
+                    message = TextUtil.replace(m, "{error}", m);
+                sender.sendMessage(AureliumSkills.getPrefix(locale) + message);
             }
         }
     }
@@ -268,7 +278,10 @@ public class YamlStorageProvider extends StorageProvider {
                                     double xp = config.getDouble(path + "xp");
                                     // Add to lists
                                     SkillValue skillLevel = new SkillValue(id, level, xp);
-                                    leaderboards.get(skill).add(skillLevel);
+                                    List<SkillValue> skillList = leaderboards.get(skill);
+                                    if (skillList == null)
+                                        throw new IllegalStateException("Invalid skill leaderboard skill index key: " + skill);
+                                    skillList.add(skillLevel);
 
                                     if (OptionL.isEnabled(skill)) {
                                         powerLevel += level;
@@ -295,7 +308,7 @@ public class YamlStorageProvider extends StorageProvider {
     }
 
     @Override
-    public void delete(UUID uuid) throws IOException {
+    public void delete(@NotNull UUID uuid) throws IOException {
         File file = new File(plugin.getDataFolder() + "/playerdata/" + uuid.toString() + ".yml");
         if (file.exists()) {
             boolean success = file.delete();

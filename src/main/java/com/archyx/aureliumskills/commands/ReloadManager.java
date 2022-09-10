@@ -4,25 +4,29 @@ import com.archyx.aureliumskills.AureliumSkills;
 import com.archyx.aureliumskills.lang.CommandMessage;
 import com.archyx.aureliumskills.lang.Lang;
 import com.archyx.aureliumskills.stats.Luck;
+import com.archyx.aureliumskills.support.WorldGuardSupport;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 
 public class ReloadManager {
 
-    private final AureliumSkills plugin;
-    private final Lang lang;
+    private final @NotNull AureliumSkills plugin;
+    private final @NotNull Lang lang;
 
-    public ReloadManager(AureliumSkills plugin) {
+    public ReloadManager(@NotNull AureliumSkills plugin) {
         this.plugin = plugin;
         this.lang = plugin.getLang();
     }
 
-    public void reload(CommandSender sender) {
-        Locale locale = plugin.getLang().getLocale(sender);
+    public void reload(@NotNull CommandSender sender) {
+        @Nullable Locale locale = plugin.getLang().getLocale(sender);
         // Load config
         plugin.reloadConfig();
         plugin.saveDefaultConfig();
@@ -48,8 +52,9 @@ public class ReloadManager {
         plugin.getLootTableManager().loadLootTables();
         // Load worlds and regions
         plugin.getWorldManager().loadWorlds();
-        if (plugin.isWorldGuardEnabled()) {
-            plugin.getWorldGuardSupport().loadRegions();
+        WorldGuardSupport worldGuardSupport = plugin.getWorldGuardSupport();
+        if (plugin.isWorldGuardEnabled() && worldGuardSupport != null) {
+            worldGuardSupport.loadRegions();
         }
         // Recalculate health and luck stats
         Luck luck = new Luck(plugin);

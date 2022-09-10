@@ -7,6 +7,7 @@ import com.archyx.aureliumskills.data.PlayerData;
 import com.archyx.aureliumskills.lang.ActionBarMessage;
 import com.archyx.aureliumskills.lang.Lang;
 import com.archyx.aureliumskills.skills.Skill;
+import com.archyx.aureliumskills.support.ProtocolLibSupport;
 import com.archyx.aureliumskills.util.math.BigNumber;
 import com.archyx.aureliumskills.util.math.NumberUtil;
 import com.archyx.aureliumskills.util.text.TextUtil;
@@ -31,6 +32,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,9 +42,9 @@ import java.util.UUID;
 
 public class ActionBar implements Listener {
 
-	private final AureliumSkills plugin;
+	private final @NotNull AureliumSkills plugin;
 
-	public ActionBar(AureliumSkills plugin) {
+	public ActionBar(@NotNull AureliumSkills plugin) {
 		this.plugin = plugin;
 	}
 
@@ -49,7 +52,7 @@ public class ActionBar implements Listener {
 	private final HashSet<Player> isGainingXp = new HashSet<>();
 	private final HashMap<Player, Integer> timer = new HashMap<>();
 	private final HashMap<Player, Integer> currentAction = new HashMap<>();
-	private final HashSet<UUID> actionBarDisabled = new HashSet<>();
+	private final @NotNull HashSet<@NotNull UUID> actionBarDisabled = new HashSet<>();
 
 	public void startUpdateActionBar() {
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
@@ -62,7 +65,7 @@ public class ActionBar implements Listener {
 								currentAction.put(player, 0);
 							}
 							if (!isGainingXp.contains(player) && !isPaused.contains(player)) {
-								PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+								@Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
 								if (playerData != null) {
 									Locale locale = playerData.getLocale();
 									sendActionBar(player, TextUtil.replace(Lang.getMessage(ActionBarMessage.IDLE, locale)
@@ -93,11 +96,11 @@ public class ActionBar implements Listener {
 		}, 0L, 2L);
 	}
 
-	public void sendXpActionBar(Player player, Skill skill, double xpAmount) {
+	public void sendXpActionBar(@NotNull Player player, @NotNull Skill skill, double xpAmount) {
 		if (OptionL.getBoolean(Option.ACTION_BAR_ENABLED)) { // If action bar enabled
 			if (!actionBarDisabled.contains(player.getUniqueId())) { // If the player's action bar is enabled
 				// Get player skill data
-				PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+				@Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
 				if (playerData != null) {
 					Locale locale = playerData.getLocale();
 					// Check enabled/disabled for max
@@ -117,8 +120,13 @@ public class ActionBar implements Listener {
 						currentAction.put(player, 0);
 					}
 					//Add to current action
-					currentAction.put(player, currentAction.get(player) + 1);
-					int thisAction = this.currentAction.get(player);
+					@Nullable Integer action = currentAction.get(player);
+					if (action == null) {
+						plugin.getLogger().warning("Current action is not cached for player: " + player.getName());
+						return;
+					}
+					int thisAction = action + 1;
+					currentAction.put(player, thisAction);
 					new BukkitRunnable() {
 						@Override
 						public void run() {
@@ -240,9 +248,9 @@ public class ActionBar implements Listener {
 		}
 	}
 
-	public void sendAbilityActionBar(Player player, String message) {
+	public void sendAbilityActionBar(@NotNull Player player, @NotNull String message) {
 		if (!actionBarDisabled.contains(player.getUniqueId())) {
-			PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+			@Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
 			if (playerData == null) return;
 			sendActionBar(player, TextUtil.replace(Lang.getMessage(ActionBarMessage.ABILITY, playerData.getLocale()),
 					"{hp}", getHp(player),
@@ -254,11 +262,11 @@ public class ActionBar implements Listener {
 		}
 	}
 
-	private String getHp(Player player) {
+	private @NotNull String getHp(@NotNull Player player) {
 		return String.valueOf(Math.round(player.getHealth() * OptionL.getDouble(Option.HEALTH_HP_INDICATOR_SCALING)));
 	}
 
-	private String getMaxHp(Player player) {
+	private @NotNull String getMaxHp(@NotNull Player player) {
 		AttributeInstance attribute = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 		if (attribute != null) {
 			return String.valueOf(Math.round(attribute.getValue() * OptionL.getDouble(Option.HEALTH_HP_INDICATOR_SCALING)));
@@ -266,23 +274,24 @@ public class ActionBar implements Listener {
 		return "";
 	}
 
-	private String getMana(PlayerData playerData) {
+	private @NotNull String getMana(@NotNull PlayerData playerData) {
 		return String.valueOf(Math.round(playerData.getMana()));
 	}
 
-	private String getMaxMana(PlayerData playerData) {
+	private @NotNull String getMaxMana(@NotNull PlayerData playerData) {
 		return String.valueOf(Math.round(playerData.getMaxMana()));
 	}
 
-	private void sendActionBar(Player player, String message) {
+	private void sendActionBar(@NotNull Player player, @NotNull String message) {
 		if (OptionL.getBoolean(Option.ACTION_BAR_PLACEHOLDER_API) && plugin.isPlaceholderAPIEnabled()) {
 			message = PlaceholderAPI.setPlaceholders(player, message);
 		}
-		if (plugin.isProtocolLibEnabled()) {
+		ProtocolLibSupport protocolLibSupport = plugin.getProtocolLibSupport();
+		if (plugin.isProtocolLibEnabled() && protocolLibSupport != null) {
 			if (VersionUtils.isAtLeastVersion(17)) {
-				plugin.getProtocolLibSupport().sendNewActionBar(player, message);
+				protocolLibSupport.sendNewActionBar(player, message);
 			} else {
-				plugin.getProtocolLibSupport().sendLegacyActionBar(player, message);
+				protocolLibSupport.sendLegacyActionBar(player, message);
 			}
 		} else {
 			player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
@@ -296,18 +305,18 @@ public class ActionBar implements Listener {
 		isPaused.clear();
 	}
 
-	public void resetActionBar(Player player) {
+	public void resetActionBar(@NotNull Player player) {
 		isGainingXp.remove(player);
 		timer.remove(player);
 		currentAction.remove(player);
 		isPaused.remove(player);
 	}
 
-	public HashSet<UUID> getActionBarDisabled() {
+	public @NotNull HashSet<@NotNull UUID> getActionBarDisabled() {
 		return actionBarDisabled;
 	}
 
-	public void setPaused(Player player, int ticks) {
+	public void setPaused(@NotNull Player player, int ticks) {
 		isPaused.add(player);
 		Integer action = currentAction.get(player);
 		if (action != null) {
@@ -315,7 +324,9 @@ public class ActionBar implements Listener {
 		} else {
 			currentAction.put(player, 0);
 		}
-		int thisAction = this.currentAction.get(player);
+		Integer thisAction = this.currentAction.get(player);
+		if (thisAction == null)
+			throw new IllegalStateException("Invalid player index key for: " + player.getName());
 		new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -331,7 +342,7 @@ public class ActionBar implements Listener {
 
 	@EventHandler
 	@SuppressWarnings("deprecation")
-	public void onInteract(PlayerInteractEvent event) {
+	public void onInteract(@NotNull PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			Block block = event.getClickedBlock();
@@ -450,7 +461,7 @@ public class ActionBar implements Listener {
 				if (item != null) {
 					if (item.getType().isBlock()) {
 						if (block.getY() == block.getWorld().getMaxHeight() - 1) {
-							if (event.getBlockFace() == BlockFace.UP)	 {
+							if (event.getBlockFace() == BlockFace.UP)	{
 								setPaused(player, 40);
 							}
 						}

@@ -19,23 +19,25 @@ import com.cryptomorin.xseries.XMaterial;
 import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class SourceItem extends AbstractItem implements TemplateItemProvider<Source> {
+public class SourceItem extends AbstractItem implements TemplateItemProvider<@NotNull Source> {
 
     public SourceItem(AureliumSkills plugin) {
         super(plugin);
     }
 
     @Override
-    public Class<Source> getContext() {
+    public @NotNull Class<@NotNull Source> getContext() {
         return Source.class;
     }
 
     @Override
-    public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu, PlaceholderType placeholderType, Source source) {
-        Locale locale = plugin.getLang().getLocale(player);
+    public @NotNull String onPlaceholderReplace(@NotNull String placeholder, @NotNull Player player, @NotNull ActiveMenu activeMenu, @NotNull PlaceholderType placeholderType, @NotNull Source source) {
+        @Nullable Locale locale = plugin.getLang().getLocale(player);
         switch (placeholder) {
             case "source_name":
                 return TextUtil.replace(Lang.getMessage(MenuMessage.SOURCE_NAME, locale),
@@ -51,7 +53,7 @@ public class SourceItem extends AbstractItem implements TemplateItemProvider<Sou
                             "{unit}", getCustomMessage("sources.units." + unitName, locale));
                 }
             case "multiplied_xp":
-                Skill skill = (Skill) activeMenu.getProperty("skill");
+                Skill skill = getSkill(activeMenu);
                 double multiplier = getMultiplier(player, skill);
                 if (multiplier > 1.0) {
                     String unit = source.getUnitName();
@@ -67,7 +69,7 @@ public class SourceItem extends AbstractItem implements TemplateItemProvider<Sou
                     return "";
                 }
             case "multiplied_desc":
-                Skill skill1 = (Skill) activeMenu.getProperty("skill");
+                Skill skill1 = getSkill(activeMenu);
                 if (getMultiplier(player, skill1) > 1.0) {
                     return Lang.getMessage(MenuMessage.MULTIPLIED_DESC, locale);
                 } else {
@@ -78,17 +80,17 @@ public class SourceItem extends AbstractItem implements TemplateItemProvider<Sou
     }
 
     @Override
-    public Set<Source> getDefinedContexts(Player player, ActiveMenu activeMenu) {
+    public @NotNull Set<@NotNull Source> getDefinedContexts(@NotNull Player player, @NotNull ActiveMenu activeMenu) {
         // Gets the needed properties from the menu
-        SortType sortType = (SortType) activeMenu.getProperty("sort_type");
-        Skill skill = (Skill) activeMenu.getProperty("skill");
-        int itemsPerPage = (Integer) activeMenu.getProperty("items_per_page");
+        SortType sortType = getSortType(activeMenu);
+        Skill skill = getSkill(activeMenu);
+        int itemsPerPage = getItemsPerPage(activeMenu);
         int page = activeMenu.getCurrentPage();
-        Locale locale = plugin.getLang().getLocale(player);
+        @Nullable Locale locale = plugin.getLang().getLocale(player);
         // Sort the sources in the skill by the selected sort type
-        Source[] allSources = plugin.getSourceRegistry().values(skill);
+        @NotNull Source[] allSources = plugin.getSourceRegistry().values(skill);
         // Filter valid sources
-        List<Source> filteredSources = new ArrayList<>();
+        List<@NotNull Source> filteredSources = new ArrayList<>();
         for (Source source : allSources) {
             if (plugin.getSourceManager().getXp(source) == 0.0) {
                 continue;
@@ -104,14 +106,14 @@ public class SourceItem extends AbstractItem implements TemplateItemProvider<Sou
         if (toIndex > filteredSources.size()) {
             toIndex = filteredSources.size();
         }
-        List<Source> shownSources = filteredSources.subList(page * itemsPerPage, toIndex);
+        List<@NotNull Source> shownSources = filteredSources.subList(page * itemsPerPage, toIndex);
         activeMenu.setProperty("sources", shownSources); // Set sorted sources property for easy access in other methods
         return new HashSet<>(shownSources);
     }
 
     @Override
-    public SlotPos getSlotPos(Player player, ActiveMenu activeMenu, Source source) {
-        List<Source> sources = getSortedSources(activeMenu);
+    public @Nullable SlotPos getSlotPos(@NotNull Player player, @NotNull ActiveMenu activeMenu, @NotNull Source source) {
+        List<@NotNull Source> sources = getSortedSources(activeMenu);
         int index = sources.indexOf(source);
         if (index != -1) {
             // Convert index of source into position on menu
@@ -124,7 +126,7 @@ public class SourceItem extends AbstractItem implements TemplateItemProvider<Sou
     }
 
     @Override
-    public ItemStack onItemModify(ItemStack baseItem, Player player, ActiveMenu activeMenu, Source source) {
+    public @Nullable ItemStack onItemModify(@NotNull ItemStack baseItem, @NotNull Player player, @NotNull ActiveMenu activeMenu, @NotNull Source source) {
         if (baseItem.getType() != XMaterial.GRAY_DYE.parseMaterial()) {
             return baseItem;
         }
@@ -136,23 +138,20 @@ public class SourceItem extends AbstractItem implements TemplateItemProvider<Sou
     }
 
     // Safely get list of sources from property
-    private List<Source> getSortedSources(ActiveMenu activeMenu) {
-        Object object = activeMenu.getProperty("sources");
-        List<Source> sources = new ArrayList<>();
-        if (object instanceof List<?>) {
-            List<?> list = (List<?>) object;
-            for (Object element : list) {
-                if (element instanceof Source) {
-                    sources.add((Source) element);
-                }
+    private @NotNull List<@NotNull Source> getSortedSources(@NotNull ActiveMenu activeMenu) {
+        List<@NotNull Source> sources = new ArrayList<>();
+        List<?> list = getSources(activeMenu);
+        for (Object element : list) {
+            if (element instanceof Source) {
+                sources.add((Source) element);
             }
         }
         return sources;
     }
 
-    private double getMultiplier(Player player, Skill skill) {
+    private double getMultiplier(@NotNull Player player, @NotNull Skill skill) {
         Ability ability = skill.getXpMultiplierAbility();
-        PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+        @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
         if (playerData == null) {
             return 1.0;
         }
@@ -166,14 +165,52 @@ public class SourceItem extends AbstractItem implements TemplateItemProvider<Sou
         return multiplier;
     }
 
-    private String getCustomMessage(String path, Locale locale) {
-        String message = Lang.getMessage(new CustomMessageKey(path), locale);
-        if (message != null) {
-            return message;
-        } else {
-            plugin.getLogger().warning("Unknown message with path " + path);
-            return path;
+    private @NotNull String getCustomMessage(@NotNull String path, @Nullable Locale locale) {
+        String message;
+        try {
+            message = Lang.getMessage(new CustomMessageKey(path), locale);
         }
+        catch (IllegalStateException ex) {
+            throw new IllegalStateException("Unknown custom message with path: " + path);
+        }
+        return message;
+    }
+
+    private @NotNull List<?> getSources(@NotNull ActiveMenu activeMenu) {
+        @Nullable Object property = activeMenu.getProperty("sources");
+        if (!(property instanceof List)) {
+            // TODO: Unclear if this should throw an exception
+            //throw new IllegalArgumentException("Could not get menu sources property");
+            return Collections.EMPTY_LIST;
+        }
+        return (List<?>) property;
+    }
+
+    protected int getItemsPerPage(@NotNull ActiveMenu activeMenu) {
+        @Nullable Object property = activeMenu.getProperty("items_per_page");
+        int itemsPerPage;
+        if (property instanceof Integer) {
+            itemsPerPage = (Integer) property;
+        } else {
+            itemsPerPage = 24;
+        }
+        return itemsPerPage;
+    }
+
+    private @NotNull SortType getSortType(@NotNull ActiveMenu activeMenu) {
+        @Nullable Object property = activeMenu.getProperty("sort_type");
+        if (!(property instanceof SortType)) {
+            throw new IllegalArgumentException("Could not get menu sort_type property");
+        }
+        return (SortType) property;
+    }
+
+    private @NotNull Skill getSkill(@NotNull ActiveMenu activeMenu) {
+        @Nullable Object property = activeMenu.getProperty("skill");
+        if (!(property instanceof Skill)) {
+            throw new IllegalArgumentException("Could not get menu skill property");
+        }
+        return (Skill) property;
     }
 
 }

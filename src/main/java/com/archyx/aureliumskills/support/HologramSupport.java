@@ -17,6 +17,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -24,17 +26,17 @@ import java.util.Random;
 
 public class HologramSupport implements Listener {
 
-    private final AureliumSkills plugin;
+    private final @NotNull AureliumSkills plugin;
     private final Random r = new Random();
-    private final NumberFormat nf;
+    private final @NotNull NumberFormat nf;
 
-    public HologramSupport(AureliumSkills plugin) {
+    public HologramSupport(@NotNull AureliumSkills plugin) {
         this.plugin = plugin;
         nf = new DecimalFormat("#." + TextUtil.repeat("#", OptionL.getInt(Option.DAMAGE_HOLOGRAMS_DECIMAL_MAX)));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+    public void onEntityDamageByEntity(@NotNull EntityDamageByEntityEvent event) {
         if (!event.isCancelled()) {
             if (event.getEntity() instanceof LivingEntity) {
                 if (plugin.isHolographicDisplaysEnabled()) {
@@ -55,12 +57,14 @@ public class HologramSupport implements Listener {
                         } else if (event.getDamager() instanceof Projectile) {
                             Projectile projectile = (Projectile) event.getDamager();
                             if (projectile.getShooter() instanceof Player) {
-                                Player player = (Player) projectile.getShooter();
-                                if (player.equals(event.getEntity())) { // Don't display self damage
+                                @Nullable Player shooter = (Player) projectile.getShooter();
+                                if (shooter == null)
+                                    return;
+                                if (shooter.equals(event.getEntity())) { // Don't display self damage
                                     return;
                                 }
                                 if (event.getFinalDamage() <= 0) return; // Don't display 0 damage
-                                if (player.hasMetadata("skillsCritical")) {
+                                if (shooter.hasMetadata("skillsCritical")) {
                                     createHologram(getLocation(event.getEntity()), getText(event.getFinalDamage(), true));
                                 } else {
                                     createHologram(getLocation(event.getEntity()), getText(event.getFinalDamage(), false));
@@ -73,7 +77,7 @@ public class HologramSupport implements Listener {
         }
     }
 
-    private Location getLocation(Entity entity) {
+    private @NotNull Location getLocation(@NotNull Entity entity) {
         Location location = entity.getLocation();
         if (OptionL.getBoolean(Option.DAMAGE_HOLOGRAMS_OFFSET_RANDOM_ENABLED)) {
             //Calculate random holograms
@@ -97,7 +101,7 @@ public class HologramSupport implements Listener {
         return location;
     }
 
-    private String getText(double damage, boolean critical) {
+    private @NotNull String getText(double damage, boolean critical) {
         StringBuilder text = new StringBuilder(ChatColor.GRAY + "");
         String damageText;
         if (OptionL.getBoolean(Option.DAMAGE_HOLOGRAMS_SCALING)) {
@@ -126,7 +130,7 @@ public class HologramSupport implements Listener {
         return text.toString();
     }
 
-    private String getCriticalText(String damageText) {
+    private @NotNull String getCriticalText(@NotNull String damageText) {
         StringBuilder text = new StringBuilder(ChatColor.GRAY + "");
         for (int i = 0; i < damageText.length(); i++) {
             int j = Math.abs(i - (damageText.length() - 1));

@@ -1,0 +1,14 @@
+<root>
+    <item name='fr.minuskube.inv.content.InventoryProvider void init(org.bukkit.entity.Player, fr.minuskube.inv.content.InventoryContents) 0'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='fr.minuskube.inv.content.InventoryProvider void init(org.bukkit.entity.Player, fr.minuskube.inv.content.InventoryContents) 1'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='fr.minuskube.inv.content.InventoryProvider void update(org.bukkit.entity.Player, fr.minuskube.inv.content.InventoryContents) 0'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='fr.minuskube.inv.content.InventoryProvider void update(org.bukkit.entity.Player, fr.minuskube.inv.content.InventoryContents) 1'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+</root>

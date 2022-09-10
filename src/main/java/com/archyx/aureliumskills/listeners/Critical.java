@@ -9,19 +9,20 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
 
 public class Critical {
 
     private final Random r = new Random();
-    private final AureliumSkills plugin;
+    private final @NotNull AureliumSkills plugin;
 
-    public Critical(AureliumSkills plugin) {
+    public Critical(@NotNull AureliumSkills plugin) {
         this.plugin = plugin;
     }
 
-    public void applyCrit(EntityDamageByEntityEvent event, Player player, PlayerData playerData) {
+    public void applyCrit(@NotNull EntityDamageByEntityEvent event, @NotNull Player player, @NotNull PlayerData playerData) {
         if (plugin.getAbilityManager().isEnabled(Ability.CRIT_CHANCE)) {
             if (isCrit(playerData)) {
                 event.setDamage(event.getDamage() * getCritMultiplier(playerData));
@@ -36,11 +37,11 @@ public class Critical {
         }
     }
 
-    private boolean isCrit(PlayerData playerData) {
+    private boolean isCrit(@NotNull PlayerData playerData) {
         return r.nextDouble() < (plugin.getAbilityManager().getValue(Ability.CRIT_CHANCE, playerData.getAbilityLevel(Ability.CRIT_CHANCE)) / 100);
     }
 
-    private double getCritMultiplier(PlayerData playerData) {
+    private double getCritMultiplier(@NotNull PlayerData playerData) {
         if (plugin.getAbilityManager().isEnabled(Ability.CRIT_DAMAGE)) {
             double multiplier = plugin.getAbilityManager().getValue(Ability.CRIT_DAMAGE, playerData.getAbilityLevel(Ability.CRIT_DAMAGE)) / 100;
             return OptionL.getDouble(Option.CRITICAL_BASE_MULTIPLIER) * (1 + multiplier);

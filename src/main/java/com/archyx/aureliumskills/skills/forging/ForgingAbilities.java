@@ -28,6 +28,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -36,28 +37,28 @@ public class ForgingAbilities extends AbilityProvider implements Listener {
 
     private final Random random = new Random();
 
-    public ForgingAbilities(AureliumSkills plugin) {
+    public ForgingAbilities(@NotNull AureliumSkills plugin) {
         super(plugin, Skills.FORGING);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void disenchanter(InventoryClickEvent event) {
+    public void disenchanter(@NotNull InventoryClickEvent event) {
         if (event.isCancelled()) return;
         if (blockDisabled(Ability.DISENCHANTER)) return;
         if (!VersionUtils.isAtLeastVersion(14)) return; // This ability requires at least 1.14
         if (event.getWhoClicked() instanceof Player) {
             Player player = (Player) event.getWhoClicked();
             if (blockAbility(player)) return;
-            Inventory inventory = event.getClickedInventory();
+            @Nullable Inventory inventory = event.getClickedInventory();
             if (inventory == null) return;
             ClickType click = event.getClick();
             // Only allow right and left clicks if inventory full
             if (click != ClickType.LEFT && click != ClickType.RIGHT && ItemUtils.isInventoryFull(player)) return;
             if (event.getResult() != Event.Result.ALLOW) return; // Make sure the click was successful
             if (player.getItemOnCursor().getType() != Material.AIR) return; // Make sure cursor is empty
-            if (event.getClickedInventory().getType() == InventoryType.GRINDSTONE) {
+            if (inventory.getType() == InventoryType.GRINDSTONE) {
                 if (event.getSlotType() == InventoryType.SlotType.RESULT) {
-                    PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+                    @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
                     if (playerData == null) return;
                     if (playerData.getAbilityLevel(Ability.DISENCHANTER) == 0) return;
                     Location location = inventory.getLocation();
@@ -95,9 +96,9 @@ public class ForgingAbilities extends AbilityProvider implements Listener {
         }
     }
 
-    private void checkEnchants(ItemStack item, Set<EnchantmentValue> enchants) {
+    private void checkEnchants(@Nullable ItemStack item, @NotNull Set<EnchantmentValue> enchants) {
         if (item != null) {
-            for (Map.Entry<Enchantment, Integer> entry : item.getEnchantments().entrySet()) {
+            for (Map.Entry<@NotNull Enchantment, @NotNull Integer> entry : item.getEnchantments().entrySet()) {
                 if (plugin.getForgingLeveler().isDisenchantable(entry.getKey())) {
                     enchants.add(new EnchantmentValue(entry.getKey(), entry.getValue()));
                 }
@@ -107,13 +108,13 @@ public class ForgingAbilities extends AbilityProvider implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     @SuppressWarnings("deprecation")
-    public void repairing(PrepareAnvilEvent event) {
+    public void repairing(@NotNull PrepareAnvilEvent event) {
         if (blockDisabled(Ability.REPAIRING)) return;
         Player player = getHighestPlayer(event.getViewers());
         if (player == null) return;
         if (blockAbility(player)) return;
         AnvilInventory inventory = event.getInventory();
-        PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+        @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
         if (playerData == null) return;
         if (playerData.getAbilityLevel(Ability.REPAIRING) == 0) return;
         ItemStack first = inventory.getItem(0);
@@ -161,7 +162,7 @@ public class ForgingAbilities extends AbilityProvider implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void anvilMaster(InventoryOpenEvent event) {
+    public void anvilMaster(@NotNull InventoryOpenEvent event) {
         if (event.isCancelled()) return;
         if (blockDisabled(Ability.ANVIL_MASTER)) return;
         if (!VersionUtils.isAtLeastVersion(13)) return;
@@ -171,7 +172,7 @@ public class ForgingAbilities extends AbilityProvider implements Listener {
             if (event.getPlayer() instanceof Player) {
                 Player player = (Player) event.getPlayer();
                 if (blockAbility(player)) return;
-                PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+                @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
                 if (playerData == null) return;
                 if (playerData.getAbilityLevel(Ability.ANVIL_MASTER) > 0) {
                     int maxCost = (int) Math.round(getValue(Ability.ANVIL_MASTER, playerData));
@@ -183,12 +184,12 @@ public class ForgingAbilities extends AbilityProvider implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     @SuppressWarnings("deprecation")
-    public void skillMender(XpGainEvent event) {
+    public void skillMender(@NotNull XpGainEvent event) {
         if (event.isCancelled()) return;
         if (blockDisabled(Ability.SKILL_MENDER)) return;
         Player player = event.getPlayer();
         if (blockAbility(player)) return;
-        PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+        @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
         if (playerData == null) return;
         if (playerData.getAbilityLevel(Ability.SKILL_MENDER) == 0) return;
         if (random.nextDouble() < getValue(Ability.SKILL_MENDER, playerData) / 100) {
@@ -227,8 +228,7 @@ public class ForgingAbilities extends AbilityProvider implements Listener {
         }
     }
 
-    @Nullable
-    private XMaterial getRawMaterial(Material material) {
+    private @Nullable XMaterial getRawMaterial(@NotNull Material material) {
         String name = material.name();
         if (name.startsWith("DIAMOND_")) {
             if (!name.equals("DIAMOND_ORE") && !name.equals("DIAMOND_BLOCK") && !name.equals("DIAMOND_HORSE_ARMOR")) {
@@ -264,14 +264,13 @@ public class ForgingAbilities extends AbilityProvider implements Listener {
         return null;
     }
 
-    @Nullable
-    private Player getHighestPlayer(List<HumanEntity> viewers) {
+    private @Nullable Player getHighestPlayer(@NotNull List<HumanEntity> viewers) {
         int highestLevel = 0;
         Player highestPlayer = null;
         for (HumanEntity entity : viewers) {
             if (entity instanceof Player) {
                 Player player = (Player) entity;
-                PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+                @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
                 if (playerData != null) {
                     int level = playerData.getSkillLevel(Skills.FORGING);
                     if (level > highestLevel) {
@@ -285,7 +284,7 @@ public class ForgingAbilities extends AbilityProvider implements Listener {
     }
 
     @SuppressWarnings("deprecation")
-    private boolean hasDamage(ItemStack item) {
+    private boolean hasDamage(@NotNull ItemStack item) {
         if (XMaterial.isNewVersion()) {
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {

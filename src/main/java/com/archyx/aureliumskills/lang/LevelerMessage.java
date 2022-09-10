@@ -1,5 +1,7 @@
 package com.archyx.aureliumskills.lang;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Locale;
 
 public enum LevelerMessage implements MessageKey {
@@ -16,7 +18,7 @@ public enum LevelerMessage implements MessageKey {
     UNCLAIMED_ITEM;
 
     @Override
-    public String getPath() {
+    public @NotNull String getPath() {
         return "leveler." + this.toString().toLowerCase(Locale.ENGLISH);
     }
 }

@@ -14,10 +14,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerManager {
 
-    private final AureliumSkills plugin;
-    private final ConcurrentHashMap<UUID, PlayerData> playerData;
+    private final @NotNull AureliumSkills plugin;
+    private final @NotNull ConcurrentHashMap<UUID, PlayerData> playerData;
 
-    public PlayerManager(AureliumSkills plugin) {
+    public PlayerManager(@NotNull AureliumSkills plugin) {
         this.plugin = plugin;
         this.playerData = new ConcurrentHashMap<>();
         if (OptionL.getBoolean(Option.AUTO_SAVE_ENABLED)) {
@@ -25,13 +25,11 @@ public class PlayerManager {
         }
     }
 
-    @Nullable
-    public PlayerData getPlayerData(Player player) {
+    public @Nullable PlayerData getPlayerData(@NotNull Player player) {
         return playerData.get(player.getUniqueId());
     }
 
-    @Nullable
-    public PlayerData getPlayerData(UUID id) {
+    public @Nullable PlayerData getPlayerData(UUID id) {
         return this.playerData.get(id);
     }
 
@@ -39,15 +37,15 @@ public class PlayerManager {
         this.playerData.put(playerData.getPlayer().getUniqueId(), playerData);
     }
 
-    public void removePlayerData(UUID id) {
+    public void removePlayerData(@NotNull UUID id) {
         this.playerData.remove(id);
     }
 
-    public boolean hasPlayerData(Player player) {
+    public boolean hasPlayerData(@NotNull Player player) {
         return playerData.containsKey(player.getUniqueId());
     }
 
-    public ConcurrentHashMap<UUID, PlayerData> getPlayerDataMap() {
+    public @NotNull ConcurrentHashMap<UUID, PlayerData> getPlayerDataMap() {
         return playerData;
     }
 
@@ -57,7 +55,7 @@ public class PlayerManager {
             @Override
             public void run() {
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+                    @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
                     if (playerData != null && !playerData.isSaving()) {
                         plugin.getStorageProvider().save(player, false);
                     }

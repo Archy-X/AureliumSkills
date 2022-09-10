@@ -1,0 +1,5 @@
+<root>
+    <item name='com.comphenix.protocol.events.PacketAdapter void onPacketSending(com.comphenix.protocol.events.PacketEvent) 0'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+</root>

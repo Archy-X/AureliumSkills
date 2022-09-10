@@ -17,17 +17,19 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class LightningBlade extends ReadiedManaAbility {
 
-    public LightningBlade(AureliumSkills plugin) {
+    public LightningBlade(@NotNull AureliumSkills plugin) {
         super(plugin, MAbility.LIGHTNING_BLADE, ManaAbilityMessage.LIGHTNING_BLADE_START, ManaAbilityMessage.LIGHTNING_BLADE_END,
-                new String[] {"SWORD"}, new Action[] {Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK});
+                new @NotNull String[] {"SWORD"}, new @NotNull Action[] {Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK});
 
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void activationListener(EntityDamageByEntityEvent event) {
+    public void activationListener(@NotNull EntityDamageByEntityEvent event) {
         if (!OptionL.isEnabled(Skills.FIGHTING)) return;
         if (event.isCancelled()) return;
         if (!(event.getDamager() instanceof Player)) return;
@@ -42,7 +44,7 @@ public class LightningBlade extends ReadiedManaAbility {
         }
         // Checks if ready
         if (isReady(player)) {
-            PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+            @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
             if (playerData == null) return;
             if (hasEnoughMana(player)) {
                 activate(player);
@@ -51,7 +53,7 @@ public class LightningBlade extends ReadiedManaAbility {
     }
 
     @Override
-    protected int getDuration(PlayerData playerData) {
+    protected int getDuration(@NotNull PlayerData playerData) {
         double baseDuration = manager.getOptionAsDouble(mAbility, "base_duration");
         double durationPerLevel = manager.getOptionAsDouble(mAbility, "duration_per_level");
         double durationSeconds = baseDuration + (durationPerLevel * (playerData.getManaAbilityLevel(mAbility) - 1));
@@ -59,7 +61,7 @@ public class LightningBlade extends ReadiedManaAbility {
     }
 
     @Override
-    public void onActivate(Player player, PlayerData playerData) {
+    public void onActivate(@NotNull Player player, @NotNull PlayerData playerData) {
         AttributeInstance attribute = player.getAttribute(Attribute.GENERIC_ATTACK_SPEED);
         if (attribute == null) return;
 
@@ -82,7 +84,7 @@ public class LightningBlade extends ReadiedManaAbility {
     }
 
     @Override
-    public void onStop(Player player, PlayerData playerData) {
+    public void onStop(@NotNull Player player, @NotNull PlayerData playerData) {
         AttributeInstance attribute = player.getAttribute(Attribute.GENERIC_ATTACK_SPEED);
         if (attribute == null) return;
         // Remove modifier if exists
@@ -94,7 +96,7 @@ public class LightningBlade extends ReadiedManaAbility {
     }
 
     @EventHandler
-    public void lightningBladeJoin(PlayerJoinEvent event) {
+    public void lightningBladeJoin(@NotNull PlayerJoinEvent event) {
         // Only remove if not activated
         Player player = event.getPlayer();
         if (plugin.getManaAbilityManager().isActivated(player.getUniqueId(), MAbility.LIGHTNING_BLADE)) {

@@ -7,6 +7,8 @@ import com.archyx.aureliumskills.skills.Skills;
 import com.archyx.aureliumskills.source.Source;
 import com.archyx.aureliumskills.source.SourceManager;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 
@@ -100,12 +102,12 @@ public enum FightingSource implements Source {
     }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         return configName != null ? configName.toUpperCase(Locale.ROOT) : name();
     }
 
     @Override
-    public String getPath() {
+    public @NotNull String getPath() {
         if (configName == null) {
             return getSkill().toString().toLowerCase(Locale.ROOT) + "." + toString().toLowerCase(Locale.ROOT);
         } else {
@@ -114,12 +116,12 @@ public enum FightingSource implements Source {
     }
 
     @Override
-    public Skill getSkill() {
+    public @NotNull Skill getSkill() {
         return Skills.FIGHTING;
     }
 
     @Override
-    public String getUnitName() {
+    public @Nullable String getUnitName() {
         if (OptionL.getBoolean(Option.FIGHTING_DAMAGE_BASED)) {
             return "damage";
         }

@@ -14,24 +14,26 @@ import com.archyx.slate.item.provider.PlaceholderType;
 import com.archyx.slate.item.provider.TemplateItemProvider;
 import com.archyx.slate.menu.ActiveMenu;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-public class LockedManaAbilityItem extends AbstractManaAbilityItem implements TemplateItemProvider<MAbility> {
+public class LockedManaAbilityItem extends AbstractManaAbilityItem implements TemplateItemProvider<@NotNull MAbility> {
 
-    private final ManaAbilityManager manager;
+    private final @NotNull ManaAbilityManager manager;
 
-    public LockedManaAbilityItem(AureliumSkills plugin) {
+    public LockedManaAbilityItem(@NotNull AureliumSkills plugin) {
         super(plugin);
         this.manager = plugin.getManaAbilityManager();
     }
 
     @Override
-    public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu menu, PlaceholderType type, MAbility mAbility) {
-        Locale locale = plugin.getLang().getLocale(player);
-        Skill skill = (Skill) menu.getProperty("skill");
+    public @NotNull String onPlaceholderReplace(@NotNull String placeholder, @NotNull Player player, @NotNull ActiveMenu activeMenu, @NotNull PlaceholderType type, @NotNull MAbility mAbility) {
+        @Nullable Locale locale = plugin.getLang().getLocale(player);
+        Skill skill = getSkill(activeMenu);
         switch (placeholder) {
             case "name":
                 return mAbility.getDisplayName(locale);
@@ -52,11 +54,11 @@ public class LockedManaAbilityItem extends AbstractManaAbilityItem implements Te
     }
 
     @Override
-    public Set<MAbility> getDefinedContexts(Player player, ActiveMenu activeMenu) {
-        Set<MAbility> lockedManaAbilities = new HashSet<>();
-        Skill skill = (Skill) activeMenu.getProperty("skill");
+    public @NotNull Set<@NotNull MAbility> getDefinedContexts(@NotNull Player player, @NotNull ActiveMenu activeMenu) {
+        Set<@NotNull MAbility> lockedManaAbilities = new HashSet<>();
+        Skill skill = getSkill(activeMenu);
         MAbility mAbility = skill.getManaAbility();
-        PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+        @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
         if (mAbility != null && playerData != null) {
             if (playerData.getManaAbilityLevel(mAbility) <= 0) {
                 lockedManaAbilities.add(mAbility);
@@ -65,12 +67,20 @@ public class LockedManaAbilityItem extends AbstractManaAbilityItem implements Te
         return lockedManaAbilities;
     }
 
-    private double getDuration(MAbility mAbility) {
+    private double getDuration(@NotNull MAbility mAbility) {
         if (mAbility == MAbility.LIGHTNING_BLADE) {
             return manager.getOptionAsDouble(MAbility.LIGHTNING_BLADE, "base_duration");
         } else {
             return manager.getValue(mAbility, 1);
         }
+    }
+
+    private @NotNull Skill getSkill(@NotNull ActiveMenu activeMenu) {
+        @Nullable Object property = activeMenu.getProperty("skill");
+        if (!(property instanceof Skill)) {
+            throw new IllegalArgumentException("Could not get menu skill property");
+        }
+        return (Skill) property;
     }
 
 }

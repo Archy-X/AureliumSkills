@@ -14,6 +14,8 @@ import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -26,15 +28,15 @@ public class SourcesItem extends AbstractItem implements SingleItemProvider {
     }
 
     @Override
-    public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu, PlaceholderType placeholderType) {
-        Locale locale = plugin.getLang().getLocale(player);
+    public @NotNull String onPlaceholderReplace(@NotNull String placeholder, @NotNull Player player, @NotNull ActiveMenu activeMenu, @NotNull PlaceholderType placeholderType) {
+        @Nullable Locale locale = plugin.getLang().getLocale(player);
         switch (placeholder) {
             case "sources":
                 return Lang.getMessage(MenuMessage.SOURCES, locale);
             case "sources_desc":
                 return Lang.getMessage(MenuMessage.SOURCES_DESC, locale);
             case "sources_click":
-                Skill skill = (Skill) activeMenu.getProperty("skill");
+                Skill skill = getSkill(activeMenu);
                 return TextUtil.replace(Lang.getMessage(MenuMessage.SOURCES_CLICK, locale),
                         "{skill}", skill.getDisplayName(locale));
         }
@@ -42,12 +44,21 @@ public class SourcesItem extends AbstractItem implements SingleItemProvider {
     }
 
     @Override
-    public void onClick(Player player, InventoryClickEvent event, ItemStack item, SlotPos pos, ActiveMenu activeMenu) {
+    public void onClick(@NotNull Player player, @NotNull InventoryClickEvent event, @NotNull ItemStack item, @NotNull SlotPos pos, @NotNull ActiveMenu activeMenu) {
         Map<String, Object> properties = new HashMap<>();
-        properties.put("skill", activeMenu.getProperty("skill"));
+        properties.put("skill", getSkill(activeMenu));
         properties.put("items_per_page", 28);
         properties.put("sort_type", SorterItem.SortType.ASCENDING);
         properties.put("previous_menu", "level_progression");
         plugin.getMenuManager().openMenu(player, "sources", properties, 0);
     }
+
+    private @NotNull Skill getSkill(@NotNull ActiveMenu activeMenu) {
+        @Nullable Object property = activeMenu.getProperty("skill");
+        if (!(property instanceof Skill)) {
+            throw new IllegalArgumentException("Could not get menu skill property");
+        }
+        return (Skill) property;
+    }
+
 }

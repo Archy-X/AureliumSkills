@@ -18,6 +18,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 import java.util.UUID;
@@ -26,13 +27,13 @@ public class AgilityLeveler extends SkillLeveler implements Listener {
 	
 	private final Set<UUID> prevPlayersOnGround = Sets.newHashSet();
 	
-	public AgilityLeveler(AureliumSkills plugin) {
+	public AgilityLeveler(@NotNull AureliumSkills plugin) {
 		super(plugin, Ability.JUMPER);
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)
 	@SuppressWarnings("deprecation")
-	public void onFall(EntityDamageEvent event) {
+	public void onFall(@NotNull EntityDamageEvent event) {
 		if (OptionL.isEnabled(Skills.AGILITY)) {
 			//Check cancelled
 			if (OptionL.getBoolean(Option.AGILITY_CHECK_CANCELLED)) {
@@ -54,7 +55,7 @@ public class AgilityLeveler extends SkillLeveler implements Listener {
 	
     @EventHandler
 	@SuppressWarnings("deprecation")
-    public void onMove(PlayerMoveEvent e) {
+    public void onMove(@NotNull PlayerMoveEvent e) {
     	if (OptionL.isEnabled(Skills.AGILITY)) {
     		//Check cancelled
     		if (OptionL.getBoolean(Option.AGILITY_CHECK_CANCELLED)) {

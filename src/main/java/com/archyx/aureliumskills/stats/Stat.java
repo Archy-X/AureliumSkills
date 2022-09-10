@@ -1,17 +1,20 @@
 package com.archyx.aureliumskills.stats;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Locale;
 
 public interface Stat {
 
-    String getDisplayName(Locale locale);
+    @NotNull String getDisplayName(@Nullable Locale locale);
 
-    String getColor(Locale locale);
+    @NotNull String getColor(@Nullable Locale locale);
 
-    String getSymbol(Locale locale);
+    @NotNull String getSymbol(@Nullable Locale locale);
 
-    String getDescription(Locale locale);
+    @NotNull String getDescription(@Nullable Locale locale);
 
-    String name();
+    @NotNull String name();
 
 }

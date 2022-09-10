@@ -2,6 +2,8 @@ package com.archyx.aureliumskills.stats;
 
 import com.archyx.aureliumskills.lang.Lang;
 import com.archyx.aureliumskills.lang.StatMessage;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 
@@ -15,22 +17,22 @@ public enum Stats implements Stat {
 	TOUGHNESS;
 
 	@Override
-	public String getDisplayName(Locale locale) {
+	public @NotNull String getDisplayName(@Nullable Locale locale) {
 		return Lang.getMessage(StatMessage.valueOf(this.name() + "_NAME"), locale);
 	}
 
 	@Override
-	public String getColor(Locale locale) {
+	public @NotNull String getColor(@Nullable Locale locale) {
 		return Lang.getMessage(StatMessage.valueOf(this.name() + "_COLOR"), locale);
 	}
 
 	@Override
-	public String getSymbol(Locale locale) {
+	public @NotNull String getSymbol(@Nullable Locale locale) {
 		return Lang.getMessage(StatMessage.valueOf(this.name() + "_SYMBOL"), locale);
 	}
 
 	@Override
-	public String getDescription(Locale locale) {
+	public @NotNull String getDescription(@Nullable Locale locale) {
 		return Lang.getMessage(StatMessage.valueOf(this.name() + "_DESC"), locale);
 	}
 

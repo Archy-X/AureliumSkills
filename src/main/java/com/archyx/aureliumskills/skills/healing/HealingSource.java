@@ -9,6 +9,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 
@@ -26,32 +28,34 @@ public enum HealingSource implements Source {
     GOLDEN_APPLE("GOLDEN_APPLE"),
     ENCHANTED_GOLDEN_APPLE("ENCHANTED_GOLDEN_APPLE");
 
-    private final String material;
-    private final PotionType potionType;
+    private final @NotNull String material;
+    private final @Nullable PotionType potionType;
 
-    HealingSource(String material) {
+    HealingSource(@NotNull String material) {
         this.material = material;
         this.potionType = null;
     }
 
-    HealingSource(String material, PotionType potionType) {
+    HealingSource(@NotNull String material, @NotNull PotionType potionType) {
         this.material = material.toUpperCase(Locale.ROOT);
         this.potionType = potionType;
     }
 
     @Override
-    public Skill getSkill() {
+    public @NotNull Skill getSkill() {
         return Skills.HEALING;
     }
 
     @Override
-    public ItemStack getMenuItem() {
-        ItemStack baseItem = ItemUtils.parseItem(material);
+    public @Nullable ItemStack getMenuItem() {
+        @Nullable ItemStack baseItem = ItemUtils.parseItem(material);
         if (baseItem != null && baseItem.getItemMeta() instanceof PotionMeta) {
-            PotionMeta meta = (PotionMeta) baseItem.getItemMeta();
-            meta.setBasePotionData(new PotionData(potionType));
-            meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-            baseItem.setItemMeta(meta);
+            @Nullable PotionMeta meta = (PotionMeta) baseItem.getItemMeta();
+            if (meta != null && potionType != null) {
+                meta.setBasePotionData(new PotionData(potionType));
+                meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+                baseItem.setItemMeta(meta);
+            }
         }
         return baseItem;
     }

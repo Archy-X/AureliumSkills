@@ -1,11 +1,13 @@
 package com.archyx.aureliumskills.lang;
 
 import com.archyx.aureliumskills.mana.MAbility;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
 public enum ManaAbilityMessage implements MessageKey {
     
+    NONE,
     REPLENISH_NAME,
     REPLENISH_DESC,
     REPLENISH_RAISE,
@@ -56,19 +58,23 @@ public enum ManaAbilityMessage implements MessageKey {
     NOT_READY("not_ready"),
     NOT_ENOUGH_MANA("not_enough_mana");
 
-    private final String path;
+    private final @NotNull String path;
 
     ManaAbilityMessage() {
+        if (this.name().equals("NONE")) {
+            this.path = "";
+            return;
+        }
         MAbility manaAbility = MAbility.valueOf(this.name().substring(0, this.name().lastIndexOf("_")));
         this.path = "mana_abilities." + manaAbility.name().toLowerCase(Locale.ENGLISH) + "." + this.name().substring(this.name().lastIndexOf("_") + 1).toLowerCase(Locale.ENGLISH);
     }
 
-    ManaAbilityMessage(String path) {
+    ManaAbilityMessage(@NotNull String path) {
         this.path = "mana_abilities." + path;
     }
 
     @Override
-    public String getPath() {
+    public @NotNull String getPath() {
         return path;
     }
 }

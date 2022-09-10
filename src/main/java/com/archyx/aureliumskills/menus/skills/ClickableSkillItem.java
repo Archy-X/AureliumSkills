@@ -11,6 +11,8 @@ import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Locale;
@@ -23,8 +25,8 @@ public class ClickableSkillItem extends AbstractSkillItem {
     }
 
     @Override
-    public void onClick(Player player, InventoryClickEvent event, ItemStack item, SlotPos pos, ActiveMenu activeMenu, Skill skill) {
-        PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+    public void onClick(@NotNull Player player, @NotNull InventoryClickEvent event, @NotNull ItemStack item, @NotNull SlotPos pos, @NotNull ActiveMenu activeMenu, @NotNull Skill skill) {
+        @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
         if (playerData == null) {
             return;
         }
@@ -35,16 +37,15 @@ public class ClickableSkillItem extends AbstractSkillItem {
     }
 
     @Override
-    public Set<Skill> getDefinedContexts(Player player, ActiveMenu activeMenu) {
+    public @NotNull Set<@NotNull Skill> getDefinedContexts(@NotNull Player player, @NotNull ActiveMenu activeMenu) {
         return new HashSet<>(plugin.getSkillRegistry().getSkills());
     }
 
     @Override
-    public ItemStack onItemModify(ItemStack baseItem, Player player, ActiveMenu activeMenu, Skill skill) {
+    public @Nullable ItemStack onItemModify(@NotNull ItemStack baseItem, @NotNull Player player, @NotNull ActiveMenu activeMenu, @NotNull Skill skill) {
         if (OptionL.isEnabled(skill)) {
             return baseItem;
-        } else {
-            return null; // Hide item if skill is disabled
         }
+        return null; // Hide item if skill is disabled
     }
 }

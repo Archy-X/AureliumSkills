@@ -8,6 +8,8 @@ import com.archyx.aureliumskills.lang.ManaAbilityMessage;
 import com.archyx.aureliumskills.skills.Skills;
 import com.archyx.aureliumskills.skills.excavation.ExcavationSource;
 import com.archyx.aureliumskills.source.SourceTag;
+import com.archyx.aureliumskills.support.TownySupport;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -18,28 +20,30 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedList;
 
 public class Terraform extends ReadiedManaAbility {
 
-    public Terraform(AureliumSkills plugin) {
+    public Terraform(@NotNull AureliumSkills plugin) {
         super(plugin, MAbility.TERRAFORM, ManaAbilityMessage.TERRAFORM_START, ManaAbilityMessage.TERRAFORM_END,
-                new String[]{"SHOVEL", "SPADE"}, new Action[]{Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR});
+                new @NotNull String[]{"SHOVEL", "SPADE"}, new @NotNull Action[]{Action.RIGHT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR});
     }
 
     @Override
-    public void onActivate(Player player, PlayerData playerData) {
+    public void onActivate(@NotNull Player player, @NotNull PlayerData playerData) {
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
     }
 
     @Override
-    public void onStop(Player player, PlayerData playerData) {
+    public void onStop(@NotNull Player player, @NotNull PlayerData playerData) {
 
     }
 
     @EventHandler
-    public void onBreak(BlockBreakEvent event) {
+    public void onBreak(@NotNull BlockBreakEvent event) {
         if (!OptionL.isEnabled(Skills.EXCAVATION)) return;
         if (event.isCancelled()) return;
         Player player = event.getPlayer();
@@ -54,7 +58,7 @@ public class Terraform extends ReadiedManaAbility {
         }
     }
 
-    private void applyTerraform(Player player, Block block) {
+    private void applyTerraform(@NotNull Player player, @NotNull Block block) {
         // Check if block is applicable to ability
         ExcavationSource source = ExcavationSource.getSource(block);
         if (source == null) return;
@@ -71,28 +75,32 @@ public class Terraform extends ReadiedManaAbility {
         }
     }
 
-    private void terraformBreak(Player player, Block block) {
+    private void terraformBreak(@NotNull Player player, @NotNull Block block) {
         Material material = block.getType();
         BlockFace[] faces = new BlockFace[] {BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
         LinkedList<Block> toCheck = new LinkedList<>();
         toCheck.add(block);
         int count = 0;
-        while ((block = toCheck.poll()) != null && count < 61) {
-            if (block.getType() == material) {
-                block.setMetadata("AureliumSkills-Terraform", new FixedMetadataValue(plugin, true));
-                breakBlock(player, block);
-                for (BlockFace face : faces) {
-                    toCheck.add(block.getRelative(face));
+        @Nullable Block nextBlock;
+        while ((nextBlock = toCheck.poll()) != null && count < 61) {
+            if (nextBlock.getType() == material) {
+                nextBlock.setMetadata("AureliumSkills-Terraform", new FixedMetadataValue(plugin, true));
+                breakBlock(player, nextBlock);
+                for (@NotNull BlockFace face : faces) {
+                    toCheck.add(nextBlock.getRelative(face));
                 }
                 count++;
             }
         }
     }
 
-    private void breakBlock(Player player, Block block) {
-        if (!plugin.getTownySupport().canBreak(player, block)) {
-            block.removeMetadata("AureliumSkills-Terraform", plugin);
-            return;
+    private void breakBlock(@NotNull Player player, @NotNull Block block) {
+        TownySupport townySupport = plugin.getTownySupport();
+        if (plugin.isTownyEnabled() && townySupport != null) {
+            if (!townySupport.canBreak(player, block)) {
+                block.removeMetadata("AureliumSkills-Terraform", plugin);
+                return;
+            }
         }
         TerraformBlockBreakEvent event = new TerraformBlockBreakEvent(block, player);
         Bukkit.getPluginManager().callEvent(event);

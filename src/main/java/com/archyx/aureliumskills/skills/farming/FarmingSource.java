@@ -7,6 +7,7 @@ import com.archyx.aureliumskills.util.block.BlockUtil;
 import com.archyx.aureliumskills.util.item.ItemUtils;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public enum FarmingSource implements Source {
@@ -75,7 +76,7 @@ public enum FarmingSource implements Source {
         return rightClickHarvestable;
     }
 
-    public boolean isMatch(Block block) {
+    public boolean isMatch(@NotNull Block block) {
         String materialName = block.getType().toString();
         boolean match = false;
         if (materialName.equalsIgnoreCase(toString())) { // Try to match by enum name
@@ -100,12 +101,11 @@ public enum FarmingSource implements Source {
     }
     
     @Override
-    public Skill getSkill() {
+    public @NotNull Skill getSkill() {
         return Skills.FARMING;
     }
 
-    @Nullable
-    public static FarmingSource getSource(Block block) {
+    public static @Nullable FarmingSource getSource(@NotNull Block block) {
         for (FarmingSource source : values()) {
             if (source.isMatch(block)) {
                 return source;
@@ -115,7 +115,7 @@ public enum FarmingSource implements Source {
     }
 
     @Override
-    public ItemStack getMenuItem() {
+    public @Nullable ItemStack getMenuItem() {
         String material = this.toString();
         switch (material) {
             case "SWEET_BERRY_BUSH":

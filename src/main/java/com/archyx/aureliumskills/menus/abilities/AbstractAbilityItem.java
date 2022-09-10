@@ -12,34 +12,36 @@ import com.archyx.slate.menu.ActiveMenu;
 import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public abstract class AbstractAbilityItem extends AbstractItem implements TemplateItemProvider<Ability> {
+public abstract class AbstractAbilityItem extends AbstractItem implements TemplateItemProvider<@NotNull Ability> {
 
-    private final String itemName;
+    private final @NotNull String itemName;
 
-    public AbstractAbilityItem(AureliumSkills plugin, String itemName) {
+    public AbstractAbilityItem(AureliumSkills plugin, @NotNull String itemName) {
         super(plugin);
         this.itemName = itemName;
     }
 
     @Override
-    public Class<Ability> getContext() {
+    public @NotNull Class<@NotNull Ability> getContext() {
         return Ability.class;
     }
 
     @Override
-    public SlotPos getSlotPos(Player player, ActiveMenu activeMenu, Ability ability) {
-        Skill skill = (Skill) activeMenu.getProperty("skill");
-        Object obj =  activeMenu.getItemOption(itemName, "slots");
+    public @NotNull SlotPos getSlotPos(@NotNull Player player, @NotNull ActiveMenu activeMenu, @NotNull Ability ability) {
+        Skill skill = getSkill(activeMenu);
+        @Nullable Object obj =  activeMenu.getItemOption(itemName, "slots");
         if (obj instanceof List<?>) {
-            List<String> slots = DataUtil.castStringList(obj);
+            List<@NotNull String> slots = DataUtil.castStringList(obj);
             // Get the index of the ability
             int index = 0;
-            for (Supplier<Ability> abilitySupplier : skill.getAbilities()) {
+            for (Supplier<@NotNull Ability> abilitySupplier : skill.getAbilities()) {
                 Ability skillAbility = abilitySupplier.get();
                 if (plugin.getAbilityManager().isEnabled(skillAbility) && OptionL.isEnabled(skill)) {
                     if (skillAbility == ability) {
@@ -55,7 +57,7 @@ public abstract class AbstractAbilityItem extends AbstractItem implements Templa
         }
         // Default slots
         List<Ability> abilityList = new ArrayList<>();
-        for (Supplier<Ability> abilitySupplier : skill.getAbilities()) {
+        for (Supplier<@NotNull Ability> abilitySupplier : skill.getAbilities()) {
             Ability skillAbility = abilitySupplier.get();
             if (plugin.getAbilityManager().isEnabled(skillAbility) && OptionL.isEnabled(skill)) {
                 abilityList.add(abilitySupplier.get());
@@ -65,7 +67,7 @@ public abstract class AbstractAbilityItem extends AbstractItem implements Templa
         return SlotPos.of(1, 2 + index);
     }
 
-    private SlotPos parseSlot(String slotString) {
+    private @NotNull SlotPos parseSlot(@NotNull String slotString) {
         String[] split = slotString.split(",", 2);
         if (split.length == 2) {
             return SlotPos.of(NumberUtil.toInt(split[0]), NumberUtil.toInt(split[1]));
@@ -78,11 +80,20 @@ public abstract class AbstractAbilityItem extends AbstractItem implements Templa
     }
 
     @Override
-    public ItemStack onItemModify(ItemStack baseItem, Player player, ActiveMenu activeMenu, Ability ability) {
+    public @Nullable ItemStack onItemModify(@NotNull ItemStack baseItem, @NotNull Player player, @NotNull ActiveMenu activeMenu, @NotNull Ability ability) {
         // Hide abilities that are disabled
         if (!plugin.getAbilityManager().isEnabled(ability)) {
             return null;
         }
         return baseItem;
     }
+
+    private @NotNull Skill getSkill(@NotNull ActiveMenu activeMenu) {
+        @Nullable Object property = activeMenu.getProperty("skill");
+        if (!(property instanceof Skill)) {
+            throw new IllegalArgumentException("Could not get menu skill property");
+        }
+        return (Skill) property;
+    }
+
 }

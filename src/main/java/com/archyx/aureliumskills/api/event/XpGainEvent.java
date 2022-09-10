@@ -4,28 +4,29 @@ import com.archyx.aureliumskills.skills.Skill;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
 public class XpGainEvent extends Event {
 
-    private static final HandlerList handlers = new HandlerList();
+    private static final @NotNull HandlerList handlers = new HandlerList();
 
-    private final Player player;
-    private final Skill skill;
+    private final @NotNull Player player;
+    private final @NotNull Skill skill;
     private double amount;
     private boolean isCancelled;
 
-    public XpGainEvent(Player player, Skill skill, double amount) {
+    public XpGainEvent(@NotNull Player player, @NotNull Skill skill, double amount) {
         this.player = player;
         this.skill = skill;
         this.amount = amount;
         this.isCancelled = false;
     }
 
-    public Player getPlayer() {
+    public @NotNull Player getPlayer() {
         return player;
     }
 
-    public Skill getSkill() {
+    public @NotNull Skill getSkill() {
         return skill;
     }
 
@@ -46,11 +47,11 @@ public class XpGainEvent extends Event {
     }
 
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return handlers;
     }
 
-    public static HandlerList getHandlerList() {
+    public static @NotNull HandlerList getHandlerList() {
         return handlers;
     }
 }

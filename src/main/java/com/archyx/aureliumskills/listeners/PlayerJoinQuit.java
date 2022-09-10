@@ -21,17 +21,18 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 public class PlayerJoinQuit implements Listener {
 
-	private final AureliumSkills plugin;
+	private final @NotNull AureliumSkills plugin;
 
-	public PlayerJoinQuit(AureliumSkills plugin) {
+	public PlayerJoinQuit(@NotNull AureliumSkills plugin) {
 		this.plugin = plugin;
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onPlayerJoin(PlayerJoinEvent event) {
+	public void onPlayerJoin(@NotNull PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		PlayerManager playerManager = plugin.getPlayerManager();
 		if (plugin.getStorageProvider() instanceof MySqlStorageProvider) { // Handles MySQL storage
@@ -81,7 +82,7 @@ public class PlayerJoinQuit implements Listener {
 	}
 
 	@EventHandler
-	public void onPlayerQuit(PlayerQuitEvent event) {
+	public void onPlayerQuit(@NotNull PlayerQuitEvent event) {
 		Player player = event.getPlayer();
 		new BukkitRunnable() {
 			@Override
@@ -92,7 +93,7 @@ public class PlayerJoinQuit implements Listener {
 		plugin.getActionBar().resetActionBar(player);
 	}
 
-	private void loadPlayerDataAsync(Player player) {
+	private void loadPlayerDataAsync(@NotNull Player player) {
 		new BukkitRunnable() {
 			@Override
 			public void run() {

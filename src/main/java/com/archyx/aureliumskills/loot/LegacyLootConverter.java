@@ -7,6 +7,8 @@ import com.archyx.aureliumskills.util.text.TextUtil;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,7 +59,7 @@ public class LegacyLootConverter {
         }
     }
 
-    private void convertSection(FileConfiguration config, List<String> legacyLoot, String sectionPath) {
+    private void convertSection(@NotNull FileConfiguration config, @NotNull List<String> legacyLoot, @NotNull String sectionPath) {
         // Convert loot
         List<Map<String, Object>> mapList = new ArrayList<>();
         for (String entry : legacyLoot) {
@@ -95,7 +97,7 @@ public class LegacyLootConverter {
                                 map.put("display_name", value);
                                 break;
                             case "lore":
-                                List<String> lore = new LinkedList<>(Arrays.asList(value.split("\\|")));
+                                List<@NotNull String> lore = new LinkedList<>(Arrays.asList(value.split("\\|")));
                                 map.put("lore", lore);
                                 break;
                             case "glow":
@@ -104,7 +106,7 @@ public class LegacyLootConverter {
                                 }
                                 break;
                             case "enchantments":
-                                List<String> enchantments = new ArrayList<>(Arrays.asList(originalValue.split("\\|")));
+                                List<@NotNull String> enchantments = new ArrayList<>(Arrays.asList(originalValue.split("\\|")));
                                 List<String> enchantmentList = new ArrayList<>();
                                 for (String enchantString : enchantments) {
                                     String[] splitEnchantString = enchantString.split(":", 2);
@@ -123,10 +125,10 @@ public class LegacyLootConverter {
                                 map.put("potion_data", potionData);
                                 break;
                             case "custom_effect":
-                                String[] values = originalValue.split(",");
+                                @NotNull String[] values = originalValue.split(",");
                                 List<Map<String, Object>> customEffects = new ArrayList<>();
                                 if (values.length == 3) {
-                                    PotionEffectType type = PotionEffectType.getByName(values[0]);
+                                    @Nullable PotionEffectType type = PotionEffectType.getByName(values[0]);
                                     if (type != null) {
                                         Map<String, Object> effect = new HashMap<>();
                                         effect.put("type", type.toString());
@@ -147,7 +149,7 @@ public class LegacyLootConverter {
         config.set(sectionPath + ".loot", mapList);
     }
 
-    private void renameLegacyFile(File file) {
+    private void renameLegacyFile(@NotNull File file) {
         String renamedName = FileUtil.renameNoDuplicates(file, "loot-OLD.yml", plugin.getDataFolder());
         if (renamedName != null) {
             plugin.getLogger().info("Successfully renamed loot.yml to " + renamedName);

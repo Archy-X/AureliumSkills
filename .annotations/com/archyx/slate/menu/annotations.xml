@@ -1,0 +1,35 @@
+<root>
+    <item name='com.archyx.slate.menu.MenuProvider int getPages(org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu) 0'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.menu.MenuProvider int getPages(org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu) 1'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.menu.MenuProvider java.lang.String onPlaceholderReplace(java.lang.String, org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu)'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.menu.MenuProvider java.lang.String onPlaceholderReplace(java.lang.String, org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu) 0'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.menu.MenuProvider java.lang.String onPlaceholderReplace(java.lang.String, org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu) 1'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.menu.MenuProvider java.lang.String onPlaceholderReplace(java.lang.String, org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu) 2'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.menu.MenuProvider org.bukkit.inventory.ItemStack getFillItem(org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu)'>
+        <annotation name='org.jetbrains.annotations.Nullable'/>
+    </item>
+    <item name='com.archyx.slate.menu.MenuProvider org.bukkit.inventory.ItemStack getFillItem(org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu) 1'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.menu.MenuProvider void onOpen(org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu) 0'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.menu.MenuProvider void onOpen(org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu) 1'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.menu.MenuProvider void onUpdate(org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu) 0'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+</root>

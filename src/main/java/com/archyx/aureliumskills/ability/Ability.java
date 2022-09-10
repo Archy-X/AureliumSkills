@@ -5,6 +5,8 @@ import com.archyx.aureliumskills.lang.AbilityMessage;
 import com.archyx.aureliumskills.lang.Lang;
 import com.archyx.aureliumskills.skills.Skill;
 import com.archyx.aureliumskills.skills.Skills;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -51,10 +53,10 @@ public enum Ability implements AbstractAbility {
 	CRIT_DAMAGE(() -> Skills.FIGHTING, 5.0, 4.0),
 	FIGHTER(() -> Skills.FIGHTING, 10.0, 10.0),
 	SWORD_MASTER(() -> Skills.FIGHTING, 3.0, 2.0),
-	FIRST_STRIKE(() -> Skills.FIGHTING, 20.0, 10.0, new String[] {"enable_message", "cooldown_ticks"}, new Object[] {true}),
+	FIRST_STRIKE(() -> Skills.FIGHTING, 20.0, 10.0, new @NotNull String[] {"enable_message", "cooldown_ticks"}, new @NotNull Object[] {true}),
 	BLEED(() -> Skills.FIGHTING, 3.0, 4.0, 0.5, 0.5,
-			new String[] {"enable_enemy_message", "enable_self_message", "enable_stop_message", "base_ticks", "added_ticks", "max_ticks", "tick_period", "show_particles"},
-			new Object[] {true, true, true, 3, 2, 11, 40, true}),
+			new @NotNull String[] {"enable_enemy_message", "enable_self_message", "enable_stop_message", "base_ticks", "added_ticks", "max_ticks", "tick_period", "show_particles"},
+			new @NotNull Object[] {true, true, true, 3, 2, 11, 40, true}),
 	ANTI_HUNGER(() -> Skills.ENDURANCE, 5.0, 5.0),
 	RUNNER(() -> Skills.ENDURANCE, 10.0, 10.0),
 	GOLDEN_HEAL(() -> Skills.ENDURANCE, 5.0, 6.0),
@@ -63,9 +65,9 @@ public enum Ability implements AbstractAbility {
 	LIGHT_FALL(() -> Skills.AGILITY, 2.0, 1.5),
 	JUMPER(() -> Skills.AGILITY, 10.0, 10.0),
 	SUGAR_RUSH(() -> Skills.AGILITY, 5.0, 7.0),
-	FLEETING(() -> Skills.AGILITY, 5.0, 4.0, new String[] {"health_percent_required"}, new Object[] {20.0}),
+	FLEETING(() -> Skills.AGILITY, 5.0, 4.0, new @NotNull String[] {"health_percent_required"}, new @NotNull Object[] {20.0}),
 	THUNDER_FALL(() -> Skills.AGILITY, 3.0, 2.0, 10, 5),
-	ALCHEMIST(() -> Skills.ALCHEMY, 3.0, 4.0, new String[] {"add_item_lore"}, new Object[] {true}),
+	ALCHEMIST(() -> Skills.ALCHEMY, 3.0, 4.0, new @NotNull String[] {"add_item_lore"}, new @NotNull Object[] {true}),
 	BREWER(() -> Skills.ALCHEMY, 10.0, 10.0),
 	SPLASHER(() -> Skills.ALCHEMY, 0.5, 0.25),
 	LINGERING(() -> Skills.ALCHEMY, 5.0, 4.0, 3.0, 2.0),
@@ -80,7 +82,7 @@ public enum Ability implements AbstractAbility {
 	HEALER(() -> Skills.HEALING, 10.0, 10.0),
 	LIFE_STEAL(() -> Skills.HEALING, 2.5, 1.0),
 	GOLDEN_HEART(() -> Skills.HEALING, 5.0, 3.0),
-	REVIVAL(() -> Skills.HEALING, 5.0, 4.0, 7.0, 6.0, new String[] {"enable_message"}, new Object[] {true}),
+	REVIVAL(() -> Skills.HEALING, 5.0, 4.0, 7.0, 6.0, new @NotNull String[] {"enable_message"}, new @NotNull Object[] {true}),
 	DISENCHANTER(() -> Skills.FORGING, 10.0, 7.0),
 	FORGER(() -> Skills.FORGING, 10.0, 10.0),
 	REPAIRING(() -> Skills.FORGING, 5.0, 4.0),
@@ -92,16 +94,17 @@ public enum Ability implements AbstractAbility {
 	private boolean hasTwoValues;
 	private double baseValue2;
 	private double valuePerLevel2;
-	private final Supplier<Skill> skill;
-	private Map<String, OptionValue> options;
+	private final @NotNull Supplier<@NotNull Skill> skill;
+	private @NotNull Map<@NotNull String, @NotNull OptionValue> options;
 	
-	Ability(Supplier<Skill> skill, double baseValue, double valuePerLevel) {
+	Ability(@NotNull Supplier<@NotNull Skill> skill, double baseValue, double valuePerLevel) {
 		this.baseValue = baseValue;
 		this.valuePerLevel = valuePerLevel;
 		this.skill = skill;
+		this.options = new HashMap<>();
 	}
 
-	Ability(Supplier<Skill> skill, double baseValue, double valuePerLevel, String[] optionKeys, Object[] optionValues) {
+	Ability(@NotNull Supplier<@NotNull Skill> skill, double baseValue, double valuePerLevel, @NotNull String @NotNull [] optionKeys, @NotNull Object @NotNull [] optionValues) {
 		this(skill, baseValue, valuePerLevel);
 		this.options = new HashMap<>();
 		for (int i = 0; i < optionKeys.length; i++) {
@@ -111,14 +114,14 @@ public enum Ability implements AbstractAbility {
 		}
 	}
 
-	Ability(Supplier<Skill> skill, double baseValue1, double valuePerLevel1, double baseValue2, double valuePerLevel2) {
+	Ability(@NotNull Supplier<@NotNull Skill> skill, double baseValue1, double valuePerLevel1, double baseValue2, double valuePerLevel2) {
 		this(skill, baseValue1, valuePerLevel1);
 		this.hasTwoValues = true;
 		this.baseValue2 = baseValue2;
 		this.valuePerLevel2 = valuePerLevel2;
 	}
 
-	Ability(Supplier<Skill> skill, double baseValue1, double valuePerLevel1, double baseValue2, double valuePerLevel2, String[] optionKeys, Object[] optionValues) {
+	Ability(@NotNull Supplier<@NotNull Skill> skill, double baseValue1, double valuePerLevel1, double baseValue2, double valuePerLevel2, @NotNull String @NotNull [] optionKeys, @NotNull Object @NotNull [] optionValues) {
 		this(skill, baseValue1, valuePerLevel1, baseValue2, valuePerLevel2);
 		this.options = new HashMap<>();
 		for (int i = 0; i < optionKeys.length; i++) {
@@ -128,12 +131,12 @@ public enum Ability implements AbstractAbility {
 		}
 	}
 
-	public String getInfo(Locale locale) {
+	public @NotNull String getInfo(@Nullable Locale locale) {
 		return Lang.getMessage(AbilityMessage.valueOf(this.name() + "_INFO"), locale);
 	}
 
 	@Override
-	public Skill getSkill() {
+	public @NotNull Skill getSkill() {
 		return skill.get();
 	}
 
@@ -159,15 +162,15 @@ public enum Ability implements AbstractAbility {
 		return valuePerLevel2;
 	}
 
-	public String getDisplayName(Locale locale) {
+	public @NotNull String getDisplayName(@Nullable Locale locale) {
 		return Lang.getMessage(AbilityMessage.valueOf(this.name() + "_NAME"), locale);
 	}
 	
-	public String getDescription(Locale locale) {
+	public @NotNull String getDescription(@Nullable Locale locale) {
 		return Lang.getMessage(AbilityMessage.valueOf(this.name() + "_DESC"), locale);
 	}
 
-	public Map<String, OptionValue> getDefaultOptions() {
+	public @NotNull Map<@NotNull String, @NotNull OptionValue> getDefaultOptions() {
 		return options;
 	}
 

@@ -10,6 +10,8 @@ import com.archyx.aureliumskills.util.text.TextUtil;
 import com.archyx.slate.item.provider.PlaceholderType;
 import com.archyx.slate.menu.ActiveMenu;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Locale;
@@ -22,9 +24,9 @@ public class UnlockedItem extends SkillLevelItem {
     }
 
     @Override
-    public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu, PlaceholderType placeholderType, Integer position) {
-        Locale locale = plugin.getLang().getLocale(player);
-        Skill skill = (Skill) activeMenu.getProperty("skill");
+    public @NotNull String onPlaceholderReplace(@NotNull String placeholder, @NotNull Player player, @NotNull ActiveMenu activeMenu, @NotNull PlaceholderType placeholderType, @NotNull Integer position) {
+        @Nullable Locale locale = plugin.getLang().getLocale(player);
+        Skill skill = getSkill(activeMenu);
         int level = getLevel(activeMenu, position);
         switch (placeholder) {
             case "level_unlocked":
@@ -44,24 +46,31 @@ public class UnlockedItem extends SkillLevelItem {
     }
 
     @Override
-    public Set<Integer> getDefinedContexts(Player player, ActiveMenu activeMenu) {
-        PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
-        if (playerData != null) {
-            Skill skill = (Skill) activeMenu.getProperty("skill");
-            int level = playerData.getSkillLevel(skill);
-            int itemsPerPage = getItemsPerPage(activeMenu);
-            int currentPage = activeMenu.getCurrentPage();
-            Set<Integer> levels = new HashSet<>();
-            for (int i = 0; i < itemsPerPage; i++) {
-                if (2 + currentPage * itemsPerPage + i <= level) {
-                    levels.add(2 + i);
-                } else {
-                    break;
-                }
-            }
+    public @NotNull Set<@NotNull Integer> getDefinedContexts(@NotNull Player player, @NotNull ActiveMenu activeMenu) {
+        Set<@NotNull Integer> levels = new HashSet<>();
+        @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+        if (playerData == null)
             return levels;
+        Skill skill = getSkill(activeMenu);
+        int level = playerData.getSkillLevel(skill);
+        int itemsPerPage = getItemsPerPage(activeMenu);
+        int currentPage = activeMenu.getCurrentPage();
+        for (int i = 0; i < itemsPerPage; i++) {
+            if (2 + currentPage * itemsPerPage + i <= level) {
+                levels.add(2 + i);
+            } else {
+                break;
+            }
         }
-        return new HashSet<>();
+        return levels;
+    }
+
+    private @NotNull Skill getSkill(@NotNull ActiveMenu activeMenu) {
+        @Nullable Object property = activeMenu.getProperty("skill");
+        if (!(property instanceof Skill)) {
+            throw new IllegalArgumentException("Could not get menu skill property");
+        }
+        return (Skill) property;
     }
 
 }

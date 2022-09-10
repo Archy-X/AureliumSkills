@@ -1,16 +1,18 @@
 package com.archyx.aureliumskills.util.misc;
 
+import org.jetbrains.annotations.NotNull;
+
 public class KeyIntPair {
 
-    private final String key;
+    private final @NotNull String key;
     private int value;
 
-    public KeyIntPair(String key, int value) {
+    public KeyIntPair(@NotNull String key, int value) {
         this.key = key;
         this.value =value;
     }
 
-    public String getKey() {
+    public @NotNull String getKey() {
         return key;
     }
 

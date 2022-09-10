@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
 
@@ -26,11 +27,11 @@ public class ExcavationAbilities extends AbilityProvider implements Listener {
 
 	private final Random r = new Random();
 
-	public ExcavationAbilities(AureliumSkills plugin) {
+	public ExcavationAbilities(@NotNull AureliumSkills plugin) {
 		super(plugin, Skills.EXCAVATION);
 	}
 
-	public void spadeMaster(EntityDamageByEntityEvent event, Player player, PlayerData playerData) {
+	public void spadeMaster(@NotNull EntityDamageByEntityEvent event, @NotNull Player player, @NotNull PlayerData playerData) {
 		if (OptionL.isEnabled(Skills.EXCAVATION)) {
 			if (plugin.getAbilityManager().isEnabled(Ability.SPADE_MASTER)) {
 				//Check permission
@@ -45,7 +46,7 @@ public class ExcavationAbilities extends AbilityProvider implements Listener {
 	}
 
 	@SuppressWarnings("deprecation")
-	public void biggerScoop(ExcavationSource source, Block block, Player player) {
+	public void biggerScoop(@NotNull ExcavationSource source, @NotNull Block block, @NotNull Player player) {
 		if (!plugin.getAbilityManager().isEnabled(Ability.BIGGER_SCOOP)) return;
 		PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
 		if (playerData == null) return;

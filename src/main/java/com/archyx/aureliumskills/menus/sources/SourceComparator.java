@@ -2,11 +2,13 @@ package com.archyx.aureliumskills.menus.sources;
 
 import com.archyx.aureliumskills.AureliumSkills;
 import com.archyx.aureliumskills.source.Source;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.Locale;
 
-public abstract class SourceComparator implements Comparator<Source> {
+public abstract class SourceComparator implements Comparator<@NotNull Source> {
 
     protected final AureliumSkills plugin;
 
@@ -40,30 +42,30 @@ public abstract class SourceComparator implements Comparator<Source> {
 
     public static class Alphabetical extends SourceComparator {
 
-        private final Locale locale;
+        private final @Nullable Locale locale;
 
-        public Alphabetical(AureliumSkills plugin, Locale locale) {
+        public Alphabetical(AureliumSkills plugin, @Nullable Locale locale) {
             super(plugin);
             this.locale = locale;
         }
 
         @Override
-        public int compare(Source source1, Source source2) {
+        public int compare(@NotNull Source source1, @NotNull Source source2) {
             return source1.getDisplayName(locale).compareTo(source2.getDisplayName(locale));
         }
     }
 
     public static class ReverseAlphabetical extends SourceComparator {
 
-        private final Locale locale;
+        private final @Nullable Locale locale;
 
-        public ReverseAlphabetical(AureliumSkills plugin, Locale locale) {
+        public ReverseAlphabetical(AureliumSkills plugin, @Nullable Locale locale) {
             super(plugin);
             this.locale = locale;
         }
 
         @Override
-        public int compare(Source source1, Source source2) {
+        public int compare(@NotNull Source source1, @NotNull Source source2) {
             return source2.getDisplayName(locale).compareTo(source1.getDisplayName(locale));
         }
     }

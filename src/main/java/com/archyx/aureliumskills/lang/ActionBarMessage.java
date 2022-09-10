@@ -1,5 +1,7 @@
 package com.archyx.aureliumskills.lang;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Locale;
 
 public enum ActionBarMessage implements MessageKey {
@@ -14,7 +16,7 @@ public enum ActionBarMessage implements MessageKey {
     BOSS_BAR_MAXED;
 
     @Override
-    public String getPath() {
+    public @NotNull String getPath() {
         return "action_bar." + this.toString().toLowerCase(Locale.ENGLISH);
     }
 

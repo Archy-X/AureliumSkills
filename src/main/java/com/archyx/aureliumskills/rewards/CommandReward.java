@@ -7,17 +7,19 @@ import com.archyx.aureliumskills.util.text.TextUtil;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 
 public class CommandReward extends MessagedReward {
 
-    private final CommandExecutor executor;
-    private final String command;
-    private final CommandExecutor revertExecutor;
-    private final String revertCommand;
+    private final @NotNull CommandExecutor executor;
+    private final @NotNull String command;
+    private final @Nullable CommandExecutor revertExecutor;
+    private final @Nullable String revertCommand;
 
-    public CommandReward(AureliumSkills plugin, String menuMessage, String chatMessage, CommandExecutor executor, String command, CommandExecutor revertExecutor, String revertCommand) {
+    public CommandReward(@NotNull AureliumSkills plugin, @NotNull String menuMessage, @NotNull String chatMessage, @NotNull CommandExecutor executor, @NotNull String command, @Nullable CommandExecutor revertExecutor, @Nullable String revertCommand) {
         super(plugin, menuMessage, chatMessage);
         this.executor = executor;
         this.command = command;
@@ -26,18 +28,18 @@ public class CommandReward extends MessagedReward {
     }
 
     @Override
-    public void giveReward(Player player, Skill skill, int level) {
+    public void giveReward(@NotNull Player player, @NotNull Skill skill, int level) {
         executeCommand(executor, command, player, skill, level);
     }
 
-    public void executeRevert(Player player, Skill skill, int level) {
+    public void executeRevert(@NotNull Player player, @NotNull Skill skill, int level) {
         if (revertCommand != null) {
             executeCommand(revertExecutor != null ? revertExecutor : CommandExecutor.CONSOLE, command, player, skill, level);
         }
     }
 
-    private void executeCommand(CommandExecutor executor, String command, Player player, Skill skill, int level) {
-        String executedCommand = TextUtil.replace(command, "{player}", player.getName(),
+    private void executeCommand(@NotNull CommandExecutor executor, @NotNull String command, @NotNull Player player, @NotNull Skill skill, int level) {
+        @Nullable String executedCommand = TextUtil.replace(command, "{player}", player.getName(),
                 "{skill}", skill.toString().toLowerCase(Locale.ROOT),
                 "{level}", String.valueOf(level));
         if (plugin.isPlaceholderAPIEnabled()) {

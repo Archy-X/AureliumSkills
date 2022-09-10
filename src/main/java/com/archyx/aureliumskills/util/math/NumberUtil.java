@@ -1,5 +1,8 @@
 package com.archyx.aureliumskills.util.math;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -16,15 +19,15 @@ public class NumberUtil {
         two.setRoundingMode(RoundingMode.HALF_UP);
     }
 
-    public static String format0(double input) {
+    public static @NotNull String format0(double input) {
         return zero.format(input);
     }
 
-    public static String format1(double input) {
+    public static @NotNull String format1(double input) {
         return one.format(input);
     }
 
-    public static String format2(double input) {
+    public static @NotNull String format2(double input) {
         return two.format(input);
     }
 
@@ -32,7 +35,7 @@ public class NumberUtil {
         return toInt(str, 0);
     }
 
-    public static int toInt(String str, int defaultValue) {
+    public static int toInt(@Nullable String str, int defaultValue) {
         if (str == null) {
             return defaultValue;
         }

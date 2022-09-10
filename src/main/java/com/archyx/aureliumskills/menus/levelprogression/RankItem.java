@@ -14,6 +14,8 @@ import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 import java.util.Map;
@@ -25,9 +27,9 @@ public class RankItem extends AbstractItem implements SingleItemProvider {
     }
 
     @Override
-    public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu, PlaceholderType type) {
-        Locale locale = plugin.getLang().getLocale(player);
-        Skill skill = (Skill) activeMenu.getProperty("skill");
+    public @NotNull String onPlaceholderReplace(@NotNull String placeholder, @NotNull Player player, @NotNull ActiveMenu activeMenu, @NotNull PlaceholderType type) {
+        @Nullable Locale locale = plugin.getLang().getLocale(player);
+        Skill skill = getSkill(activeMenu);
         switch (placeholder) {
             case "your_ranking":
                 return Lang.getMessage(MenuMessage.YOUR_RANKING, locale);
@@ -54,23 +56,32 @@ public class RankItem extends AbstractItem implements SingleItemProvider {
     }
 
     @Override
-    public void onClick(Player player, InventoryClickEvent event, ItemStack item, SlotPos pos, ActiveMenu activeMenu) {
+    public void onClick(@NotNull Player player, @NotNull InventoryClickEvent event, @NotNull ItemStack item, @NotNull SlotPos pos, @NotNull ActiveMenu activeMenu) {
         Map<String, Object> properties = activeMenu.getProperties();
         properties.put("previous_menu", "level_progression");
         plugin.getMenuManager().openMenu(player, "leaderboard", properties);
     }
 
-    private double getPercent(Skill skill, Player player) {
+    private double getPercent(@NotNull Skill skill, @NotNull Player player) {
         int rank = getRank(skill, player);
         int size = getSize(skill, player);
         return (double) rank / (double) size * 100;
     }
 
-    private int getRank(Skill skill, Player player) {
+    private int getRank(@NotNull Skill skill, @NotNull Player player) {
         return plugin.getLeaderboardManager().getSkillRank(skill, player.getUniqueId());
     }
 
-    private int getSize(Skill skill, Player player) {
+    private int getSize(@NotNull Skill skill, @NotNull Player player) {
         return plugin.getLeaderboardManager().getLeaderboard(skill).size();
     }
+
+    private @NotNull Skill getSkill(@NotNull ActiveMenu activeMenu) {
+        @Nullable Object property = activeMenu.getProperty("skill");
+        if (!(property instanceof Skill)) {
+            throw new IllegalArgumentException("Could not get menu skill property");
+        }
+        return (Skill) property;
+    }
+
 }

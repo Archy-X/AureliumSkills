@@ -1,5 +1,6 @@
 package com.archyx.aureliumskills.skills;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -9,22 +10,21 @@ import java.util.Map;
 
 public class SkillRegistry {
 
-    public final Map<String, Skill> skills;
+    public final @NotNull Map<String, @NotNull Skill> skills;
 
     public SkillRegistry() {
         this.skills = new HashMap<>();
     }
 
-    public void register(String key, Skill skill) {
+    public void register(@NotNull String key, @NotNull Skill skill) {
         this.skills.put(key.toLowerCase(Locale.ROOT), skill);
     }
 
-    public Collection<Skill> getSkills() {
+    public @NotNull Collection<@NotNull Skill> getSkills() {
         return skills.values();
     }
 
-    @Nullable
-    public Skill getSkill(String key) {
+    public @Nullable Skill getSkill(@NotNull String key) {
         return this.skills.get(key.toLowerCase(Locale.ROOT));
     }
 

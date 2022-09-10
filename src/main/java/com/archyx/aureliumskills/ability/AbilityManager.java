@@ -15,6 +15,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -26,8 +27,9 @@ import java.util.function.Supplier;
 
 public class AbilityManager {
 
-    private final Map<Ability, AbilityOption> abilityOptions;
-    private final Map<MAbility, ManaAbilityOption> manaAbilityOptions;
+
+    private final @NotNull Map<Ability, AbilityOption> abilityOptions;
+    private final @NotNull Map<MAbility, ManaAbilityOption> manaAbilityOptions;
     private final AureliumSkills plugin;
 
     public AbilityManager(AureliumSkills plugin) {
@@ -83,7 +85,7 @@ public class AbilityManager {
                             int levelUp = config.getInt(path + "level_up", 5);
                             int maxLevel = config.getInt(path + "max_level", 0);
                             // Load options
-                            Set<String> optionKeys = getOptionKeys(ability);
+                            Set<@NotNull String> optionKeys = getOptionKeys(ability);
                             Map<String, OptionValue> options = null;
                             if (optionKeys != null) {
                                 options = new HashMap<>();
@@ -146,7 +148,7 @@ public class AbilityManager {
                     int levelUp = config.getInt(path + "level_up", 7);
                     int maxLevel = config.getInt(path + "max_level", 0);
                     // Load options
-                    Set<String> optionKeys = plugin.getManaAbilityManager().getOptionKeys(mAbility);
+                    Set<@NotNull String> optionKeys = plugin.getManaAbilityManager().getOptionKeys(mAbility);
                     Map<String, OptionValue> options = null;
                     if (optionKeys != null) {
                         options = new HashMap<>();
@@ -176,7 +178,7 @@ public class AbilityManager {
         plugin.getLogger().info("Loaded " + amountLoaded + " Ability Options in " + timeElapsed + "ms");
     }
 
-    private FileConfiguration updateFile(File file, FileConfiguration config) {
+    private @NotNull FileConfiguration updateFile(@NotNull File file, @NotNull FileConfiguration config) {
         if (config.contains("file_version")) {
             InputStream stream = plugin.getResource("abilities_config.yml");
             if (stream != null) {
@@ -207,13 +209,14 @@ public class AbilityManager {
         return YamlConfiguration.loadConfiguration(file);
     }
 
-    private void migrateOptions(File file, FileConfiguration abilitiesConfig) {
+    private void migrateOptions(@NotNull File file, @NotNull FileConfiguration abilitiesConfig) {
         FileConfiguration config = plugin.getConfig();
         ConfigurationSection abilities = config.getConfigurationSection("abilities");
         if (abilities == null) return;
         try {
             for (String abilityName : abilities.getKeys(false)) {
-                String newKey = TextUtil.replace(abilityName, "-", "_").toUpperCase();
+                String newKey = TextUtil.replace(abilityName, "-", "_");
+                newKey = newKey.toUpperCase();
                 if (isAbility(newKey)) {
                     Ability ability = Ability.valueOf(newKey);
                     boolean enabled = abilities.getBoolean(abilityName + ".enabled", true);
@@ -235,7 +238,8 @@ public class AbilityManager {
             ConfigurationSection manaAbilities = config.getConfigurationSection("mana-abilities");
             if (manaAbilities != null) {
                 for (String manaAbilityName : manaAbilities.getKeys(false)) {
-                    String newKey = TextUtil.replace(manaAbilityName, "-", "_").toUpperCase();
+                    String newKey = TextUtil.replace(manaAbilityName, "-", "_");
+                    newKey = newKey.toUpperCase();
                     if (isManaAbility(newKey)) {
                         MAbility mAbility = MAbility.valueOf(newKey);
                         boolean enabled = manaAbilities.getBoolean(manaAbilityName + ".enabled", true);
@@ -266,37 +270,39 @@ public class AbilityManager {
         }
     }
 
-    public AbilityOption getAbilityOption(Ability ability) {
+    public @Nullable AbilityOption getAbilityOption(@NotNull Ability ability) {
         return abilityOptions.get(ability);
     }
 
-    public ManaAbilityOption getAbilityOption(MAbility mAbility) {
+    public @Nullable ManaAbilityOption getAbilityOption(@NotNull MAbility mAbility) {
         return manaAbilityOptions.get(mAbility);
     }
 
-    public boolean isEnabled(Ability ability) {
-        if (abilityOptions.containsKey(ability)) {
-            return abilityOptions.get(ability).isEnabled();
+    public boolean isEnabled(@NotNull Ability ability) {
+        @Nullable AbilityOption option = abilityOptions.get(ability);
+        if (option != null) {
+            return option.isEnabled();
         }
         return true;
     }
 
-    public boolean isPlayerEnabled(AbstractAbility ability, PlayerData playerData) {
+    public boolean isPlayerEnabled(@NotNull AbstractAbility ability, @NotNull PlayerData playerData) {
         return !playerData.getAbilityData(ability).getBoolean("disabled");
     }
 
-    public boolean isEnabled(MAbility mAbility) {
-        if (manaAbilityOptions.containsKey(mAbility)) {
-            return manaAbilityOptions.get(mAbility).isEnabled();
+    public boolean isEnabled(@NotNull MAbility mAbility) {
+        @Nullable ManaAbilityOption option = manaAbilityOptions.get(mAbility);
+        if (option != null) {
+            return option.isEnabled();
         }
         return true;
     }
 
-    public double getValue(Ability ability, int level) {
+    public double getValue(@NotNull Ability ability, int level) {
         return getBaseValue(ability) + (getValuePerLevel(ability) * (level - 1));
     }
 
-    public double getBaseValue(Ability ability) {
+    public double getBaseValue(@NotNull Ability ability) {
         AbilityOption option = getAbilityOption(ability);
         if (option != null) {
             return option.getBaseValue();
@@ -304,7 +310,7 @@ public class AbilityManager {
         return ability.getDefaultBaseValue();
     }
 
-    public double getValuePerLevel(Ability ability) {
+    public double getValuePerLevel(@NotNull Ability ability) {
         AbilityOption option = getAbilityOption(ability);
         if (option != null) {
             return option.getValuePerLevel();
@@ -312,11 +318,11 @@ public class AbilityManager {
         return ability.getDefaultValuePerLevel();
     }
 
-    public double getValue2(Ability ability, int level) {
+    public double getValue2(@NotNull Ability ability, int level) {
         return getBaseValue2(ability) + (getValuePerLevel2(ability) * (level - 1));
     }
 
-    public double getBaseValue2(Ability ability) {
+    public double getBaseValue2(@NotNull Ability ability) {
         AbilityOption option = getAbilityOption(ability);
         if (option != null) {
             return option.getBaseValue2();
@@ -324,7 +330,7 @@ public class AbilityManager {
         return ability.getDefaultBaseValue2();
     }
 
-    public double getValuePerLevel2(Ability ability) {
+    public double getValuePerLevel2(@NotNull Ability ability) {
         AbilityOption option = getAbilityOption(ability);
         if (option != null) {
             return option.getValuePerLevel2();
@@ -332,7 +338,7 @@ public class AbilityManager {
         return ability.getDefaultValuePerLevel2();
     }
 
-    public int getUnlock(Ability ability) {
+    public int getUnlock(@NotNull Ability ability) {
         AbilityOption option = getAbilityOption(ability);
         if (option != null) {
             return option.getUnlock();
@@ -348,7 +354,7 @@ public class AbilityManager {
         return defUnlock;
     }
 
-    public int getLevelUp(Ability ability) {
+    public int getLevelUp(@NotNull Ability ability) {
         AbilityOption option = getAbilityOption(ability);
         if (option != null) {
             return option.getLevelUp();
@@ -356,7 +362,7 @@ public class AbilityManager {
         return 5;
     }
 
-    public int getMaxLevel(Ability ability) {
+    public int getMaxLevel(@NotNull Ability ability) {
         AbilityOption option = getAbilityOption(ability);
         if (option != null) {
             return option.getMaxLevel();
@@ -370,11 +376,11 @@ public class AbilityManager {
      * @param level The skill level
      * @return A list of abilities
      */
-    public List<Ability> getAbilities(Skill skill, int level) {
-        ImmutableList<Supplier<Ability>> skillAbilities = skill.getAbilities();
-        List<Ability> abilities = new ArrayList<>();
+    public @NotNull List<@NotNull Ability> getAbilities(@NotNull Skill skill, int level) {
+        @NotNull ImmutableList<@NotNull Supplier<@NotNull Ability>> skillAbilities = skill.getAbilities();
+        List<@NotNull Ability> abilities = new ArrayList<>();
         if (skillAbilities.size() == 5) {
-            for (Supplier<Ability> abilitySupplier : skillAbilities) {
+            for (Supplier<@NotNull Ability> abilitySupplier : skillAbilities) {
                 Ability ability = abilitySupplier.get();
                 if (level >= getUnlock(ability) && (level - getUnlock(ability)) % getLevelUp(ability) == 0) {
                     abilities.add(ability);
@@ -384,7 +390,7 @@ public class AbilityManager {
         return abilities;
     }
 
-    public OptionValue getOption(Ability ability, String key) {
+    public @Nullable OptionValue getOption(@NotNull Ability ability, @NotNull String key) {
         AbilityOption option = getAbilityOption(ability);
         if (option != null) {
             OptionValue optionValue = option.getOption(key);
@@ -398,35 +404,32 @@ public class AbilityManager {
         }
     }
 
-    public boolean getOptionAsBooleanElseTrue(Ability ability, String key) {
+    public boolean getOptionAsBooleanElseTrue(@NotNull Ability ability, @NotNull String key) {
         OptionValue value = getOption(ability, key);
         if (value != null) {
-            if (value.getValue() != null) {
-                return value.asBoolean();
-            }
+            return value.asBoolean();
         }
         return true;
     }
 
-    @Nullable
-    public Set<String> getOptionKeys(Ability ability) {
-        if (ability.getDefaultOptions() != null) {
+    public @Nullable Set<@NotNull String> getOptionKeys(@NotNull Ability ability) {
+        if (!ability.getDefaultOptions().isEmpty()) {
             return ability.getDefaultOptions().keySet();
         }
         return null;
     }
 
-    public void sendMessage(Player player, String message) {
+    public void sendMessage(@NotNull Player player, @NotNull String message) {
         if (OptionL.getBoolean(Option.ACTION_BAR_ABILITY) && OptionL.getBoolean(Option.ACTION_BAR_ENABLED)) {
             plugin.getActionBar().sendAbilityActionBar(player, message);
         } else {
-            PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+            @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
             if (playerData == null) return;
             player.sendMessage(AureliumSkills.getPrefix(playerData.getLocale()) + message);
         }
     }
 
-    private boolean isAbility(String abilityName) {
+    private boolean isAbility(@NotNull String abilityName) {
         for (Ability ability : Ability.values()) {
             if (ability.toString().equals(abilityName)) {
                 return true;
@@ -435,7 +438,7 @@ public class AbilityManager {
         return false;
     }
 
-    private boolean isManaAbility(String manaAbilityName) {
+    private boolean isManaAbility(@NotNull String manaAbilityName) {
         for (MAbility mAbility : MAbility.values()) {
             if (mAbility.toString().equals(manaAbilityName)) {
                 return true;

@@ -7,12 +7,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ManaManager implements Listener {
 
-    private final AureliumSkills plugin;
+    private final @NotNull AureliumSkills plugin;
 
-    public ManaManager(AureliumSkills plugin) {
+    public ManaManager(@NotNull AureliumSkills plugin) {
         this.plugin = plugin;
     }
 
@@ -24,7 +26,7 @@ public class ManaManager implements Listener {
             @Override
             public void run() {
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+                    @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
                     if (playerData != null) {
                         double originalMana = playerData.getMana();
                         double maxMana = playerData.getMaxMana();

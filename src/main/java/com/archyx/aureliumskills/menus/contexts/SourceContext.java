@@ -4,8 +4,9 @@ import com.archyx.aureliumskills.AureliumSkills;
 import com.archyx.aureliumskills.source.Source;
 import com.archyx.slate.context.ContextProvider;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
-public class SourceContext implements ContextProvider<Source> {
+public class SourceContext implements ContextProvider<@NotNull Source> {
 
     private final AureliumSkills plugin;
 
@@ -14,8 +15,7 @@ public class SourceContext implements ContextProvider<Source> {
     }
 
     @Override
-    @Nullable
-    public Source parse(String input) {
+    public @Nullable Source parse(@NotNull String input) {
         return plugin.getSourceRegistry().valueOf(input);
     }
 }

@@ -1,6 +1,7 @@
 package com.archyx.aureliumskills.lang;
 
 import com.archyx.aureliumskills.ability.Ability;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
@@ -239,7 +240,7 @@ public enum AbilityMessage implements MessageKey {
     SKILL_MENDER_DESC,
     SKILL_MENDER_INFO;
 
-    private final String path;
+    private final @NotNull String path;
 
     AbilityMessage() {
         Ability ability;
@@ -253,7 +254,7 @@ public enum AbilityMessage implements MessageKey {
     }
 
     @Override
-    public String getPath() {
+    public @NotNull String getPath() {
         return path;
     }
 }

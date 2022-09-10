@@ -12,9 +12,10 @@ import de.tr7zw.changeme.nbtapi.NBTCompound;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -24,7 +25,7 @@ public class Modifiers extends NBTAPIUser {
         super(plugin);
     }
 
-    public ItemStack addModifier(ModifierType type, ItemStack item, Stat stat, double value) {
+    public @NotNull ItemStack addModifier(@NotNull ModifierType type, @NotNull ItemStack item, @NotNull Stat stat, double value) {
         if (isNBTDisabled()) return item;
         NBTItem nbtItem = new NBTItem(item);
         NBTCompound compound = ItemUtils.getModifiersTypeCompound(nbtItem, type);
@@ -32,7 +33,7 @@ public class Modifiers extends NBTAPIUser {
         return nbtItem.getItem();
     }
 
-    public ItemStack convertFromLegacy(ItemStack item) {
+    public @NotNull ItemStack convertFromLegacy(@NotNull ItemStack item) {
         if (isNBTDisabled()) return item;
         NBTItem nbtItem = new NBTItem(item);
         for (ModifierType type : ModifierType.values()) {
@@ -52,7 +53,7 @@ public class Modifiers extends NBTAPIUser {
         return nbtItem.getItem();
     }
 
-    public ItemStack removeModifier(ModifierType type, ItemStack item, Stat stat) {
+    public @NotNull ItemStack removeModifier(@NotNull ModifierType type, @NotNull ItemStack item, @NotNull Stat stat) {
         if (isNBTDisabled()) return item;
         NBTItem nbtItem = new NBTItem(item);
         NBTCompound compound = ItemUtils.getModifiersTypeCompound(nbtItem, type);
@@ -61,7 +62,7 @@ public class Modifiers extends NBTAPIUser {
         return nbtItem.getItem();
     }
 
-    public ItemStack removeAllModifiers(ModifierType type, ItemStack item) {
+    public @NotNull ItemStack removeAllModifiers(@NotNull ModifierType type, @NotNull ItemStack item) {
         if (isNBTDisabled()) return item;
         NBTItem nbtItem = new NBTItem(item);
         NBTCompound compound = ItemUtils.getModifiersTypeCompound(nbtItem, type);
@@ -72,7 +73,7 @@ public class Modifiers extends NBTAPIUser {
         return nbtItem.getItem();
     }
 
-    public List<StatModifier> getLegacyModifiers(ModifierType type, NBTItem nbtItem) {
+    public @NotNull List<StatModifier> getLegacyModifiers(@NotNull ModifierType type, @NotNull NBTItem nbtItem) {
         if (isNBTDisabled()) return new ArrayList<>();
         List<StatModifier> modifiers = new ArrayList<>();
         for (String key : nbtItem.getKeys()) {
@@ -96,10 +97,10 @@ public class Modifiers extends NBTAPIUser {
         return modifiers;
     }
 
-    public List<StatModifier> getModifiers(ModifierType type, ItemStack item) {
+    public @NotNull List<@NotNull StatModifier> getModifiers(@NotNull ModifierType type, @NotNull ItemStack item) {
         if (isNBTDisabled()) return new ArrayList<>();
         NBTItem nbtItem = new NBTItem(item);
-        List<StatModifier> modifiers = new ArrayList<>();
+        List<@NotNull StatModifier> modifiers = new ArrayList<>();
         NBTCompound compound = ItemUtils.getModifiersTypeCompound(nbtItem, type);
         for (String key : compound.getKeys()) {
             Stat stat = plugin.getStatRegistry().getStat(key);
@@ -124,17 +125,12 @@ public class Modifiers extends NBTAPIUser {
         return modifiers;
     }
 
-    public void addLore(ModifierType type, ItemStack item, Stat stat, double value, Locale locale) {
+    public void addLore(@NotNull ModifierType type, @NotNull ItemStack item, @NotNull Stat stat, double value, @Nullable Locale locale) {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            List<String> lore;
-            if (meta.getLore() != null) {
-                if (meta.getLore().size() > 0) lore = meta.getLore();
-                else lore = new LinkedList<>();
-            }
-            else {
-                lore = new LinkedList<>();
-            }
+            @Nullable List<@NotNull String> lore = meta.getLore();
+            if (lore == null)
+                lore = new ArrayList<>();
             CommandMessage message;
             if (value >= 0) {
                 message = CommandMessage.valueOf(type.name() + "_MODIFIER_ADD_LORE");
@@ -150,17 +146,19 @@ public class Modifiers extends NBTAPIUser {
         item.setItemMeta(meta);
     }
 
-    public void removeLore(ItemStack item, Stat stat, Locale locale) {
+    public void removeLore(@NotNull ItemStack item, @NotNull Stat stat, @Nullable Locale locale) {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            List<String> lore = meta.getLore();
-            if (lore != null && lore.size() > 0) lore.removeIf(line -> line.contains(stat.getDisplayName(locale)));
-            meta.setLore(lore);
+            @Nullable List<@NotNull String> lore = meta.getLore();
+            if (lore != null) {
+                lore.removeIf(line -> line.contains(stat.getDisplayName(locale)));
+                meta.setLore(lore);
+            }
         }
         item.setItemMeta(meta);
     }
 
-    private String getName(Stat stat) {
+    private @NotNull String getName(@NotNull Stat stat) {
         return TextUtil.capitalize(stat.name().toLowerCase(Locale.ENGLISH));
     }
     

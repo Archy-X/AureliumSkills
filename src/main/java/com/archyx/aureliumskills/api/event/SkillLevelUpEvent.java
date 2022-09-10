@@ -4,10 +4,11 @@ import com.archyx.aureliumskills.skills.Skill;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
 public class SkillLevelUpEvent extends Event {
 
-    private static final HandlerList handlers = new HandlerList();
+    private static final @NotNull HandlerList handlers = new HandlerList();
 
     private final Player player;
     private final Skill skill;
@@ -32,11 +33,11 @@ public class SkillLevelUpEvent extends Event {
     }
 
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return handlers;
     }
 
-    public static HandlerList getHandlerList() {
+    public static @NotNull HandlerList getHandlerList() {
         return handlers;
     }
 

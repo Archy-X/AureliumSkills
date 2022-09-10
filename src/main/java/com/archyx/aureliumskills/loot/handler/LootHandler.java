@@ -23,11 +23,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -35,14 +37,14 @@ import java.util.*;
 public abstract class LootHandler extends AbilityProvider {
 
     private final Random random = new Random();
-    private final Ability ability;
+    private final @NotNull Ability ability;
 
-    public LootHandler(AureliumSkills plugin, Skill skill, Ability ability) {
+    public LootHandler(@NotNull AureliumSkills plugin, @NotNull Skill skill, @NotNull Ability ability) {
         super(plugin, skill);
         this.ability = ability;
     }
 
-    protected void giveCommandLoot(Player player, CommandLoot loot, Source source) {
+    protected void giveCommandLoot(@NotNull Player player, @NotNull CommandLoot loot, @NotNull Source source) {
         // Apply placeholders to command
         String finalCommand = TextUtil.replace(loot.getCommand(), "{player}", player.getName());
         if (plugin.isPlaceholderAPIEnabled()) {
@@ -59,46 +61,45 @@ public abstract class LootHandler extends AbilityProvider {
         giveXp(player, loot, source);
     }
 
-    protected void giveBlockItemLoot(Player player, ItemLoot loot, BlockBreakEvent event, @Nullable Source source, LootDropCause cause) {
+    protected void giveBlockItemLoot(@NotNull Player player, @NotNull ItemLoot loot, @NotNull BlockBreakEvent event, @Nullable Source source, @NotNull LootDropCause cause) {
         Block block = event.getBlock();
         ItemStack drop = loot.getItem().clone();
         drop.setAmount(generateAmount(loot.getMinAmount(), loot.getMaxAmount()));
         Location location = block.getLocation().add(0.5, 0.5, 0.5);
         // Call event
         PlayerLootDropEvent dropEvent = new PlayerLootDropEvent(player, drop, location, cause);
-        if (cause != null) {
-            Bukkit.getPluginManager().callEvent(dropEvent);
-            if (dropEvent.isCancelled()) return;
-        }
+        Bukkit.getPluginManager().callEvent(dropEvent);
+        if (dropEvent.isCancelled()) return;
         if (dropEvent.getItemStack().getType() == Material.AIR) return;
         block.getWorld().dropItem(dropEvent.getLocation(), dropEvent.getItemStack());
         attemptSendMessage(player, loot);
         giveXp(player, loot, source);
     }
 
-    protected void giveFishingItemLoot(Player player, ItemLoot loot, PlayerFishEvent event, @Nullable Source source, LootDropCause cause) {
+    protected void giveFishingItemLoot(@NotNull Player player, @NotNull ItemLoot loot, @NotNull PlayerFishEvent event, @Nullable Source source, @NotNull LootDropCause cause) {
         if (!(event.getCaught() instanceof Item)) return;
-        Item itemEntity = (Item) event.getCaught();
+        @Nullable Entity itemEntity = event.getCaught();
 
         int amount = generateAmount(loot.getMinAmount(), loot.getMaxAmount());
         if (amount == 0) return;
 
         ItemStack drop = loot.getItem().clone();
         drop.setAmount(amount);
-        Location location = event.getCaught().getLocation();
+        
+        if (itemEntity == null)
+            return;
+        
+        Location location = itemEntity.getLocation();
         // Call event
         PlayerLootDropEvent dropEvent = new PlayerLootDropEvent(player, drop, location, cause);
-        if (cause != null) {
-            Bukkit.getPluginManager().callEvent(dropEvent);
-            if (dropEvent.isCancelled()) return;
-        }
-        itemEntity.setItemStack(drop);
+        Bukkit.getPluginManager().callEvent(dropEvent);
+        if (dropEvent.isCancelled()) return;
+        ((Item)itemEntity).setItemStack(drop);
         attemptSendMessage(player, loot);
         giveXp(player, loot, source);
     }
 
-    @Nullable
-    protected Loot selectLoot(LootPool pool, @Nullable Source source) {
+    protected @Nullable Loot selectLoot(@NotNull LootPool pool, @Nullable Source source) {
         List<Loot> lootList = new ArrayList<>();
         // Add applicable loot to list for selection
         for (Loot loot : pool.getLoot()) {
@@ -138,8 +139,8 @@ public abstract class LootHandler extends AbilityProvider {
         return selectedLoot;
     }
 
-    private void giveXp(Player player, Loot loot, @Nullable Source source) {
-        PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+    private void giveXp(@NotNull Player player, @NotNull Loot loot, @Nullable Source source) {
+        @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
         if (playerData == null) return;
         double xp = loot.getOption("xp", Double.class, -1.0);
         if (xp == -1.0 && source != null) {
@@ -149,16 +150,14 @@ public abstract class LootHandler extends AbilityProvider {
         }
     }
 
-    private double getXp(Player player, double input) {
-        PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+    private double getXp(@NotNull Player player, double input) {
+        @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
         if (playerData != null) {
             double output = input;
-            if (ability != null) {
-                if (plugin.getAbilityManager().isEnabled(ability)) {
-                    double modifier = 1;
-                    modifier += plugin.getAbilityManager().getValue(ability, playerData.getAbilityLevel(ability)) / 100;
-                    output *= modifier;
-                }
+            if (plugin.getAbilityManager().isEnabled(ability)) {
+                double modifier = 1;
+                modifier += plugin.getAbilityManager().getValue(ability, playerData.getAbilityLevel(ability)) / 100;
+                output *= modifier;
             }
             return output;
         }
@@ -169,19 +168,23 @@ public abstract class LootHandler extends AbilityProvider {
         return new Random().nextInt(maxAmount - minAmount + 1) + minAmount;
     }
 
-    private void attemptSendMessage(Player player, Loot loot) {
+    private void attemptSendMessage(@NotNull Player player, @NotNull Loot loot) {
         String message = loot.getMessage();
         if (message != null && !message.equals("")) {
-            PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+            @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
             if (playerData == null) return;
 
             Locale locale = playerData.getLocale();
             // Try to get message as message key
             CustomMessageKey key = new CustomMessageKey(message);
-            String finalMessage = Lang.getMessage(key, locale);
             // Use input as message if fail
-            if (finalMessage == null) {
-                finalMessage = message;
+            String finalMessage = message;
+            try {
+                finalMessage = Lang.getMessage(key, locale);
+            }
+            catch (IllegalStateException ex) {
+                // No custom message exists when using the message as a key
+                plugin.getLogger().warning("Unknown custom message with path: " + key);
             }
             // Replace placeholders
             if (plugin.isPlaceholderAPIEnabled()) {
@@ -191,7 +194,7 @@ public abstract class LootHandler extends AbilityProvider {
         }
     }
 
-    protected double getCommonChance(LootPool pool, PlayerData playerData) {
+    protected double getCommonChance(@NotNull LootPool pool, @NotNull PlayerData playerData) {
         double chancePerLuck = pool.getOption("chance_per_luck", Double.class, 0.0) / 100;
         return pool.getBaseChance() + chancePerLuck * playerData.getStatLevel(Stats.LUCK);
     }

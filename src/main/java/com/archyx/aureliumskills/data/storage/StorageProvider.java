@@ -22,22 +22,24 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.*;
 
 public abstract class StorageProvider {
 
-    public final AureliumSkills plugin;
-    public final PlayerManager playerManager;
+    public final @NotNull AureliumSkills plugin;
+    public final @NotNull PlayerManager playerManager;
 
-    public StorageProvider(AureliumSkills plugin) {
+    public StorageProvider(@NotNull AureliumSkills plugin) {
         this.playerManager = plugin.getPlayerManager();
         this.plugin = plugin;
     }
 
-    public PlayerData createNewPlayer(Player player) {
-        PlayerData playerData = new PlayerData(player, plugin);
+    public @NotNull PlayerData createNewPlayer(@NotNull Player player) {
+        @Nullable PlayerData playerData = new PlayerData(player, plugin);
         playerManager.addPlayerData(playerData);
         plugin.getLeveler().updatePermissions(player);
         PlayerDataLoadEvent event = new PlayerDataLoadEvent(playerData);
@@ -50,21 +52,26 @@ public abstract class StorageProvider {
         return playerData;
     }
 
-    protected void sendErrorMessageToPlayer(Player player, Exception e) {
+    protected void sendErrorMessageToPlayer(@NotNull Player player, @NotNull Exception e) {
         player.sendMessage(ChatColor.RED + "There was an error loading your skill data: " + e.getMessage() +
                 ". Please report the error to your server administrator. To prevent your data from resetting permanently" +
                 ", your skill data will not be saved. Try relogging to attempt loading again.");
     }
 
-    protected void applyData(PlayerData playerData, Map<Skill, Integer> levels, Map<Skill, Double> xpLevels) {
+    protected void applyData(@NotNull PlayerData playerData, @NotNull Map<Skill, Integer> levels, @NotNull Map<Skill, Double> xpLevels) {
         for (Stat stat : plugin.getStatRegistry().getStats()) {
             playerData.setStatLevel(stat, 0);
         }
         // Apply to object if in memory
         for (Skill skill : Skills.values()) {
-            int level = levels.get(skill);
+            Integer level = levels.get(skill);
+            if (level == null)
+                throw new IllegalStateException("Invalid level for skill index key: " + skill.name());
             playerData.setSkillLevel(skill, level);
-            playerData.setSkillXp(skill, xpLevels.get(skill));
+            Double xpLevel = xpLevels.get(skill);
+            if (xpLevel == null)
+                throw new IllegalStateException("Invalid experience level for skill index key: " + skill.name());
+            playerData.setSkillXp(skill, xpLevel);
             // Add stat levels
             plugin.getRewardManager().getRewardTable(skill).applyStats(playerData, level);
         }
@@ -76,7 +83,7 @@ public abstract class StorageProvider {
         save(playerData.getPlayer(), false);
     }
 
-    protected Map<Skill, Integer> getLevelsFromBackup(ConfigurationSection playerDataSection, String stringId) {
+    protected @NotNull Map<Skill, Integer> getLevelsFromBackup(@NotNull ConfigurationSection playerDataSection, @NotNull String stringId) {
         Map<Skill, Integer> levels = new HashMap<>();
         for (Skill skill : Skills.values()) {
             int level = playerDataSection.getInt(stringId + "." + skill.toString().toLowerCase(Locale.ROOT) + ".level", 1);
@@ -85,7 +92,7 @@ public abstract class StorageProvider {
         return levels;
     }
 
-    protected Map<Skill, Double> getXpLevelsFromBackup(ConfigurationSection playerDataSection, String stringId) {
+    protected @NotNull Map<Skill, Double> getXpLevelsFromBackup(@NotNull ConfigurationSection playerDataSection, @NotNull String stringId) {
         Map<Skill, Double> xpLevels = new HashMap<>();
         for (Skill skill : Skills.values()) {
             double xp = playerDataSection.getDouble(stringId + "." + skill.toString().toLowerCase(Locale.ROOT) + ".xp");
@@ -94,7 +101,7 @@ public abstract class StorageProvider {
         return xpLevels;
     }
 
-    protected Set<UUID> addLoadedPlayersToLeaderboards(Map<Skill, List<SkillValue>> leaderboards, List<SkillValue> powerLeaderboard, List<SkillValue> averageLeaderboard) {
+    protected @NotNull Set<UUID> addLoadedPlayersToLeaderboards(@NotNull Map<Skill, List<SkillValue>> leaderboards, @NotNull List<SkillValue> powerLeaderboard, @NotNull List<SkillValue> averageLeaderboard) {
         Set<UUID> loadedFromMemory = new HashSet<>();
         for (PlayerData playerData : playerManager.getPlayerDataMap().values()) {
             UUID id = playerData.getPlayer().getUniqueId();
@@ -106,8 +113,10 @@ public abstract class StorageProvider {
                 double xp = playerData.getSkillXp(skill);
                 // Add to lists
                 SkillValue skillLevel = new SkillValue(id, level, xp);
-                leaderboards.get(skill).add(skillLevel);
-
+                List<SkillValue> skillList = leaderboards.get(skill);
+                if (skillList == null)
+                    throw new IllegalStateException("Invalid skill leaderboard skill index key: " + skill);
+                skillList.add(skillLevel);
                 if (OptionL.isEnabled(skill)) {
                     powerLevel += level;
                     powerXp += xp;
@@ -126,7 +135,7 @@ public abstract class StorageProvider {
         return loadedFromMemory;
     }
 
-    protected void sortLeaderboards(Map<Skill, List<SkillValue>> leaderboards, List<SkillValue> powerLeaderboard, List<SkillValue> averageLeaderboard) {
+    protected void sortLeaderboards(@NotNull Map<Skill, List<SkillValue>> leaderboards, @NotNull List<SkillValue> powerLeaderboard, @NotNull List<SkillValue> averageLeaderboard) {
         LeaderboardManager manager = plugin.getLeaderboardManager();
         LeaderboardSorter sorter = new LeaderboardSorter();
         for (Skill skill : Skills.values()) {
@@ -145,18 +154,18 @@ public abstract class StorageProvider {
         manager.setSorting(false);
     }
 
-    public abstract void load(Player player);
+    public abstract void load(@NotNull Player player);
 
-    public void save(Player player) {
+    public void save(@NotNull Player player) {
         save(player, true);
     }
 
-    public abstract void save(Player player, boolean removeFromMemory);
+    public abstract void save(@NotNull Player player, boolean removeFromMemory);
 
-    public abstract void loadBackup(FileConfiguration file, CommandSender sender);
+    public abstract void loadBackup(@NotNull FileConfiguration file, @NotNull CommandSender sender);
 
     public abstract void updateLeaderboards();
 
-    public abstract void delete(UUID uuid) throws IOException;
+    public abstract void delete(@NotNull UUID uuid) throws IOException;
 
 }

@@ -1,15 +1,18 @@
 package com.archyx.aureliumskills.util.misc;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 import java.util.Map;
 
 public class Parser {
 
-    protected Object getElement(Map<?, ?> map, String key) {
+    protected @NotNull Object getElement(@NotNull Map<?, ?> map, @NotNull String key) {
         return DataUtil.getElement(map, key);
     }
 
-    protected Object getElementOrDefault(Map<?, ?> map, String key, Object def) {
+    protected @Nullable Object getElementOrDefault(@NotNull Map<?, ?> map, @NotNull String key, @Nullable Object def) {
         try {
             return getElement(map, key);
         } catch (IllegalArgumentException e) {
@@ -17,11 +20,11 @@ public class Parser {
         }
     }
     
-    protected String getString(Map<?, ?> map, String key) {
+    protected @NotNull String getString(@NotNull Map<?, ?> map, @NotNull String key) {
         return DataUtil.getString(map, key);
     }
 
-    protected String getStringOrDefault(Map<?, ?> map, String key, String def) {
+    protected @Nullable String getStringOrDefault(@NotNull Map<?, ?> map, @NotNull String key, @Nullable String def) {
         try {
             return getString(map, key);
         } catch (IllegalArgumentException e) {
@@ -29,11 +32,11 @@ public class Parser {
         }
     }
     
-    protected double getDouble(Map<?, ?> map, String key) {
+    protected double getDouble(@NotNull Map<?, ?> map, @NotNull String key) {
         return DataUtil.getDouble(map, key);
     }
 
-    protected double getDoubleOrDefault(Map<?, ?> map, String key, double def) {
+    protected double getDoubleOrDefault(@NotNull Map<?, ?> map, @NotNull String key, double def) {
         try {
             return getDouble(map, key);
         } catch (IllegalArgumentException e) {
@@ -41,11 +44,11 @@ public class Parser {
         }
     }
     
-    protected int getInt(Map<?, ?> map, String key) {
+    protected int getInt(@NotNull Map<?, ?> map, @NotNull String key) {
         return DataUtil.getInt(map, key);
     }
 
-    protected int getIntOrDefault(Map<?, ?> map, String key, int def) {
+    protected int getIntOrDefault(@NotNull Map<?, ?> map, @NotNull String key, int def) {
         try {
             return getInt(map, key);
         } catch (IllegalArgumentException e) {
@@ -53,11 +56,11 @@ public class Parser {
         }
     }
     
-    protected boolean getBoolean(Map<?, ?> map, String key) {
+    protected boolean getBoolean(@NotNull Map<?, ?> map, @NotNull String key) {
         return DataUtil.getBoolean(map, key);
     }
 
-    protected boolean getBooleanOrDefault(Map<?, ?> map, String key, boolean def) {
+    protected boolean getBooleanOrDefault(@NotNull Map<?, ?> map, @NotNull String key, boolean def) {
         try {
             return getBoolean(map, key);
         } catch (IllegalArgumentException e) {
@@ -65,11 +68,11 @@ public class Parser {
         }
     }
     
-    protected List<String> getStringList(Map<?, ?> map, String key) {
+    protected @NotNull List<@NotNull String> getStringList(@NotNull Map<?, ?> map, @NotNull String key) {
         return DataUtil.getStringList(map, key);
     }
 
-    protected List<String> getStringListOrDefault(Map<?, ?> map, String key, List<String> def) {
+    protected @NotNull List<@NotNull String> getStringListOrDefault(@NotNull Map<?, ?> map, @NotNull String key, @NotNull List<@NotNull String> def) {
         try {
             return getStringList(map, key);
         } catch (IllegalArgumentException e) {
@@ -77,11 +80,11 @@ public class Parser {
         }
     }
 
-    protected Map<?, ?> getMap(Map<?, ?> map, String key) {
+    protected @NotNull Map<?, ?> getMap(@NotNull Map<?, ?> map, @NotNull String key) {
         return DataUtil.getMap(map, key);
     }
 
-    protected Map<?, ?> getMapOrDefault(Map<?, ?> map, String key, Map<?, ?> def) {
+    protected @NotNull Map<?, ?> getMapOrDefault(@NotNull Map<?, ?> map, @NotNull String key, @NotNull Map<?, ?> def) {
         try {
             return getMap(map, key);
         } catch (IllegalArgumentException e) {
@@ -89,11 +92,11 @@ public class Parser {
         }
     }
 
-    protected List<Map<?, ?>> getMapList(Map<?, ?> map, String key) {
+    protected @NotNull List<@NotNull Map<?, ?>> getMapList(@NotNull Map<?, ?> map, @NotNull String key) {
         return DataUtil.getMapList(map, key);
     }
 
-    protected List<Map<?, ?>> getMapListOrDefault(Map<?, ?> map, String key, List<Map<?, ?>> def) {
+    protected @NotNull List<@NotNull Map<?, ?>> getMapListOrDefault(@NotNull Map<?, ?> map, @NotNull String key, @NotNull List<@NotNull Map<?, ?>> def) {
         try {
             return getMapList(map, key);
         } catch (IllegalArgumentException e) {

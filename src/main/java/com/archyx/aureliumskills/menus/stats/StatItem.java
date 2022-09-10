@@ -16,33 +16,36 @@ import com.archyx.slate.item.provider.PlaceholderType;
 import com.archyx.slate.item.provider.TemplateItemProvider;
 import com.archyx.slate.menu.ActiveMenu;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-public class StatItem extends AbstractItem implements TemplateItemProvider<Stat> {
+public class StatItem extends AbstractItem implements TemplateItemProvider<@NotNull Stat> {
 
     public StatItem(AureliumSkills plugin) {
         super(plugin);
     }
 
     @Override
-    public Class<Stat> getContext() {
+    public @NotNull Class<@NotNull Stat> getContext() {
         return Stat.class;
     }
 
     @Override
-    public Set<Stat> getDefinedContexts(Player player, ActiveMenu activeMenu) {
+    public @NotNull Set<@NotNull Stat> getDefinedContexts(@NotNull Player player, @NotNull ActiveMenu activeMenu) {
         return new HashSet<>(plugin.getStatRegistry().getStats());
     }
 
     @Override
-    public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu, PlaceholderType type, Stat stat) {
-        Locale locale = plugin.getLang().getLocale(player);
-        PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
-        if (playerData == null) return placeholder;
+    public @NotNull String onPlaceholderReplace(@NotNull String placeholder, @NotNull Player player, @NotNull ActiveMenu activeMenu, @NotNull PlaceholderType type, @NotNull Stat stat) {
+        @Nullable Locale locale = plugin.getLang().getLocale(player);
+        @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+        if (playerData == null)
+            return placeholder;
         switch (placeholder) {
             case "color":
                 return stat.getColor(locale);
@@ -77,7 +80,7 @@ public class StatItem extends AbstractItem implements TemplateItemProvider<Stat>
         return placeholder;
     }
 
-    private String getSkillsLeveledBy(Stat stat, Locale locale) {
+    private @NotNull String getSkillsLeveledBy(@NotNull Stat stat, @Nullable Locale locale) {
         List<Skill> skillsLeveledBy = plugin.getRewardManager().getSkillsLeveledBy(stat);
         StringBuilder skillList = new StringBuilder();
         for (Skill skill : skillsLeveledBy) {
@@ -94,7 +97,7 @@ public class StatItem extends AbstractItem implements TemplateItemProvider<Stat>
         }
     }
 
-    private String getStrengthDescriptors(PlayerData playerData, Locale locale) {
+    private @NotNull String getStrengthDescriptors(@NotNull PlayerData playerData, @Nullable Locale locale) {
         double strengthLevel = playerData.getStatLevel(Stats.STRENGTH);
         double attackDamage = strengthLevel * OptionL.getDouble(Option.STRENGTH_MODIFIER);
         if (OptionL.getBoolean(Option.STRENGTH_DISPLAY_DAMAGE_WITH_HEALTH_SCALING) && !OptionL.getBoolean(Option.STRENGTH_USE_PERCENT)) {
@@ -103,13 +106,13 @@ public class StatItem extends AbstractItem implements TemplateItemProvider<Stat>
         return TextUtil.replace(Lang.getMessage(MenuMessage.ATTACK_DAMAGE, locale),"{value}", NumberUtil.format2(attackDamage));
     }
 
-    private String getHealthDescriptors(PlayerData playerData, Locale locale) {
+    private @NotNull String getHealthDescriptors(@NotNull PlayerData playerData, @Nullable Locale locale) {
         double modifier = playerData.getStatLevel(Stats.HEALTH) * OptionL.getDouble(Option.HEALTH_MODIFIER);
         double scaledHealth = modifier * OptionL.getDouble(Option.HEALTH_HP_INDICATOR_SCALING);
         return TextUtil.replace(Lang.getMessage(MenuMessage.HP, locale),"{value}", NumberUtil.format2(scaledHealth));
     }
 
-    private String getRegenerationDescriptors(PlayerData playerData, Locale locale) {
+    private @NotNull String getRegenerationDescriptors(@NotNull PlayerData playerData, @Nullable Locale locale) {
         double regenLevel = playerData.getStatLevel(Stats.REGENERATION);
         double saturatedRegen = regenLevel * OptionL.getDouble(Option.REGENERATION_SATURATED_MODIFIER) * OptionL.getDouble(Option.HEALTH_HP_INDICATOR_SCALING);
         double hungerFullRegen = regenLevel *  OptionL.getDouble(Option.REGENERATION_HUNGER_FULL_MODIFIER) * OptionL.getDouble(Option.HEALTH_HP_INDICATOR_SCALING);
@@ -121,7 +124,7 @@ public class StatItem extends AbstractItem implements TemplateItemProvider<Stat>
                 + "\n" + TextUtil.replace(Lang.getMessage(MenuMessage.MANA_REGEN, locale),"{value}", String.valueOf(Math.round(manaRegen)));
     }
 
-    private String getLuckDescriptors(PlayerData playerData, Locale locale) {
+    private @NotNull String getLuckDescriptors(@NotNull PlayerData playerData, @Nullable Locale locale) {
         double luckLevel = playerData.getStatLevel(Stats.LUCK);
         double luck = luckLevel * OptionL.getDouble(Option.LUCK_MODIFIER);
         double doubleDropChance = luckLevel * OptionL.getDouble(Option.LUCK_DOUBLE_DROP_MODIFIER) * 100;
@@ -132,7 +135,7 @@ public class StatItem extends AbstractItem implements TemplateItemProvider<Stat>
                 + "\n" + TextUtil.replace(Lang.getMessage(MenuMessage.DOUBLE_DROP_CHANCE, locale),"{value}", NumberUtil.format2(doubleDropChance));
     }
 
-    private String getWisdomDescriptors(PlayerData playerData, Locale locale) {
+    private @NotNull String getWisdomDescriptors(@NotNull PlayerData playerData, @Nullable Locale locale) {
         double wisdomLevel = playerData.getStatLevel(Stats.WISDOM);
         double xpModifier = wisdomLevel * OptionL.getDouble(Option.WISDOM_EXPERIENCE_MODIFIER) * 100;
         double anvilCostReduction = (-1.0 * Math.pow(1.025, -1.0 * wisdomLevel * OptionL.getDouble(Option.WISDOM_ANVIL_COST_MODIFIER)) + 1) * 100;
@@ -142,7 +145,7 @@ public class StatItem extends AbstractItem implements TemplateItemProvider<Stat>
                 + "\n" + TextUtil.replace(Lang.getMessage(MenuMessage.MAX_MANA, locale), "{value}", NumberUtil.format1(maxMana));
     }
 
-    private String getToughnessDescriptors(PlayerData playerData, Locale locale) {
+    private @NotNull String getToughnessDescriptors(@NotNull PlayerData playerData, @Nullable Locale locale) {
         double toughness = playerData.getStatLevel(Stats.TOUGHNESS) * OptionL.getDouble(Option.TOUGHNESS_NEW_MODIFIER);
         double damageReduction = (-1.0 * Math.pow(1.01, -1.0 * toughness) + 1) * 100;
         return TextUtil.replace(Lang.getMessage(MenuMessage.INCOMING_DAMAGE, locale),"{value}", NumberUtil.format2(damageReduction));

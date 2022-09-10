@@ -1,0 +1,17 @@
+<root>
+    <item name='me.clip.placeholderapi.PlaceholderHook java.lang.String onPlaceholderRequest(org.bukkit.entity.Player, java.lang.String)'>
+        <annotation name='org.jetbrains.annotations.Nullable'/>
+    </item>
+    <item name='me.clip.placeholderapi.PlaceholderHook java.lang.String onPlaceholderRequest(org.bukkit.entity.Player, java.lang.String) 0'>
+        <annotation name='org.jetbrains.annotations.Nullable'/>
+    </item>
+    <item name='me.clip.placeholderapi.PlaceholderHook java.lang.String onPlaceholderRequest(org.bukkit.entity.Player, java.lang.String) 1'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='me.clip.placeholderapi.PlaceholderHook java.lang.String onRequest(org.bukkit.OfflinePlayer, java.lang.String) 0'>
+        <annotation name='org.jetbrains.annotations.Nullable'/>
+    </item>
+    <item name='me.clip.placeholderapi.PlaceholderHook java.lang.String onRequest(org.bukkit.OfflinePlayer, java.lang.String) 1'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+</root>

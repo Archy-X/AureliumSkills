@@ -12,6 +12,8 @@ import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 
@@ -22,8 +24,8 @@ public class SorterItem extends AbstractItem implements SingleItemProvider {
     }
 
     @Override
-    public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu, PlaceholderType placeholderType) {
-        Locale locale = plugin.getLang().getLocale(player);
+    public @NotNull String onPlaceholderReplace(@NotNull String placeholder, @NotNull Player player, @NotNull ActiveMenu activeMenu, @NotNull PlaceholderType placeholderType) {
+        @Nullable Locale locale = plugin.getLang().getLocale(player);
         switch (placeholder) {
             case "sorter":
                 return Lang.getMessage(MenuMessage.SORTER, locale);
@@ -36,9 +38,9 @@ public class SorterItem extends AbstractItem implements SingleItemProvider {
     }
 
     @Override
-    public void onClick(Player player, InventoryClickEvent event, ItemStack item, SlotPos pos, ActiveMenu activeMenu) {
+    public void onClick(@NotNull Player player, @NotNull InventoryClickEvent event, @NotNull ItemStack item, @NotNull SlotPos pos, @NotNull ActiveMenu activeMenu) {
         SortType[] sortTypes = SortType.values();
-        SortType currentType = (SortType) activeMenu.getProperty("sort_type");
+        SortType currentType = getSortType(activeMenu);
         // Get the index of the current sort type in the array
         int currentTypeIndex = 0;
         for (int i = 0; i < sortTypes.length; i++) {
@@ -60,9 +62,9 @@ public class SorterItem extends AbstractItem implements SingleItemProvider {
         activeMenu.setCooldown("sorter", 5);
     }
 
-    private String getSortedTypesLore(Locale locale, ActiveMenu activeMenu) {
+    private @NotNull String getSortedTypesLore(@Nullable Locale locale, @NotNull ActiveMenu activeMenu) {
         StringBuilder builder = new StringBuilder();
-        SortType selectedSort = (SortType) activeMenu.getProperty("sort_type");
+        SortType selectedSort = getSortType(activeMenu);
         for (SortType sortType : SortType.values()) {
             String typeString = TextUtil.replace(Lang.getMessage(MenuMessage.SORT_TYPE, locale)
                     , "{type_name}", Lang.getMessage(MenuMessage.valueOf(sortType.toString()), locale));
@@ -83,7 +85,7 @@ public class SorterItem extends AbstractItem implements SingleItemProvider {
         ALPHABETICAL,
         REVERSE_ALPHABETICAL;
 
-        public SourceComparator getComparator(AureliumSkills plugin, Locale locale) {
+        public @NotNull SourceComparator getComparator(AureliumSkills plugin, Locale locale) {
             switch (this) {
                 case DESCENDING:
                     return new SourceComparator.Descending(plugin);
@@ -96,6 +98,14 @@ public class SorterItem extends AbstractItem implements SingleItemProvider {
             }
         }
 
+    }
+
+    private @NotNull SortType getSortType(@NotNull ActiveMenu activeMenu) {
+        @Nullable Object property = activeMenu.getProperty("sort_type");
+        if (!(property instanceof SortType)) {
+            throw new IllegalArgumentException("Could not get menu sort_type property");
+        }
+        return (SortType) property;
     }
 
 }

@@ -7,6 +7,7 @@ import com.archyx.aureliumskills.configuration.OptionL;
 import com.archyx.aureliumskills.leveler.Leveler;
 import com.archyx.aureliumskills.leveler.SkillLeveler;
 import com.archyx.aureliumskills.skills.Skills;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,15 +16,17 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerFishEvent.State;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class FishingLeveler extends SkillLeveler implements Listener {
 
-	public FishingLeveler(AureliumSkills plugin) {
+	public FishingLeveler(@NotNull AureliumSkills plugin) {
 		super(plugin, Ability.FISHER);
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onFish(PlayerFishEvent event) {
+	public void onFish(@NotNull PlayerFishEvent event) {
 		if (OptionL.isEnabled(Skills.FISHING)) {
 			//Check cancelled
 			if (OptionL.getBoolean(Option.FISHING_CHECK_CANCELLED)) {
@@ -35,11 +38,14 @@ public class FishingLeveler extends SkillLeveler implements Listener {
 				Player player = event.getPlayer();
 				if (blockXpGain(player)) return;
 				if (event.getCaught() instanceof Item) {
-					ItemStack item = ((Item) event.getCaught()).getItemStack();
-					Leveler leveler = plugin.getLeveler();
-					FishingSource source = FishingSource.valueOf(item);
-					if (source != null) {
-						leveler.addXp(player, Skills.FISHING, getXp(player, source));
+					@Nullable Entity caught = event.getCaught();
+					if (caught != null) {
+						ItemStack item = ((Item) caught).getItemStack();
+						Leveler leveler = plugin.getLeveler();
+						FishingSource source = FishingSource.valueOf(item);
+						if (source != null) {
+							leveler.addXp(player, Skills.FISHING, getXp(player, source));
+						}
 					}
 				}
 			}

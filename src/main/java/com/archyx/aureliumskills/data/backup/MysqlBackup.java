@@ -14,6 +14,8 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.sql.Connection;
@@ -28,13 +30,13 @@ public class MysqlBackup extends BackupProvider {
 
     private final MySqlStorageProvider storageProvider;
 
-    public MysqlBackup(AureliumSkills plugin, MySqlStorageProvider storageProvider) {
+    public MysqlBackup(@NotNull AureliumSkills plugin, MySqlStorageProvider storageProvider) {
         super(plugin);
         this.storageProvider = storageProvider;
     }
 
     @Override
-    public void saveBackup(CommandSender sender, boolean savePlayerData) {
+    public void saveBackup(@NotNull CommandSender sender, boolean savePlayerData) {
         try {
             // Save online players
             if (savePlayerData) {
@@ -64,7 +66,7 @@ public class MysqlBackup extends BackupProvider {
                         }
                     }
                     config.save(file);
-                    Locale locale = plugin.getLang().getLocale(sender);
+                    @Nullable Locale locale = plugin.getLang().getLocale(sender);
                     String message = TextUtil.replace(Lang.getMessage(CommandMessage.BACKUP_SAVE_SAVED, locale)
                             , "{type}", "MySQL", "{file}", file.getName());
                     if (sender instanceof ConsoleCommandSender) {
@@ -75,7 +77,7 @@ public class MysqlBackup extends BackupProvider {
                 }
             }
         } catch (Exception e) {
-            Locale locale = plugin.getLang().getLocale(sender);
+            @Nullable Locale locale = plugin.getLang().getLocale(sender);
             String message = TextUtil.replace(Lang.getMessage(CommandMessage.BACKUP_SAVE_ERROR, locale), "{type}", "MySQL");
             if (sender instanceof ConsoleCommandSender) {
                 plugin.getLogger().warning(ChatColor.stripColor(message));

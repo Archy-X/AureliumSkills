@@ -9,6 +9,7 @@ import com.archyx.aureliumskills.skills.foraging.ForagingSource;
 import com.archyx.aureliumskills.skills.mining.MiningSource;
 import com.archyx.aureliumskills.skills.sorcery.SorcerySource;
 import com.archyx.aureliumskills.source.SourceManager;
+import com.archyx.aureliumskills.support.WorldGuardSupport;
 import com.archyx.aureliumskills.util.block.BlockFaceUtil;
 import com.cryptomorin.xseries.XBlock;
 import com.cryptomorin.xseries.XMaterial;
@@ -26,6 +27,7 @@ import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
@@ -34,10 +36,10 @@ public class RegionBlockListener implements Listener {
 
     private Material[] customMaterials;
 
-    private final AureliumSkills plugin;
+    private final @NotNull AureliumSkills plugin;
     private final RegionManager regionManager;
 
-    public RegionBlockListener(AureliumSkills plugin) {
+    public RegionBlockListener(@NotNull AureliumSkills plugin) {
         this.plugin = plugin;
         this.regionManager = plugin.getRegionManager();
         SourceManager sourceManager = plugin.getSourceManager();
@@ -60,14 +62,15 @@ public class RegionBlockListener implements Listener {
     }
 
     @EventHandler
-    public void checkPlace(BlockPlaceEvent event) {
+    public void checkPlace(@NotNull BlockPlaceEvent event) {
         // Checks if world is blocked
         if (plugin.getWorldManager().isInBlockedCheckWorld(event.getBlock().getLocation())) {
             return;
         }
         // Checks if region is blocked
-        if (plugin.isWorldGuardEnabled()) {
-            if (plugin.getWorldGuardSupport().isInBlockedCheckRegion(event.getBlock().getLocation())) {
+        WorldGuardSupport worldGuardSupport = plugin.getWorldGuardSupport();
+        if (plugin.isWorldGuardEnabled() && worldGuardSupport != null) {
+            if (worldGuardSupport.isInBlockedCheckRegion(event.getBlock().getLocation())) {
                 return;
             }
         }
@@ -106,7 +109,7 @@ public class RegionBlockListener implements Listener {
     }
 
     @EventHandler
-    public void onSandFall(EntityChangeBlockEvent event) {
+    public void onSandFall(@NotNull EntityChangeBlockEvent event) {
         Block block = event.getBlock();
         if (!regionManager.isPlacedBlock(block)) return;
         Material type = block.getType();
@@ -138,7 +141,7 @@ public class RegionBlockListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void checkBreak(BlockBreakEvent event) {
+    public void checkBreak(@NotNull BlockBreakEvent event) {
         if (event.isCancelled()) return;
         Block block = event.getBlock();
         regionManager.removePlacedBlock(block);
@@ -150,7 +153,7 @@ public class RegionBlockListener implements Listener {
     }
 
     @EventHandler
-    public void onBlockPistonExtend(BlockPistonExtendEvent event) {
+    public void onBlockPistonExtend(@NotNull BlockPistonExtendEvent event) {
         for (Block block : event.getBlocks()) {
             regionManager.addPlacedBlock(block.getRelative(event.getDirection()));
         }
@@ -158,7 +161,7 @@ public class RegionBlockListener implements Listener {
     }
 
     @EventHandler
-    public void onBlockPistonRetract(BlockPistonRetractEvent event) {
+    public void onBlockPistonRetract(@NotNull BlockPistonRetractEvent event) {
         Block lastBlock = event.getBlock();
         for (Block block : event.getBlocks()) {
             if (regionManager.isPlacedBlock(block)) {
@@ -171,7 +174,7 @@ public class RegionBlockListener implements Listener {
         regionManager.removePlacedBlock(lastBlock);
     }
 
-    private void checkTallPlant(Block block, int num, Predicate<Material> isMaterial) {
+    private void checkTallPlant(@NotNull Block block, int num, @NotNull Predicate<Material> isMaterial) {
         if (num < 20) {
             Block above = block.getRelative(BlockFace.UP);
             if (isMaterial.test(above.getType())) {
@@ -183,7 +186,7 @@ public class RegionBlockListener implements Listener {
         }
     }
 
-    private void checkBlocksRequiringSupportBelow(Block block) {
+    private void checkBlocksRequiringSupportBelow(@NotNull Block block) {
         // Check if the block above requires support
         Block above = block.getRelative(BlockFace.UP);
         ForagingSource source = ForagingSource.getSource(above);
@@ -200,7 +203,7 @@ public class RegionBlockListener implements Listener {
         }
     }
 
-    private void checkAmethystCluster(Block block) {
+    private void checkAmethystCluster(@NotNull Block block) {
         // Check each side
         for (BlockFace face : BlockFaceUtil.getBlockSides()) {
             Block checkedBlock = block.getRelative(face);

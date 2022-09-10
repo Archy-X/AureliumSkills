@@ -17,22 +17,24 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class FightingLeveler extends SkillLeveler implements Listener {
 
-	public FightingLeveler(AureliumSkills plugin) {
+	public FightingLeveler(@NotNull AureliumSkills plugin) {
 		super(plugin, Ability.FIGHTER);
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onEntityDeath(EntityDeathEvent event) {
+	public void onEntityDeath(@NotNull EntityDeathEvent event) {
 		if (OptionL.isEnabled(Skills.FIGHTING)) {
 			if (OptionL.getBoolean(Option.FIGHTING_DAMAGE_BASED)) return;
 			LivingEntity e = event.getEntity();
 			if (e.getKiller() != null) {
 				if (e.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
-					EntityDamageByEntityEvent ee = (EntityDamageByEntityEvent) e.getLastDamageCause();
-					if (ee.getDamager() instanceof Player) {
+					@Nullable EntityDamageByEntityEvent ee = (EntityDamageByEntityEvent) e.getLastDamageCause();
+					if (ee != null && ee.getDamager() instanceof Player) {
 						EntityType type = e.getType();
 						Player p = (Player) ee.getDamager();
 						if (blockXpGainLocation(e.getLocation(), p)) return;
@@ -61,7 +63,7 @@ public class FightingLeveler extends SkillLeveler implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void onEntityDamage(EntityDamageByEntityEvent event) {
+	public void onEntityDamage(@NotNull EntityDamageByEntityEvent event) {
 		// Damage based listener
 		if (OptionL.isEnabled(Skills.FIGHTING)) {
 			if (event.isCancelled()) return;
@@ -95,7 +97,7 @@ public class FightingLeveler extends SkillLeveler implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void onMobSpawn(CreatureSpawnEvent event) {
+	public void onMobSpawn(@NotNull CreatureSpawnEvent event) {
 		if (event.isCancelled()) return;
 		if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER) {
 			if (OptionL.isEnabled(Skills.FIGHTING) || OptionL.isEnabled(Skills.ARCHERY)) {

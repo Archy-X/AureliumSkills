@@ -1,0 +1,116 @@
+<root>
+    <item name='com.archyx.slate.item.provider.SingleItemProvider java.lang.String onPlaceholderReplace(java.lang.String, org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu, com.archyx.slate.item.provider.PlaceholderType)'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.SingleItemProvider java.lang.String onPlaceholderReplace(java.lang.String, org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu, com.archyx.slate.item.provider.PlaceholderType) 0'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.SingleItemProvider java.lang.String onPlaceholderReplace(java.lang.String, org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu, com.archyx.slate.item.provider.PlaceholderType) 1'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.SingleItemProvider java.lang.String onPlaceholderReplace(java.lang.String, org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu, com.archyx.slate.item.provider.PlaceholderType) 2'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.SingleItemProvider java.lang.String onPlaceholderReplace(java.lang.String, org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu, com.archyx.slate.item.provider.PlaceholderType) 3'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.SingleItemProvider org.bukkit.inventory.ItemStack onItemModify(org.bukkit.inventory.ItemStack, org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu)'>
+        <annotation name='org.jetbrains.annotations.Nullable'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.SingleItemProvider org.bukkit.inventory.ItemStack onItemModify(org.bukkit.inventory.ItemStack, org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu) 0'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.SingleItemProvider org.bukkit.inventory.ItemStack onItemModify(org.bukkit.inventory.ItemStack, org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu) 1'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.SingleItemProvider org.bukkit.inventory.ItemStack onItemModify(org.bukkit.inventory.ItemStack, org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu) 2'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.SingleItemProvider void onClick(org.bukkit.entity.Player, org.bukkit.event.inventory.InventoryClickEvent, org.bukkit.inventory.ItemStack, fr.minuskube.inv.content.SlotPos, com.archyx.slate.menu.ActiveMenu) 0'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.SingleItemProvider void onClick(org.bukkit.entity.Player, org.bukkit.event.inventory.InventoryClickEvent, org.bukkit.inventory.ItemStack, fr.minuskube.inv.content.SlotPos, com.archyx.slate.menu.ActiveMenu) 1'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.SingleItemProvider void onClick(org.bukkit.entity.Player, org.bukkit.event.inventory.InventoryClickEvent, org.bukkit.inventory.ItemStack, fr.minuskube.inv.content.SlotPos, com.archyx.slate.menu.ActiveMenu) 2'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.SingleItemProvider void onClick(org.bukkit.entity.Player, org.bukkit.event.inventory.InventoryClickEvent, org.bukkit.inventory.ItemStack, fr.minuskube.inv.content.SlotPos, com.archyx.slate.menu.ActiveMenu) 3'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.SingleItemProvider void onClick(org.bukkit.entity.Player, org.bukkit.event.inventory.InventoryClickEvent, org.bukkit.inventory.ItemStack, fr.minuskube.inv.content.SlotPos, com.archyx.slate.menu.ActiveMenu) 4'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.TemplateItemProvider fr.minuskube.inv.content.SlotPos getSlotPos(org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu, C)'>
+        <annotation name='org.jetbrains.annotations.Nullable'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.TemplateItemProvider fr.minuskube.inv.content.SlotPos getSlotPos(org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu, C) 0'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.TemplateItemProvider fr.minuskube.inv.content.SlotPos getSlotPos(org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu, C) 1'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.TemplateItemProvider fr.minuskube.inv.content.SlotPos getSlotPos(org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu, C) 2'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.TemplateItemProvider java.lang.String onPlaceholderReplace(java.lang.String, org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu, com.archyx.slate.item.provider.PlaceholderType, C)'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.TemplateItemProvider java.lang.String onPlaceholderReplace(java.lang.String, org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu, com.archyx.slate.item.provider.PlaceholderType, C) 0'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.TemplateItemProvider java.lang.String onPlaceholderReplace(java.lang.String, org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu, com.archyx.slate.item.provider.PlaceholderType, C) 1'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.TemplateItemProvider java.lang.String onPlaceholderReplace(java.lang.String, org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu, com.archyx.slate.item.provider.PlaceholderType, C) 2'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.TemplateItemProvider java.lang.String onPlaceholderReplace(java.lang.String, org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu, com.archyx.slate.item.provider.PlaceholderType, C) 3'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.TemplateItemProvider java.lang.String onPlaceholderReplace(java.lang.String, org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu, com.archyx.slate.item.provider.PlaceholderType, C) 4'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.TemplateItemProvider java.util.Set&lt;C&gt; getDefinedContexts(org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu)'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.TemplateItemProvider java.util.Set&lt;C&gt; getDefinedContexts(org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu) 0'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.TemplateItemProvider java.util.Set&lt;C&gt; getDefinedContexts(org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu) 1'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.TemplateItemProvider org.bukkit.inventory.ItemStack onItemModify(org.bukkit.inventory.ItemStack, org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu, C)'>
+        <annotation name='org.jetbrains.annotations.Nullable'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.TemplateItemProvider org.bukkit.inventory.ItemStack onItemModify(org.bukkit.inventory.ItemStack, org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu, C) 0'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.TemplateItemProvider org.bukkit.inventory.ItemStack onItemModify(org.bukkit.inventory.ItemStack, org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu, C) 1'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.TemplateItemProvider org.bukkit.inventory.ItemStack onItemModify(org.bukkit.inventory.ItemStack, org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu, C) 2'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.TemplateItemProvider org.bukkit.inventory.ItemStack onItemModify(org.bukkit.inventory.ItemStack, org.bukkit.entity.Player, com.archyx.slate.menu.ActiveMenu, C) 3'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.TemplateItemProvider void onClick(org.bukkit.entity.Player, org.bukkit.event.inventory.InventoryClickEvent, org.bukkit.inventory.ItemStack, fr.minuskube.inv.content.SlotPos, com.archyx.slate.menu.ActiveMenu, C) 0'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.TemplateItemProvider void onClick(org.bukkit.entity.Player, org.bukkit.event.inventory.InventoryClickEvent, org.bukkit.inventory.ItemStack, fr.minuskube.inv.content.SlotPos, com.archyx.slate.menu.ActiveMenu, C) 1'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.TemplateItemProvider void onClick(org.bukkit.entity.Player, org.bukkit.event.inventory.InventoryClickEvent, org.bukkit.inventory.ItemStack, fr.minuskube.inv.content.SlotPos, com.archyx.slate.menu.ActiveMenu, C) 2'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.TemplateItemProvider void onClick(org.bukkit.entity.Player, org.bukkit.event.inventory.InventoryClickEvent, org.bukkit.inventory.ItemStack, fr.minuskube.inv.content.SlotPos, com.archyx.slate.menu.ActiveMenu, C) 3'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.TemplateItemProvider void onClick(org.bukkit.entity.Player, org.bukkit.event.inventory.InventoryClickEvent, org.bukkit.inventory.ItemStack, fr.minuskube.inv.content.SlotPos, com.archyx.slate.menu.ActiveMenu, C) 4'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.slate.item.provider.TemplateItemProvider void onClick(org.bukkit.entity.Player, org.bukkit.event.inventory.InventoryClickEvent, org.bukkit.inventory.ItemStack, fr.minuskube.inv.content.SlotPos, com.archyx.slate.menu.ActiveMenu, C) 5'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+</root>

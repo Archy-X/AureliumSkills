@@ -16,6 +16,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.InputStream;
@@ -25,8 +26,8 @@ import java.util.*;
 public class SourceManager {
 
     private final AureliumSkills plugin;
-    private final Map<Source, Double> sources;
-    private final Map<SourceTag, List<Source>> tags;
+    private final @NotNull Map<Source, Double> sources;
+    private final @NotNull Map<SourceTag, List<@NotNull Source>> tags;
     private Map<Skill, Map<XMaterial, Double>> customBlocks;
     private Map<Skill, Map<String, Double>> customMobs;
     private Set<XMaterial> customBlockSet;
@@ -68,7 +69,7 @@ public class SourceManager {
             String path = tag.getPath();
             if (config.contains("tags." + path)) {
                 List<String> sourceStringList = config.getStringList("tags." + path);
-                List<Source> sourcesList = new ArrayList<>();
+                List<@NotNull Source> sourcesList = new ArrayList<>();
                 for (String sourceString : sourceStringList) {
                     if (sourceString.equals("*")) { // Add all sources in that skill if use * syntax
                         sourcesList.addAll(Arrays.asList(plugin.getSourceRegistry().values(tag.getSkill())));
@@ -135,7 +136,7 @@ public class SourceManager {
         Bukkit.getLogger().info("[AureliumSkills] Loaded " + sourcesLoaded + " sources and " + tagsLoaded + " tags in " + (System.currentTimeMillis() - start) + "ms");
     }
 
-    private FileConfiguration updateFile(File file, FileConfiguration config) {
+    private @NotNull FileConfiguration updateFile(@NotNull File file, @NotNull FileConfiguration config) {
         if (config.contains("file_version")) {
             InputStream stream = plugin.getResource("sources_config.yml");
             if (stream != null) {
@@ -167,13 +168,16 @@ public class SourceManager {
         return YamlConfiguration.loadConfiguration(file);
     }
 
-    public double getXp(Source source) {
-        return sources.get(source);
+    public double getXp(@NotNull Source source) {
+        Double xp = sources.get(source);
+        if (xp == null)
+            throw new IllegalStateException("Invalid xp souce index key: " + source.getPath());
+        return xp;
     }
 
-    @NotNull
-    public List<Source> getTag(SourceTag tag) {
-        return tags.getOrDefault(tag, new ArrayList<>());
+    public @NotNull List<@NotNull Source> getTag(SourceTag tag) {
+        @Nullable List<@NotNull Source> list = tags.get(tag);
+        return list != null ? list : new ArrayList<>();
     }
 
     public Map<XMaterial, Double> getCustomBlocks(Skill skill) {
@@ -192,7 +196,7 @@ public class SourceManager {
         return customMobSet;
     }
 
-    public static ItemStack getMenuItem(Source source) {
+    public static @Nullable ItemStack getMenuItem(@NotNull Source source) {
         String material = source + "_SPAWN_EGG";
         ItemStack item = null;
         switch (source.name()) {

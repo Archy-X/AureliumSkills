@@ -9,6 +9,7 @@ import com.archyx.aureliumskills.util.misc.DataUtil;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -18,14 +19,14 @@ import java.util.*;
 public class RewardManager {
 
     private final AureliumSkills plugin;
-    private final Map<Skill, RewardTable> rewardTables;
+    private final @NotNull Map<Skill, RewardTable> rewardTables;
 
     public RewardManager(AureliumSkills plugin) {
         this.plugin = plugin;
         this.rewardTables = new HashMap<>();
     }
 
-    public RewardTable getRewardTable(Skill skill) {
+    public RewardTable getRewardTable(@NotNull Skill skill) {
         return rewardTables.get(skill);
     }
 
@@ -59,9 +60,9 @@ public class RewardManager {
         patternsLoaded += loadPatterns(globalTable, globalConfig, globalFile, plugin.getOptionLoader().getHighestMaxLevel());
         levelsLoaded += loadLevels(globalTable, globalConfig, globalFile);
         // Apply global rewards table to each skill reward table
-        for (Map.Entry<Integer, List<Reward>> entry : globalTable.getRewardsMap().entrySet()) {
-            int level = entry.getKey();
-            List<Reward> rewards = entry.getValue();
+        for (Map.Entry<Integer, @NotNull List<@NotNull Reward>> entry : globalTable.getRewardsMap().entrySet()) {
+            Integer level = entry.getKey();
+            List<@NotNull Reward> rewards = entry.getValue();
             for (Skill skill : plugin.getSkillRegistry().getSkills()) {
                 RewardTable rewardTable = this.rewardTables.get(skill);
                 if (rewardTable != null) {
@@ -74,14 +75,14 @@ public class RewardManager {
         plugin.getLogger().info("Loaded " + patternsLoaded + " pattern rewards and " + levelsLoaded + " level rewards");
     }
 
-    private int loadPatterns(RewardTable rewardTable, FileConfiguration rewardsConfig, File rewardsFile, int maxLevel) {
+    private int loadPatterns(@NotNull RewardTable rewardTable, @NotNull FileConfiguration rewardsConfig, @NotNull File rewardsFile, int maxLevel) {
         // Load patterns section
         int patternsLoaded = 0;
-        List<Map<?, ?>> patterns = rewardsConfig.getMapList("patterns");
+        List<@NotNull Map<?, ?>> patterns = rewardsConfig.getMapList("patterns");
         for (int index = 0; index < patterns.size(); index++) {
-            Map<?, ?> rewardMap = patterns.get(index);
+            @NotNull Map<?, ?> rewardMap = patterns.get(index);
             try {
-                Reward reward = parseReward(rewardMap);
+                @NotNull Reward reward = parseReward(rewardMap);
                 // Load pattern info
                 Object patternObj = DataUtil.getElement(rewardMap, "pattern");
                 if (!(patternObj instanceof Map<?, ?>)) {
@@ -110,7 +111,7 @@ public class RewardManager {
         return patternsLoaded;
     }
 
-    private int loadLevels(RewardTable rewardTable, FileConfiguration rewardsConfig, File rewardsFile) {
+    private int loadLevels(@NotNull RewardTable rewardTable, @NotNull FileConfiguration rewardsConfig, @NotNull File rewardsFile) {
         int levelsLoaded = 0;
         ConfigurationSection levelsSection = rewardsConfig.getConfigurationSection("levels");
         if (levelsSection != null) {
@@ -119,11 +120,11 @@ public class RewardManager {
                 try {
                     int level = Integer.parseInt(levelString);
                     // For each reward in that level
-                    List<Map<?, ?>> rewards = levelsSection.getMapList(levelString);
+                    List<@NotNull Map<?, ?>> rewards = levelsSection.getMapList(levelString);
                     for (int index = 0; index < rewards.size(); index++) {
-                        Map<?, ?> rewardMap = rewards.get(index);
+                        @NotNull Map<?, ?> rewardMap = rewards.get(index);
                         try {
-                            Reward reward = parseReward(rewardMap);
+                            @NotNull Reward reward = parseReward(rewardMap);
                             rewardTable.addReward(reward, level);
                             levelsLoaded++;
                         } catch (IllegalArgumentException e) {
@@ -138,7 +139,7 @@ public class RewardManager {
         return levelsLoaded;
     }
 
-    private Reward parseReward(Map<?, ?> map) {
+    private @NotNull Reward parseReward(@NotNull Map<?, ?> map) {
         // Get type of reward
         String type = DataUtil.getString(map, "type");
         // Parse the type
@@ -156,7 +157,7 @@ public class RewardManager {
     }
 
     // Gets all the skills a stat is leveled by
-    public List<Skill> getSkillsLeveledBy(Stat stat) {
+    public @NotNull List<Skill> getSkillsLeveledBy(@NotNull Stat stat) {
         List<Skill> skillsLeveledBy = new ArrayList<>();
         for (Skill skill : plugin.getSkillRegistry().getSkills()) {
             if (!OptionL.isEnabled(skill)) continue; // Skip disabled skills

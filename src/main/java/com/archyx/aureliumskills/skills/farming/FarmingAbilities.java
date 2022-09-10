@@ -20,6 +20,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
 
@@ -27,11 +28,11 @@ public class FarmingAbilities extends AbilityProvider implements Listener {
 
 	private static final Random r = new Random();
 
-	public FarmingAbilities(AureliumSkills plugin) {
+	public FarmingAbilities(@NotNull AureliumSkills plugin) {
 		super(plugin, Skills.FARMING);
 	}
 
-	public void bountifulHarvest(Player player, Block block) {
+	public void bountifulHarvest(@NotNull Player player, @NotNull Block block) {
 		if (OptionL.isEnabled(Skills.FARMING)) {
 			if (plugin.getAbilityManager().isEnabled(Ability.BOUNTIFUL_HARVEST)) {
 				if (player.getGameMode().equals(GameMode.SURVIVAL)) {
@@ -54,7 +55,7 @@ public class FarmingAbilities extends AbilityProvider implements Listener {
 		}
 	}
 	
-	public void tripleHarvest(Player player, Block block) {
+	public void tripleHarvest(@NotNull Player player, @NotNull Block block) {
 		if (OptionL.isEnabled(Skills.FARMING)) {
 			if (plugin.getAbilityManager().isEnabled(Ability.TRIPLE_HARVEST)) {
 				if (player.getGameMode().equals(GameMode.SURVIVAL)) {
@@ -79,7 +80,7 @@ public class FarmingAbilities extends AbilityProvider implements Listener {
 		}
 	}
 
-	private void checkMelonSilkTouch(Player player, Block block, ItemStack item) {
+	private void checkMelonSilkTouch(@NotNull Player player, @NotNull Block block, @NotNull ItemStack item) {
 		if (block.getType() == XMaterial.MELON.parseMaterial()) {
 			if (player.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.SILK_TOUCH) > 0) {
 				Material melon = XMaterial.MELON.parseMaterial();
@@ -92,7 +93,7 @@ public class FarmingAbilities extends AbilityProvider implements Listener {
 	}
 
 	@EventHandler
-	public void geneticist(PlayerItemConsumeEvent event) {
+	public void geneticist(@NotNull PlayerItemConsumeEvent event) {
 		if (blockDisabled(Ability.GENETICIST)) return;
 		Player player = event.getPlayer();
 		if (blockAbility(player)) return;
@@ -108,7 +109,7 @@ public class FarmingAbilities extends AbilityProvider implements Listener {
 		}
 	}
 
-	public void scytheMaster(EntityDamageByEntityEvent event, Player player, PlayerData playerData) {
+	public void scytheMaster(@NotNull EntityDamageByEntityEvent event, @NotNull Player player, @NotNull PlayerData playerData) {
 		if (blockDisabled(Ability.SCYTHE_MASTER)) return;
 			//Check permission
 			if (!player.hasPermission("aureliumskills.farming")) {

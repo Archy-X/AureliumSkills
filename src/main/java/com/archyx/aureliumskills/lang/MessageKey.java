@@ -1,15 +1,18 @@
 package com.archyx.aureliumskills.lang;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 public interface MessageKey {
 
-    String getPath();
+    @Nullable String getPath();
 
-    static Set<MessageKey> values() {
-        Set<MessageKey> keys = new HashSet<>(Arrays.asList(AbilityMessage.values()));
+    static @NotNull Set<@NotNull MessageKey> values() {
+        @NotNull Set<@NotNull MessageKey> keys = new HashSet<>(Arrays.asList(AbilityMessage.values()));
         keys.addAll(Arrays.asList(CommandMessage.values()));
         keys.addAll(Arrays.asList(MenuMessage.values()));
         keys.addAll(Arrays.asList(ManaAbilityMessage.values()));

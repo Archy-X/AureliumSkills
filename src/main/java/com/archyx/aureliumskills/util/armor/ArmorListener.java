@@ -3,6 +3,7 @@ package com.archyx.aureliumskills.util.armor;
 import com.archyx.aureliumskills.util.armor.ArmorEquipEvent.EquipMethod;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
@@ -14,7 +15,10 @@ import org.bukkit.event.inventory.*;
 import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemBreakEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,7 +31,7 @@ import java.util.List;
  */
 public class ArmorListener implements Listener{
 
-    private final List<String> blockedMaterials;
+    private final @NotNull List<String> blockedMaterials;
 
     private static final String[] defBlocked = new String[] {
             "CHEST", "TRAPPED_CHEST", "ENDER_CHEST",
@@ -46,7 +50,7 @@ public class ArmorListener implements Listener{
             "*SIGN"
     };
 
-    public ArmorListener(List<String> blockedMaterials){
+    public ArmorListener(@NotNull List<@NotNull String> blockedMaterials){
         this.blockedMaterials = new LinkedList<>();
         this.blockedMaterials.addAll(Arrays.asList(defBlocked));
         this.blockedMaterials.addAll(blockedMaterials);
@@ -54,7 +58,7 @@ public class ArmorListener implements Listener{
     //Event Priority is highest because other plugins might cancel the events before we check.
 
     @EventHandler(priority =  EventPriority.HIGHEST, ignoreCancelled = true)
-    public final void inventoryClick(final InventoryClickEvent e){
+    public final void inventoryClick(final @NotNull InventoryClickEvent e){
         boolean shift = false, numberkey = false;
         if(e.isCancelled()) return;
         if(e.getAction() == InventoryAction.NOTHING) return;// Why does this get called if nothing happens??
@@ -65,7 +69,10 @@ public class ArmorListener implements Listener{
             numberkey = true;
         }
         if(e.getSlotType() != SlotType.ARMOR && e.getSlotType() != SlotType.QUICKBAR && e.getSlotType() != SlotType.CONTAINER) return;
-        if(e.getClickedInventory() != null && !e.getClickedInventory().getType().equals(InventoryType.PLAYER)) return;
+        @Nullable Inventory inventory = e.getClickedInventory();
+        if (inventory == null)
+            return;
+        if(!inventory.getType().equals(InventoryType.PLAYER)) return;
         if (!e.getInventory().getType().equals(InventoryType.CRAFTING) && !e.getInventory().getType().equals(InventoryType.PLAYER)) return;
         if(!(e.getWhoClicked() instanceof Player)) return;
         ArmorType newArmorType = ArmorType.matchType(shift ? e.getCurrentItem() : e.getCursor());
@@ -92,16 +99,16 @@ public class ArmorListener implements Listener{
             ItemStack newArmorPiece = e.getCursor();
             ItemStack oldArmorPiece = e.getCurrentItem();
             if(numberkey){
-                if(e.getClickedInventory().getType().equals(InventoryType.PLAYER)){// Prevents shit in the 2by2 crafting
+                if(inventory.getType().equals(InventoryType.PLAYER)){// Prevents shit in the 2by2 crafting
                     // e.getClickedInventory() == The players inventory
                     // e.getHotBarButton() == key people are pressing to equip or unequip the item to or from.
                     // e.getRawSlot() == The slot the item is going to.
                     // e.getSlot() == Armor slot, can't use e.getRawSlot() as that gives a hotbar slot ;-;
-                    ItemStack hotbarItem = e.getClickedInventory().getItem(e.getHotbarButton());
+                    ItemStack hotbarItem = inventory.getItem(e.getHotbarButton());
                     if(!isAirOrNull(hotbarItem)){// Equipping
                         newArmorType = ArmorType.matchType(hotbarItem);
                         newArmorPiece = hotbarItem;
-                        oldArmorPiece = e.getClickedInventory().getItem(e.getSlot());
+                        oldArmorPiece = inventory.getItem(e.getSlot());
                     }else{// Unequipping
                         newArmorType = ArmorType.matchType(!isAirOrNull(e.getCurrentItem()) ? e.getCurrentItem() : e.getCursor());
                     }
@@ -127,14 +134,17 @@ public class ArmorListener implements Listener{
     }
 
     @EventHandler(priority =  EventPriority.HIGHEST)
-    public void playerInteractEvent(PlayerInteractEvent e){
+    public void playerInteractEvent(@NotNull PlayerInteractEvent e){
         if(e.useItemInHand().equals(Result.DENY))return;
         //
         if(e.getAction() == Action.PHYSICAL) return;
         if(e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK){
             Player player = e.getPlayer();
             if (e.getItem() != null) {
-                Material mat = e.getItem().getType();
+                @Nullable ItemStack itemStack = e.getItem();
+                if (itemStack == null)
+                    return;
+                Material mat = itemStack.getType();
                 if (mat.name().endsWith("_HEAD") || mat.name().endsWith("_SKULL") || mat.name().endsWith("SKULL_ITEM")) {
                     return;
                 }
@@ -142,7 +152,10 @@ public class ArmorListener implements Listener{
             if(!e.useInteractedBlock().equals(Result.DENY)){
                 if(e.getClickedBlock() != null && e.getAction() == Action.RIGHT_CLICK_BLOCK && !player.isSneaking()){// Having both of these checks is useless, might as well do it though.
                     // Some blocks have actions when you right click them which stops the client from equipping the armor in hand.
-                    Material mat = e.getClickedBlock().getType();
+                    @Nullable Block clickedBlock = e.getClickedBlock();
+                    if (clickedBlock == null)
+                        return;
+                    Material mat = clickedBlock.getType();
                     for (String s : blockedMaterials){
                         String[] split = s.split("!");
                         String checked = split[0];
@@ -179,7 +192,7 @@ public class ArmorListener implements Listener{
         }
     }
 
-    private boolean isExcluded(Material mat, List<String> excluded) {
+    private boolean isExcluded(@NotNull Material mat, @NotNull List<String> excluded) {
         boolean isExcluded = false;
         //Check exclusions
         for (String exclusion : excluded) {
@@ -200,7 +213,7 @@ public class ArmorListener implements Listener{
     }
 
     @EventHandler(priority =  EventPriority.HIGHEST, ignoreCancelled = true)
-    public void inventoryDrag(InventoryDragEvent event){
+    public void inventoryDrag(@NotNull InventoryDragEvent event){
         // getType() seems to always be even.
         // Old Cursor gives the item you are equipping
         // Raw slot is the ArmorType slot
@@ -228,7 +241,7 @@ public class ArmorListener implements Listener{
     }
 
     @EventHandler
-    public void itemBreakEvent(PlayerItemBreakEvent e){
+    public void itemBreakEvent(@NotNull PlayerItemBreakEvent e){
         ArmorType type = ArmorType.matchType(e.getBrokenItem());
         if(type != null){
             Player p = e.getPlayer();
@@ -252,7 +265,7 @@ public class ArmorListener implements Listener{
     }
 
     @EventHandler
-    public void playerDeathEvent(PlayerDeathEvent e){
+    public void playerDeathEvent(@NotNull PlayerDeathEvent e){
         Player p = e.getEntity();
         if(e.getKeepInventory()) return;
         for(ItemStack i : p.getInventory().getArmorContents()){
@@ -266,7 +279,7 @@ public class ArmorListener implements Listener{
     /**
      * A utility method to support versions that use null or air ItemStacks.
      */
-    public static boolean isAirOrNull(ItemStack item){
+    public static boolean isAirOrNull(@Nullable ItemStack item){
         return item == null || item.getType().equals(Material.AIR);
     }
 }

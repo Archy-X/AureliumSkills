@@ -4,6 +4,7 @@ import com.archyx.aureliumskills.util.math.NumberUtil;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class VersionUtils {
@@ -11,7 +12,7 @@ public class VersionUtils {
     private static final int MAJOR_VERSION = XMaterial.getVersion();
     private static final int MINOR_VERSION = getMinorVersion(getVersionString(Bukkit.getVersion()));
 
-    public static boolean isPigman(EntityType type) {
+    public static boolean isPigman(@NotNull EntityType type) {
         if (XMaterial.getVersion() == 16) {
             return type.equals(EntityType.ZOMBIFIED_PIGLIN);
         }
@@ -34,7 +35,7 @@ public class VersionUtils {
         }
     }
 
-    public static int getMinorVersion(String version) {
+    public static int getMinorVersion(@Nullable String version) {
         if (version != null) {
             int lastDot = version.lastIndexOf('.');
             if (version.indexOf('.') != lastDot) {

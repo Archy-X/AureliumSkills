@@ -3,6 +3,7 @@ package com.archyx.aureliumskills.source;
 import com.archyx.aureliumskills.skills.Skill;
 import com.archyx.aureliumskills.skills.Skills;
 import com.archyx.aureliumskills.util.text.TextUtil;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
@@ -11,8 +12,8 @@ import java.util.*;
 
 public class SourceRegistry {
 
-    private final Map<Skill, Class<?>> registry;
-    private final Map<Skill, Source[]> sources;
+    private final @NotNull Map<@NotNull Skill, Class<?>> registry;
+    private final @NotNull Map<@NotNull Skill, @NotNull Source @NotNull []> sources;
 
     public SourceRegistry() {
         registry = new HashMap<>();
@@ -36,24 +37,24 @@ public class SourceRegistry {
      * The registered class must be an enum or a class that has a values method that returns an array of Source objects.
      * Any class must implement
      */
-    public void register(Skill skill, Class<?> sourceClass) {
+    public void register(@NotNull Skill skill, @NotNull Class<?> sourceClass) {
         registry.put(skill, sourceClass);
         try {
             Method method = sourceClass.getMethod("values");
             Object object = method.invoke(null);
             if (object instanceof Source[]) {
-                sources.put(skill, (Source[]) object);
+                sources.put(skill, (@NotNull Source[]) object);
             }
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | IllegalArgumentException e) {
             e.printStackTrace();
         }
     }
 
-    public Source[] values(Skill skill) {
+    public @NotNull Source @NotNull [] values(@NotNull Skill skill) {
         return sources.get(skill);
     }
 
-    public Set<Source> values() {
+    public @NotNull Set<Source> values() {
         Set<Source> sourceSet = new HashSet<>();
         for (Source[] skillSources : sources.values()) {
             sourceSet.addAll(Arrays.asList(skillSources));
@@ -61,8 +62,7 @@ public class SourceRegistry {
         return sourceSet;
     }
 
-    @Nullable
-    public Source valueOf(String sourceString) {
+    public @Nullable Source valueOf(@NotNull String sourceString) {
         for (Source source : values()) {
             if (source.toString().equals(sourceString.toUpperCase(Locale.ROOT))) {
                 return source;

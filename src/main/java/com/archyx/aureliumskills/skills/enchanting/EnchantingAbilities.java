@@ -19,6 +19,8 @@ import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Random;
@@ -27,18 +29,18 @@ public class EnchantingAbilities extends AbilityProvider implements Listener {
 
     private final Random random = new Random();
 
-    public EnchantingAbilities(AureliumSkills plugin) {
+    public EnchantingAbilities(@NotNull AureliumSkills plugin) {
         super(plugin, Skills.ENCHANTING);
         enchantedStrength();
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void xpConvert(XpGainEvent event) {
+    public void xpConvert(@NotNull XpGainEvent event) {
         if (event.isCancelled()) return;
         if (blockDisabled(Ability.XP_CONVERT)) return;
         Player player = event.getPlayer();
         if (blockAbility(player)) return;
-        PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+        @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
         if (playerData != null) {
             if (playerData.getAbilityLevel(Ability.XP_CONVERT) > 0 && event.getAmount() > 0) {
                 double totalXp = playerData.getAbilityData(Ability.XP_CONVERT).getDouble("xp") + event.getAmount();
@@ -54,13 +56,16 @@ public class EnchantingAbilities extends AbilityProvider implements Listener {
     }
 
     @EventHandler
-    public void xpWarrior(EntityDeathEvent event) {
+    public void xpWarrior(@NotNull EntityDeathEvent event) {
         if (blockDisabled(Ability.XP_WARRIOR)) return;
         LivingEntity entity = event.getEntity();
         if (entity.getKiller() != null) {
-            Player player = entity.getKiller();
-            if (blockAbility(player)) return;
-            PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+            @Nullable Player player = entity.getKiller();
+            if (player == null)
+                return;
+            if (blockAbility(player))
+                return;
+            @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
             if (playerData != null) {
                 if (playerData.getAbilityLevel(Ability.XP_WARRIOR) > 0 && event.getDroppedExp() > 0) {
                     if (random.nextDouble() < getValue(Ability.XP_WARRIOR, playerData) / 100) {
@@ -77,7 +82,7 @@ public class EnchantingAbilities extends AbilityProvider implements Listener {
             public void run() {
                 if (blockDisabled(Ability.ENCHANTED_STRENGTH)) return;
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+                    @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
                     if (playerData != null) {
                         if (playerData.getAbilityLevel(Ability.ENCHANTED_STRENGTH) > 0) {
                             ItemStack item = player.getInventory().getItemInMainHand();
@@ -99,12 +104,12 @@ public class EnchantingAbilities extends AbilityProvider implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void luckyTable(EnchantItemEvent event) {
+    public void luckyTable(@NotNull EnchantItemEvent event) {
         if (event.isCancelled()) return;
         if (blockDisabled(Ability.LUCKY_TABLE)) return;
         Player player = event.getEnchanter();
         if (blockAbility(player)) return;
-        PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+        @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
         if (playerData == null) return;
         if (playerData.getAbilityLevel(Ability.LUCKY_TABLE) > 0) {
             for (Map.Entry<Enchantment, Integer> entry : event.getEnchantsToAdd().entrySet()) {

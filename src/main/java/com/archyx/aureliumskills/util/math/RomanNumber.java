@@ -2,6 +2,8 @@ package com.archyx.aureliumskills.util.math;
 
 import com.archyx.aureliumskills.configuration.Option;
 import com.archyx.aureliumskills.configuration.OptionL;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.TreeMap;
 
@@ -43,12 +45,14 @@ public class RomanNumber {
         map.put(1, "I");
     }
 
-    public static String toRoman(int number) {
+    public static @NotNull String toRoman(int number) {
     	if (number > 0) {
 	    	if (OptionL.getBoolean(Option.ENABLE_ROMAN_NUMERALS)) {
 		        int l =  map.floorKey(number);
 		        if ( number == l ) {
-		            return map.get(number);
+		            @Nullable String roman = map.get(number);
+		            assert (null != roman);
+		            return roman;
 		        }
 		        return map.get(l) + toRoman(number-l);
 	    	}

@@ -22,18 +22,19 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 public class FarmingLeveler extends SkillLeveler implements Listener {
 
-	private final FarmingAbilities farmingAbilities;
+	private final @NotNull FarmingAbilities farmingAbilities;
 
-	public FarmingLeveler(AureliumSkills plugin) {
+	public FarmingLeveler(@NotNull AureliumSkills plugin) {
 		super(plugin, Ability.FARMER);
 		this.farmingAbilities = new FarmingAbilities(plugin);
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onBlockBreak(BlockBreakEvent event) {
+	public void onBlockBreak(@NotNull BlockBreakEvent event) {
 		if (!OptionL.isEnabled(Skills.FARMING)) return;
 		// Check cancelled
 		if (OptionL.getBoolean(Option.FARMING_CHECK_CANCELLED) && event.isCancelled()) {
@@ -106,7 +107,7 @@ public class FarmingLeveler extends SkillLeveler implements Listener {
 		checkCustomBlocks(player, block, Skills.FARMING);
 	}
 
-	protected void giveXp(Player player, double amount, FarmingSource source, Block block) {
+	protected void giveXp(@NotNull Player player, double amount, @NotNull FarmingSource source, @NotNull Block block) {
 		// Give XP
 		plugin.getLeveler().addXp(player, Skills.FARMING, amount);
 		// Handle abilities
@@ -118,7 +119,7 @@ public class FarmingLeveler extends SkillLeveler implements Listener {
 		}
 	}
 
-	private int getSameBlocksAbove(Block block, FarmingSource source, int num) {
+	private int getSameBlocksAbove(@NotNull Block block, @NotNull FarmingSource source, int num) {
 		if (source.isMatch(block)) {
 			if (OptionL.getBoolean(Option.CHECK_BLOCK_REPLACE) && plugin.getRegionManager().isPlacedBlock(block)) {
 				return num;
@@ -129,7 +130,7 @@ public class FarmingLeveler extends SkillLeveler implements Listener {
 		return num;
 	}
 
-	protected void handleRightClick(Player player, Block block) {
+	protected void handleRightClick(@NotNull Player player, @NotNull Block block) {
 		if (blockXpGainLocation(block.getLocation(), player)) return;
 		if (blockXpGainPlayer(player)) return;
 
@@ -167,7 +168,7 @@ public class FarmingLeveler extends SkillLeveler implements Listener {
 		}
 	}
 
-	protected boolean isHoldingItem(Player player) {
+	protected boolean isHoldingItem(@NotNull Player player) {
 		return player.getInventory().getItemInMainHand().getType() != Material.AIR || player.getInventory().getItemInOffHand().getType() != Material.AIR;
 	}
 

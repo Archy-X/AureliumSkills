@@ -4,17 +4,18 @@ import com.archyx.aureliumskills.AureliumSkills;
 import com.archyx.aureliumskills.rewards.Reward;
 import com.archyx.aureliumskills.rewards.builder.StatRewardBuilder;
 import com.archyx.aureliumskills.stats.Stat;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
 public class StatRewardParser extends RewardParser {
     
-    public StatRewardParser(AureliumSkills plugin) {
+    public StatRewardParser(@NotNull AureliumSkills plugin) {
         super(plugin);
     }
 
     @Override
-    public Reward parse(Map<?, ?> map) {
+    public @NotNull Reward parse(@NotNull Map<?, ?> map) {
         StatRewardBuilder builder = new StatRewardBuilder(plugin);
 
         String statName = getString(map, "stat");

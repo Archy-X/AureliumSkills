@@ -13,6 +13,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -25,8 +27,8 @@ public class StatsItem extends AbstractItem implements SingleItemProvider {
     }
 
     @Override
-    public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu, PlaceholderType placeholderType) {
-        Locale locale = plugin.getLang().getLocale(player);
+    public @NotNull String onPlaceholderReplace(@NotNull String placeholder, @NotNull Player player, @NotNull ActiveMenu activeMenu, @NotNull PlaceholderType placeholderType) {
+        @Nullable Locale locale = plugin.getLang().getLocale(player);
         switch (placeholder) {
             case "stats":
                 return Lang.getMessage(MenuMessage.STATS, locale);
@@ -39,18 +41,20 @@ public class StatsItem extends AbstractItem implements SingleItemProvider {
     }
 
     @Override
-    public void onClick(Player player, InventoryClickEvent event, ItemStack item, SlotPos pos, ActiveMenu activeMenu) {
+    public void onClick(@NotNull Player player, @NotNull InventoryClickEvent event, @NotNull ItemStack item, @NotNull SlotPos pos, @NotNull ActiveMenu activeMenu) {
         Map<String, Object> properties = new HashMap<>();
         properties.put("previous_menu", "skills");
         plugin.getMenuManager().openMenu(player, "stats", properties);
     }
 
     @Override
-    public ItemStack onItemModify(ItemStack baseItem, Player player, ActiveMenu activeMenu) {
+    public @NotNull ItemStack onItemModify(@NotNull ItemStack baseItem, @NotNull Player player, @NotNull ActiveMenu activeMenu) {
         if (baseItem.getItemMeta() instanceof SkullMeta) {
-            SkullMeta meta = (SkullMeta) baseItem.getItemMeta();
-            meta.setOwningPlayer(Bukkit.getOfflinePlayer(player.getUniqueId()));
-            baseItem.setItemMeta(meta);
+            @Nullable SkullMeta meta = (SkullMeta) baseItem.getItemMeta();
+            if (meta != null) {
+                meta.setOwningPlayer(Bukkit.getOfflinePlayer(player.getUniqueId()));
+                baseItem.setItemMeta(meta);
+            }
         }
         return baseItem;
     }

@@ -2,6 +2,8 @@ package com.archyx.aureliumskills.region;
 
 import com.google.common.base.Objects;
 import org.bukkit.block.Block;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class BlockPosition {
 
@@ -27,12 +29,12 @@ public class BlockPosition {
         return z;
     }
 
-    public static BlockPosition fromBlock(Block block) {
+    public static @NotNull BlockPosition fromBlock(@NotNull Block block) {
         return new BlockPosition(block.getX(), block.getY(), block.getZ());
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (this == obj) {
             return true;
         } else if (obj == null) {

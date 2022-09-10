@@ -2,6 +2,7 @@ package com.archyx.aureliumskills.lang;
 
 import com.archyx.aureliumskills.skills.Skill;
 import com.archyx.aureliumskills.skills.Skills;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
@@ -39,10 +40,10 @@ public enum SkillMessage implements MessageKey {
     FORGING_DESC;
 
     private final Skill skill = Skills.valueOf(this.name().substring(0, this.name().lastIndexOf("_")));
-    private final String path = "skills." + skill.name().toLowerCase(Locale.ENGLISH) + "." + this.name().substring(this.name().lastIndexOf("_") + 1).toLowerCase(Locale.ENGLISH);
+    private final @NotNull String path = "skills." + skill.name().toLowerCase(Locale.ENGLISH) + "." + this.name().substring(this.name().lastIndexOf("_") + 1).toLowerCase(Locale.ENGLISH);
 
     @Override
-    public String getPath() {
+    public @NotNull String getPath() {
         return path;
     }
 

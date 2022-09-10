@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -13,12 +14,12 @@ import java.util.Locale;
 
 public class LegacyFileBackup extends BackupProvider {
 
-    public LegacyFileBackup(AureliumSkills plugin) {
+    public LegacyFileBackup(@NotNull AureliumSkills plugin) {
         super(plugin);
     }
 
     @Override
-    public void saveBackup(CommandSender sender, boolean savePlayerData) {
+    public void saveBackup(@NotNull CommandSender sender, boolean savePlayerData) {
         try {
             File file = new File(plugin.getDataFolder(), "data.yml");
             if (!file.exists()) return;

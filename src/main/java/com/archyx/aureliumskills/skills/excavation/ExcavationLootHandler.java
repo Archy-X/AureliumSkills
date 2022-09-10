@@ -9,20 +9,22 @@ import com.archyx.aureliumskills.skills.Skills;
 import com.archyx.aureliumskills.source.Source;
 import com.archyx.lootmanager.loot.LootPool;
 import org.bukkit.block.Block;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ExcavationLootHandler extends BlockLootHandler {
 
-    public ExcavationLootHandler(AureliumSkills plugin) {
+    public ExcavationLootHandler(@NotNull AureliumSkills plugin) {
         super(plugin, Skills.EXCAVATION, Ability.EXCAVATOR);
     }
 
     @Override
-    public Source getSource(Block block) {
+    public @Nullable Source getSource(@NotNull Block block) {
         return ExcavationSource.getSource(block);
     }
 
     @Override
-    public double getChance(LootPool pool, PlayerData playerData) {
+    public double getChance(@NotNull LootPool pool, @NotNull PlayerData playerData) {
         double chance = getCommonChance(pool, playerData);
         if (pool.getName().equals("rare") && plugin.getAbilityManager().isEnabled(Ability.METAL_DETECTOR)) {
             chance += (getValue(Ability.METAL_DETECTOR, playerData) / 100);
@@ -33,7 +35,7 @@ public class ExcavationLootHandler extends BlockLootHandler {
     }
 
     @Override
-    public LootDropCause getCause(LootPool pool) {
+    public @NotNull LootDropCause getCause(@NotNull LootPool pool) {
         LootDropCause cause;
         if (pool.getName().equals("rare") && plugin.getAbilityManager().isEnabled(Ability.METAL_DETECTOR)) {
             cause = LootDropCause.METAL_DETECTOR;

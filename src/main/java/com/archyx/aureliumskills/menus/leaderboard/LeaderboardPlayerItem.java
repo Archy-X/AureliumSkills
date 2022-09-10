@@ -16,24 +16,26 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class LeaderboardPlayerItem extends AbstractItem implements TemplateItemProvider<Integer> {
+public class LeaderboardPlayerItem extends AbstractItem implements TemplateItemProvider<@NotNull Integer> {
 
     public LeaderboardPlayerItem(AureliumSkills plugin) {
         super(plugin);
     }
 
     @Override
-    public Class<Integer> getContext() {
+    public @NotNull Class<@NotNull Integer> getContext() {
         return Integer.class;
     }
 
     @Override
-    public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu, PlaceholderType placeholderType, Integer place) {
-        Locale locale = plugin.getLang().getLocale(player);
-        Skill skill = (Skill) activeMenu.getProperty("skill");
+    public @NotNull String onPlaceholderReplace(@NotNull String placeholder, @NotNull Player player, @NotNull ActiveMenu activeMenu, @NotNull PlaceholderType placeholderType, @NotNull Integer place) {
+        @Nullable Locale locale = plugin.getLang().getLocale(player);
+        @Nullable Skill skill = getSkill(activeMenu);
         SkillValue value = plugin.getLeaderboardManager().getLeaderboard(skill, place, 1).get(0);
         switch (placeholder) {
             case "player_entry":
@@ -50,8 +52,8 @@ public class LeaderboardPlayerItem extends AbstractItem implements TemplateItemP
     }
 
     @Override
-    public Set<Integer> getDefinedContexts(Player player, ActiveMenu activeMenu) {
-        Set<Integer> places = new HashSet<>();
+    public @NotNull Set<@NotNull Integer> getDefinedContexts(@NotNull Player player, @NotNull ActiveMenu activeMenu) {
+        Set<@NotNull Integer> places = new HashSet<>();
         for (int i = 1; i <= 10; i++) {
             places.add(i);
         }
@@ -59,8 +61,8 @@ public class LeaderboardPlayerItem extends AbstractItem implements TemplateItemP
     }
 
     @Override
-    public ItemStack onItemModify(ItemStack baseItem, Player player, ActiveMenu activeMenu, Integer place) {
-        Skill skill = (Skill) activeMenu.getProperty("skill");
+    public @Nullable ItemStack onItemModify(@NotNull ItemStack baseItem, @NotNull Player player, @NotNull ActiveMenu activeMenu, @NotNull Integer place) {
+        Skill skill = getSkill(activeMenu);
         List<SkillValue> values = plugin.getLeaderboardManager().getLeaderboard(skill, place, 1);
         if (values.size() == 0) {
             return null;
@@ -76,10 +78,22 @@ public class LeaderboardPlayerItem extends AbstractItem implements TemplateItemP
                 }
             }
             // Set the player skin on the head
-            SkullMeta meta = (SkullMeta) baseItem.getItemMeta();
-            meta.setOwningPlayer(Bukkit.getOfflinePlayer(id));
+            @Nullable SkullMeta meta = (SkullMeta) baseItem.getItemMeta();
+            
+            if (meta != null)
+                meta.setOwningPlayer(Bukkit.getOfflinePlayer(id));
+            
             baseItem.setItemMeta(meta);
         }
         return baseItem;
     }
+
+    private @NotNull Skill getSkill(@NotNull ActiveMenu activeMenu) {
+        @Nullable Object property = activeMenu.getProperty("skill");
+        if (!(property instanceof Skill)) {
+            throw new IllegalArgumentException("Could not get menu skill property");
+        }
+        return (Skill) property;
+    }
+
 }

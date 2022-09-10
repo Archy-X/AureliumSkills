@@ -6,25 +6,24 @@ import org.jetbrains.annotations.NotNull;
 
 public class PlayerDataLoadEvent extends Event {
 
-    private static final HandlerList handlers = new HandlerList();
+    private static final @NotNull HandlerList handlers = new HandlerList();
 
-    private final PlayerData playerData;
+    private final @NotNull PlayerData playerData;
 
-    public PlayerDataLoadEvent(PlayerData playerData) {
+    public PlayerDataLoadEvent(@NotNull PlayerData playerData) {
         this.playerData = playerData;
     }
 
-    public PlayerData getPlayerData() {
+    public @NotNull PlayerData getPlayerData() {
         return playerData;
     }
 
-    @NotNull
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return handlers;
     }
 
-    public static HandlerList getHandlerList() {
+    public static @NotNull HandlerList getHandlerList() {
         return handlers;
     }
 }

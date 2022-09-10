@@ -27,6 +27,8 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -36,12 +38,12 @@ import java.util.regex.Pattern;
 
 public class Leveler {
 	
-	private final AureliumSkills plugin;
-	private final XpRequirements xpRequirements;
-	private final StatLeveler statLeveler;
+	private final @NotNull AureliumSkills plugin;
+	private final @NotNull XpRequirements xpRequirements;
+	private final @NotNull StatLeveler statLeveler;
 	private final Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
 
-	public Leveler(AureliumSkills plugin) {
+	public Leveler(@NotNull AureliumSkills plugin) {
 		this.plugin = plugin;
 		this.xpRequirements = new XpRequirements(plugin);
 		this.statLeveler = new StatLeveler(plugin);
@@ -51,7 +53,7 @@ public class Leveler {
 		xpRequirements.loadXpRequirements();
 	}
 
-	public double getMultiplier(Player player, Skill skill) {
+	public double getMultiplier(@NotNull Player player, @Nullable Skill skill) {
 		double multiplier = 1.0;
 		if (skill != null && !OptionL.getBoolean(Option.valueOf(skill + "_CHECK_MULTIPLIER_PERMISSIONS"))) { // Disable check option
 			return multiplier;
@@ -75,20 +77,20 @@ public class Leveler {
 			}
 		}
 		// Add multiplier modifiers
-		PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+		@Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
 		if (playerData != null) {
 			multiplier += playerData.getTotalMultiplier(skill) / 100;
 		}
 		return multiplier;
 	}
 
-	public double getMultiplier(Player player) {
+	public double getMultiplier(@NotNull Player player) {
 		return getMultiplier(player, null);
 	}
 
 	//Method for adding xp with a defined amount
-	public void addXp(Player player, Skill skill, double amount) {
-		PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+	public void addXp(@NotNull Player player, @NotNull Skill skill, double amount) {
+		@Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
 		//Checks if player has a skill profile for safety
 		if (playerData != null) {
 			//Checks if xp amount is not zero
@@ -112,7 +114,7 @@ public class Leveler {
 		}
 	}
 
-	private void sendBossBar(Player player, Skill skill, PlayerData playerData) {
+	private void sendBossBar(@NotNull Player player, @NotNull Skill skill, @NotNull PlayerData playerData) {
 		if (OptionL.getBoolean(Option.BOSS_BAR_ENABLED)) {
 			// Check whether boss bar should update
 			plugin.getBossBar().incrementAction(player, skill);
@@ -130,8 +132,8 @@ public class Leveler {
 	}
 
 	//Method for setting xp with a defined amount
-	public void setXp(Player player, Skill skill, double amount) {
-		PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+	public void setXp(@NotNull Player player, @NotNull Skill skill, double amount) {
+		@Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
 		//Checks if player has a skill profile for safety
 		if (playerData != null) {
 			double originalAmount = playerData.getSkillXp(skill);
@@ -146,8 +148,8 @@ public class Leveler {
 		}
 	}
 	
-	public void updateStats(Player player) {
-		PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+	public void updateStats(@NotNull Player player) {
+		@Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
 		if (playerData == null) return;
 		for (Stat stat : plugin.getStatRegistry().getStats()) {
 			playerData.setStatLevel(stat, 0);
@@ -158,21 +160,23 @@ public class Leveler {
 		// Reloads modifiers
 		for (String key : playerData.getStatModifiers().keySet()) {
 			StatModifier modifier = playerData.getStatModifiers().get(key);
+			if (modifier == null)
+				throw new IllegalStateException("Invalid stat modifier index key: " + key);
 			playerData.addStatLevel(modifier.getStat(), modifier.getValue());
 		}
 		statLeveler.reloadStat(player, Stats.HEALTH);
 		statLeveler.reloadStat(player, Stats.WISDOM);
 	}
 
-	public void updatePermissions(Player player) {
-		PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+	public void updatePermissions(@NotNull Player player) {
+		@Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
 		if (playerData == null) return;
 		for (Skill skill : plugin.getSkillRegistry().getSkills()) {
 			plugin.getRewardManager().getRewardTable(skill).applyPermissions(player, playerData.getSkillLevel(skill));
 		}
 	}
 
-	public void applyLevelUpCommands(Player player, Skill skill, int oldLevel, int newLevel) {
+	public void applyLevelUpCommands(@NotNull Player player, @NotNull Skill skill, int oldLevel, int newLevel) {
 		if (newLevel > oldLevel) {
 			for (int i = oldLevel + 1; i <= newLevel; i++) {
 				for (CommandReward reward : plugin.getRewardManager().getRewardTable(skill).searchRewards(CommandReward.class, i)) {
@@ -182,7 +186,7 @@ public class Leveler {
 		}
 	}
 
-	public void applyRevertCommands(Player player, Skill skill, int oldLevel, int newLevel) {
+	public void applyRevertCommands(@NotNull Player player, @NotNull Skill skill, int oldLevel, int newLevel) {
 		if (newLevel < oldLevel) {
 			for (int i = oldLevel; i > newLevel; i--) {
 				for (CommandReward reward : plugin.getRewardManager().getRewardTable(skill).searchRewards(CommandReward.class, i)) {
@@ -192,8 +196,8 @@ public class Leveler {
 		}
 	}
 
-	public void checkLevelUp(Player player, Skill skill) {
-		PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+	public void checkLevelUp(@NotNull Player player, @NotNull Skill skill) {
+		@Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
 		if (playerData == null) return;
 		int currentLevel = playerData.getSkillLevel(skill);
 		double currentXp = playerData.getSkillXp(skill);
@@ -206,9 +210,9 @@ public class Leveler {
 		}
 	}
 
-	private void levelUpSkill(PlayerData playerData, Skill skill) {
+	private void levelUpSkill(@NotNull PlayerData playerData, @NotNull Skill skill) {
 		Player player = playerData.getPlayer();
-		Locale locale = playerData.getLocale();
+		@Nullable Locale locale = playerData.getLocale();
 
 		double currentXp = playerData.getSkillXp(skill);
 		int level = playerData.getSkillLevel(skill) + 1;
@@ -216,7 +220,7 @@ public class Leveler {
 		playerData.setSkillXp(skill, currentXp - xpRequirements.getXpRequired(skill, level));
 		playerData.setSkillLevel(skill, level);
 		// Give custom rewards
-		List<Reward> rewards = plugin.getRewardManager().getRewardTable(skill).getRewards(level);
+		List<@NotNull Reward> rewards = plugin.getRewardManager().getRewardTable(skill).getRewards(level);
 		for (Reward reward : rewards) {
 			reward.giveReward(player, skill, level);
 		}
@@ -245,7 +249,7 @@ public class Leveler {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> checkLevelUp(player, skill), OptionL.getInt(Option.LEVELER_DOUBLE_CHECK_DELAY));
 	}
 
-	private void sendTitle(Player player, Locale locale, Skill skill, int level) {
+	private void sendTitle(@NotNull Player player, @Nullable Locale locale, @NotNull Skill skill, int level) {
 		player.sendTitle(TextUtil.replace(Lang.getMessage(LevelerMessage.TITLE, locale),
 						"{skill}", skill.getDisplayName(locale),
 						"{old}", RomanNumber.toRoman(level - 1),
@@ -257,7 +261,7 @@ public class Leveler {
 				, OptionL.getInt(Option.LEVELER_TITLE_FADE_IN), OptionL.getInt(Option.LEVELER_TITLE_STAY), OptionL.getInt(Option.LEVELER_TITLE_FADE_OUT));
 	}
 
-	private void playSound(Player player) {
+	private void playSound(@NotNull Player player) {
 		try {
 			player.playSound(player.getLocation(), Sound.valueOf(OptionL.getString(Option.LEVELER_SOUND_TYPE))
 					, SoundCategory.valueOf(OptionL.getString(Option.LEVELER_SOUND_CATEGORY))
@@ -269,7 +273,7 @@ public class Leveler {
 		}
 	}
 
-	private String getLevelUpMessage(Player player, PlayerData playerData, Skill skill, int newLevel, Locale locale, List<Reward> rewards) {
+	private @NotNull String getLevelUpMessage(@NotNull Player player, @NotNull PlayerData playerData, @NotNull Skill skill, int newLevel, @Nullable Locale locale, @NotNull List<@NotNull Reward> rewards) {
 		String message = TextUtil.replace(Lang.getMessage(LevelerMessage.LEVEL_UP, locale)
 				,"{skill}", skill.getDisplayName(locale)
 				,"{old}", RomanNumber.toRoman(newLevel - 1)
@@ -338,7 +342,7 @@ public class Leveler {
 		return message.replaceAll("(\\u005C\\u006E)|(\\n)", "\n");
 	}
 
-	public XpRequirements getXpRequirements() {
+	public @NotNull XpRequirements getXpRequirements() {
 		return xpRequirements;
 	}
 

@@ -5,10 +5,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionType;
+import org.jetbrains.annotations.NotNull;
 
 public class PotionUtil {
 
-    public static int getDuration(PotionData potionData) {
+    public static int getDuration(@NotNull PotionData potionData) {
         String type = potionData.getType().toString();
         if (potionData.isUpgraded()) {
             switch (type) {
@@ -55,14 +56,14 @@ public class PotionUtil {
         }
     }
 
-    public static String formatDuration(int duration) {
+    public static @NotNull String formatDuration(int duration) {
         int seconds = duration / 20;
         int minutes = seconds / 60;
         return minutes + ":" + String.format("%02d", seconds % 60);
     }
 
     @SuppressWarnings("deprecation")
-    public static void applyEffect(Player player, PotionEffect effect) {
+    public static void applyEffect(@NotNull Player player, @NotNull PotionEffect effect) {
         if (!effect.getType().isInstant()) {
             if (XMaterial.isNewVersion()) {
                 player.addPotionEffect(effect);
@@ -82,7 +83,7 @@ public class PotionUtil {
         }
     }
 
-    public static boolean isNegativePotion(PotionType potionType) {
+    public static boolean isNegativePotion(@NotNull PotionType potionType) {
         switch (potionType) {
             case POISON:
             case SLOWNESS:

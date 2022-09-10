@@ -109,6 +109,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -117,6 +118,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class AureliumSkills extends JavaPlugin {
 
@@ -250,14 +252,14 @@ public class AureliumSkills extends JavaPlugin {
 			holographicDisplaysEnabled = false;
 		}
 		commandManager = new PaperCommandManager(this);
-		// Load	items
+		// Load items
 		itemRegistry.loadFromFile();
 		// Load languages
 		lang = new Lang(this);
-		getServer().getPluginManager().registerEvents(lang, this);
+		getServer().getPluginManager().registerEvents(getLang(), this);
 		lang.init();
-		lang.loadEmbeddedMessages(commandManager);
-		lang.loadLanguages(commandManager);
+		lang.loadEmbeddedMessages(getCommandManager());
+		lang.loadLanguages(getCommandManager());
 		// Load rewards
 		rewardManager = new RewardManager(this);
 		rewardManager.loadRewards();
@@ -269,7 +271,7 @@ public class AureliumSkills extends JavaPlugin {
 		registerEvents();
 		// Load ability manager
 		manaAbilityManager = new ManaAbilityManager(this);
-		getServer().getPluginManager().registerEvents(manaAbilityManager, this);
+		getServer().getPluginManager().registerEvents(getManaAbilityManager(), this);
 		manaAbilityManager.init();
 		// Load ability options
 		abilityManager = new AbilityManager(this);
@@ -347,10 +349,10 @@ public class AureliumSkills extends JavaPlugin {
 	
 	@Override
 	public void onDisable() {
-		for (PlayerData playerData : playerManager.getPlayerDataMap().values()) {
+		for (PlayerData playerData : getPlayerManager().getPlayerDataMap().values()) {
 			storageProvider.save(playerData.getPlayer(), false);
 		}
-		playerManager.getPlayerDataMap().clear();
+		getPlayerManager().getPlayerDataMap().clear();
 		File file = new File(this.getDataFolder(), "config.yml");
 		if (file.exists()) {
 			// Reloads config
@@ -439,15 +441,17 @@ public class AureliumSkills extends JavaPlugin {
 				saveConfig();
 			}
 		} catch (Exception e) {
-            e.printStackTrace();
-        }
+			e.printStackTrace();
+		}
 	}
 
 	private void registerCommands() {
-		commandManager.enableUnstableAPI("help");
-		commandManager.usePerIssuerLocale(true, false);
-		commandManager.getCommandContexts().registerContext(Stat.class, c -> {
+		getCommandManager().enableUnstableAPI("help");
+		getCommandManager().usePerIssuerLocale(true, false);
+		getCommandManager().getCommandContexts().registerContext(Stat.class, c -> {
 			String input = c.popFirstArg();
+			if (input == null)
+				throw new IndexOutOfBoundsException();
 			Stat stat = statRegistry.getStat(input);
 			if (stat != null) {
 				return stat;
@@ -455,17 +459,21 @@ public class AureliumSkills extends JavaPlugin {
 				throw new InvalidCommandArgument("Stat " + input + " not found!");
 			}
 		});
-		commandManager.getCommandContexts().registerContext(Skill.class, c -> {
-			String input = c.popFirstArg();
-			Skill skill = skillRegistry.getSkill(input);
+		getCommandManager().getCommandContexts().registerContext(Skill.class, c -> {
+			@Nullable String input = c.popFirstArg();
+			@Nullable Skill skill = null;
+			
+			if (input != null)
+				skill = skillRegistry.getSkill(input);
+			
 			if (skill != null) {
 				return skill;
 			} else {
 				throw new InvalidCommandArgument("Skill " + input + " not found!");
 			}
 		});
-		commandManager.getCommandCompletions().registerAsyncCompletion("skills", c -> {
-			List<String> values = new ArrayList<>();
+		getCommandManager().getCommandCompletions().registerAsyncCompletion("skills", c -> {
+			List<@NotNull String> values = new ArrayList<>();
 			for (Skill skill : skillRegistry.getSkills()) {
 				if (OptionL.isEnabled(skill)) {
 					values.add(skill.toString().toLowerCase(Locale.ENGLISH));
@@ -473,8 +481,8 @@ public class AureliumSkills extends JavaPlugin {
 			}
 			return values;
 		});
-		commandManager.getCommandCompletions().registerAsyncCompletion("skills_global", c -> {
-			List<String> values = new ArrayList<>();
+		getCommandManager().getCommandCompletions().registerAsyncCompletion("skills_global", c -> {
+			List<@NotNull String> values = new ArrayList<>();
 			values.add("global");
 			for (Skill skill : skillRegistry.getSkills()) {
 				if (OptionL.isEnabled(skill)) {
@@ -483,8 +491,8 @@ public class AureliumSkills extends JavaPlugin {
 			}
 			return values;
 		});
-		commandManager.getCommandCompletions().registerAsyncCompletion("skillTop", c -> {
-			List<String> values = new ArrayList<>();
+		getCommandManager().getCommandCompletions().registerAsyncCompletion("skillTop", c -> {
+			List<@NotNull String> values = new ArrayList<>();
 			for (Skill skill : skillRegistry.getSkills()) {
 				if (OptionL.isEnabled(skill)) {
 					values.add(skill.toString().toLowerCase(Locale.ENGLISH));
@@ -493,50 +501,52 @@ public class AureliumSkills extends JavaPlugin {
 			values.add("average");
 			return values;
 		});
-		commandManager.getCommandCompletions().registerAsyncCompletion("stats", c -> {
-			List<String> values = new ArrayList<>();
+		getCommandManager().getCommandCompletions().registerAsyncCompletion("stats", c -> {
+			List<@NotNull String> values = new ArrayList<>();
 			for (Stat stat : statRegistry.getStats()) {
 				values.add(stat.toString().toLowerCase(Locale.ENGLISH));
 			}
 			return values;
 		});
-		commandManager.getCommandCompletions().registerAsyncCompletion("lang", c -> Lang.getDefinedLanguagesSet());
-		commandManager.getCommandCompletions().registerAsyncCompletion("modifiers", c -> {
-			Player player = c.getPlayer();
-			PlayerData playerData = getPlayerManager().getPlayerData(player);
-			if (playerData != null) {
-				return playerData.getStatModifiers().keySet();
+		getCommandManager().getCommandCompletions().registerAsyncCompletion("lang", c -> Lang.getDefinedLanguagesSet());
+		getCommandManager().getCommandCompletions().registerAsyncCompletion("modifiers", c -> {
+			@Nullable Player player = c.getPlayer();
+			if (player != null) {
+				@Nullable PlayerData playerData = getPlayerManager().getPlayerData(player);
+				if (playerData != null) {
+					return playerData.getStatModifiers().keySet();
+				}
 			}
 			return null;
 		});
-		commandManager.getCommandCompletions().registerAsyncCompletion("item_keys", c -> itemRegistry.getKeys());
-		commandManager.getCommandCompletions().registerAsyncCompletion("sort_types", c -> {
+		getCommandManager().getCommandCompletions().registerAsyncCompletion("item_keys", c -> itemRegistry.getKeys());
+		getCommandManager().getCommandCompletions().registerAsyncCompletion("sort_types", c -> {
 			SorterItem.SortType[] sortTypes = SorterItem.SortType.values();
-			List<String> typeNames = new ArrayList<>();
+			List<@NotNull String> typeNames = new ArrayList<>();
 			for (SorterItem.SortType sortType : sortTypes) {
 				typeNames.add(sortType.toString().toLowerCase(Locale.ROOT));
 			}
 			return typeNames;
 		});
-		commandManager.registerCommand(new SkillsCommand(this));
-		commandManager.registerCommand(new StatsCommand(this));
-		commandManager.registerCommand(new ManaCommand(this));
+		getCommandManager().registerCommand(new SkillsCommand(this));
+		getCommandManager().registerCommand(new StatsCommand(this));
+		getCommandManager().registerCommand(new ManaCommand(this));
 		if (OptionL.getBoolean(Option.ENABLE_SKILL_COMMANDS)) {
-			if (OptionL.isEnabled(Skills.FARMING)) { commandManager.registerCommand(new SkillCommands.FarmingCommand(this)); }
-			if (OptionL.isEnabled(Skills.FORAGING)) { commandManager.registerCommand(new SkillCommands.ForagingCommand(this)); }
-			if (OptionL.isEnabled(Skills.MINING)) { commandManager.registerCommand(new SkillCommands.MiningCommand(this)); }
-			if (OptionL.isEnabled(Skills.FISHING)) { commandManager.registerCommand(new SkillCommands.FishingCommand(this)); }
-			if (OptionL.isEnabled(Skills.EXCAVATION)) { commandManager.registerCommand(new SkillCommands.ExcavationCommand(this)); }
-			if (OptionL.isEnabled(Skills.ARCHERY)) { commandManager.registerCommand(new SkillCommands.ArcheryCommand(this)); }
-			if (OptionL.isEnabled(Skills.DEFENSE)) { commandManager.registerCommand(new SkillCommands.DefenseCommand(this)); }
-			if (OptionL.isEnabled(Skills.FIGHTING)) { commandManager.registerCommand(new SkillCommands.FightingCommand(this)); }
-			if (OptionL.isEnabled(Skills.ENDURANCE)) { commandManager.registerCommand(new SkillCommands.EnduranceCommand(this)); }
-			if (OptionL.isEnabled(Skills.AGILITY)) { commandManager.registerCommand(new SkillCommands.AgilityCommand(this)); }
-			if (OptionL.isEnabled(Skills.ALCHEMY)) { commandManager.registerCommand(new SkillCommands.AlchemyCommand(this)); }
-			if (OptionL.isEnabled(Skills.ENCHANTING)) { commandManager.registerCommand(new SkillCommands.EnchantingCommand(this)); }
-			if (OptionL.isEnabled(Skills.SORCERY)) { commandManager.registerCommand(new SkillCommands.SorceryCommand(this)); }
-			if (OptionL.isEnabled(Skills.HEALING)) { commandManager.registerCommand(new SkillCommands.HealingCommand(this)); }
-			if (OptionL.isEnabled(Skills.FORGING)) { commandManager.registerCommand(new SkillCommands.ForgingCommand(this)); }
+			if (OptionL.isEnabled(Skills.FARMING)) { getCommandManager().registerCommand(new SkillCommands.FarmingCommand(this)); }
+			if (OptionL.isEnabled(Skills.FORAGING)) { getCommandManager().registerCommand(new SkillCommands.ForagingCommand(this)); }
+			if (OptionL.isEnabled(Skills.MINING)) { getCommandManager().registerCommand(new SkillCommands.MiningCommand(this)); }
+			if (OptionL.isEnabled(Skills.FISHING)) { getCommandManager().registerCommand(new SkillCommands.FishingCommand(this)); }
+			if (OptionL.isEnabled(Skills.EXCAVATION)) { getCommandManager().registerCommand(new SkillCommands.ExcavationCommand(this)); }
+			if (OptionL.isEnabled(Skills.ARCHERY)) { getCommandManager().registerCommand(new SkillCommands.ArcheryCommand(this)); }
+			if (OptionL.isEnabled(Skills.DEFENSE)) { getCommandManager().registerCommand(new SkillCommands.DefenseCommand(this)); }
+			if (OptionL.isEnabled(Skills.FIGHTING)) { getCommandManager().registerCommand(new SkillCommands.FightingCommand(this)); }
+			if (OptionL.isEnabled(Skills.ENDURANCE)) { getCommandManager().registerCommand(new SkillCommands.EnduranceCommand(this)); }
+			if (OptionL.isEnabled(Skills.AGILITY)) { getCommandManager().registerCommand(new SkillCommands.AgilityCommand(this)); }
+			if (OptionL.isEnabled(Skills.ALCHEMY)) { getCommandManager().registerCommand(new SkillCommands.AlchemyCommand(this)); }
+			if (OptionL.isEnabled(Skills.ENCHANTING)) { getCommandManager().registerCommand(new SkillCommands.EnchantingCommand(this)); }
+			if (OptionL.isEnabled(Skills.SORCERY)) { getCommandManager().registerCommand(new SkillCommands.SorceryCommand(this)); }
+			if (OptionL.isEnabled(Skills.HEALING)) { getCommandManager().registerCommand(new SkillCommands.HealingCommand(this)); }
+			if (OptionL.isEnabled(Skills.FORGING)) { getCommandManager().registerCommand(new SkillCommands.ForgingCommand(this)); }
 		}
 	}
 
@@ -591,7 +601,7 @@ public class AureliumSkills extends JavaPlugin {
 		pm.registerEvents(new DamageListener(this, defenseAbilities, fightingAbilities), this);
 		// Load mana manager
 		manaManager = new ManaManager(this);
-		getServer().getPluginManager().registerEvents(manaManager, this);
+		getServer().getPluginManager().registerEvents(getManaManager(), this);
 		manaManager.startRegen();
 		ItemListener itemListener = new ItemListener(this);
 		pm.registerEvents(itemListener, this);
@@ -612,7 +622,7 @@ public class AureliumSkills extends JavaPlugin {
 		if (Bukkit.getPluginManager().getPlugin("Vault") == null) {
 			return false;
 		}
-		RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+		RegisteredServiceProvider<@NotNull Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
 		if (rsp == null) {
 			return false;
 		}
@@ -654,99 +664,121 @@ public class AureliumSkills extends JavaPlugin {
 		menuFileManager.loadMenus();
 	}
 
-	public RewardManager getRewardManager() {
+	public @NotNull RewardManager getRewardManager() {
+		Objects.requireNonNull(rewardManager);
 		return rewardManager;
 	}
 
-	public PlayerManager getPlayerManager() {
+	public @NotNull PlayerManager getPlayerManager() {
+		Objects.requireNonNull(playerManager);
 		return playerManager;
 	}
 
-	public Economy getEconomy() {
+	public @NotNull Economy getEconomy() {
+		Objects.requireNonNull(economy);
 		return economy;
 	}
 
-	public LootTableManager getLootTableManager() {
+	public @NotNull LootTableManager getLootTableManager() {
+		Objects.requireNonNull(lootTableManager);
 		return lootTableManager;
 	}
 
-	public InventoryManager getInventoryManager() {
+	public @NotNull InventoryManager getInventoryManager() {
+		Objects.requireNonNull(inventoryManager);
 		return inventoryManager;
 	}
 
-	public AbilityManager getAbilityManager() {
+	public @NotNull AbilityManager getAbilityManager() {
+		Objects.requireNonNull(abilityManager);
 		return abilityManager;
 	}
 
-	public WorldGuardSupport getWorldGuardSupport() {
+	public @Nullable WorldGuardSupport getWorldGuardSupport() {
 		return worldGuardSupport;
 	}
 
-	public WorldManager getWorldManager() {
+	public @NotNull WorldManager getWorldManager() {
+		Objects.requireNonNull(worldManager);
 		return worldManager;
 	}
 
-	public ManaManager getManaManager() {
+	public @NotNull ManaManager getManaManager() {
+		Objects.requireNonNull(manaManager);
 		return manaManager;
 	}
 
-	public ManaAbilityManager getManaAbilityManager() {
+	public @NotNull ManaAbilityManager getManaAbilityManager() {
+		Objects.requireNonNull(manaAbilityManager);
 		return manaAbilityManager;
 	}
 
-	public PaperCommandManager getCommandManager() {
+	public @NotNull PaperCommandManager getCommandManager() {
+		Objects.requireNonNull(commandManager);
 		return commandManager;
 	}
 
-	public static String getPrefix(Locale locale) {
+	public static @NotNull String getPrefix(@Nullable Locale locale) {
 		return Lang.getMessage(CommandMessage.PREFIX, locale);
 	}
 
-	public ActionBar getActionBar() {
+	public @NotNull ActionBar getActionBar() {
+		Objects.requireNonNull(actionBar);
 		return actionBar;
 	}
 
-	public SkillBossBar getBossBar() {
+	public @NotNull SkillBossBar getBossBar() {
+		Objects.requireNonNull(bossBar);
 		return bossBar;
 	}
 
-	public SourceManager getSourceManager() {
+	public @NotNull SourceManager getSourceManager() {
+		Objects.requireNonNull(sourceManager);
 		return sourceManager;
 	}
 
-	public SorceryLeveler getSorceryLeveler() {
+	public @NotNull SorceryLeveler getSorceryLeveler() {
+		Objects.requireNonNull(sorceryLeveler);
 		return sorceryLeveler;
 	}
 
-	public RegionBlockListener getCheckBlockReplace() {
+	public @NotNull RegionBlockListener getCheckBlockReplace() {
+		Objects.requireNonNull(regionBlockListener);
 		return regionBlockListener;
 	}
 
-	public RequirementManager getRequirementManager() {
+	public @NotNull RequirementManager getRequirementManager() {
+		Objects.requireNonNull(requirementManager);
 		return requirementManager;
 	}
 
-	public OptionL getOptionLoader() {
+	public @NotNull OptionL getOptionLoader() {
+		Objects.requireNonNull(optionLoader);
 		return optionLoader;
 	}
 
-	public ModifierManager getModifierManager() {
+	public @NotNull ModifierManager getModifierManager() {
+		Objects.requireNonNull(modifierManager);
 		return modifierManager;
 	}
 
-	public Lang getLang() {
+	public @NotNull Lang getLang() {
+		Objects.requireNonNull(lang);
 		return lang;
 	}
 
-	public Leveler getLeveler() {
+	public @NotNull Leveler getLeveler() {
+		Objects.requireNonNull(leveler);
 		return leveler;
 	}
 
 	public boolean isHolographicDisplaysEnabled() {
+		Objects.requireNonNull(holographicDisplaysEnabled);
 		return holographicDisplaysEnabled;
 	}
 
 	public boolean isWorldGuardEnabled() {
+		Objects.requireNonNull(worldGuardEnabled);
 		return worldGuardEnabled;
 	}
 
@@ -774,11 +806,13 @@ public class AureliumSkills extends JavaPlugin {
 		return slimefunEnabled;
 	}
 
-	public Health getHealth() {
+	public @NotNull Health getHealth() {
+		Objects.requireNonNull(health);
 		return health;
 	}
 
-	public StorageProvider getStorageProvider() {
+	public @NotNull StorageProvider getStorageProvider() {
+		Objects.requireNonNull(storageProvider);
 		return storageProvider;
 	}
 
@@ -786,11 +820,13 @@ public class AureliumSkills extends JavaPlugin {
 		this.storageProvider = storageProvider;
 	}
 
-	public BackupProvider getBackupProvider() {
+	public @NotNull BackupProvider getBackupProvider() {
+		Objects.requireNonNull(backupProvider);
 		return backupProvider;
 	}
 
-	public LeaderboardManager getLeaderboardManager() {
+	public @NotNull LeaderboardManager getLeaderboardManager() {
+		Objects.requireNonNull(leaderboardManager);
 		return leaderboardManager;
 	}
 
@@ -798,40 +834,44 @@ public class AureliumSkills extends JavaPlugin {
 		return townyEnabled;
 	}
 
-	public TownySupport getTownySupport() {
+	public @Nullable TownySupport getTownySupport() {
 		return townySupport;
 	}
 
-	public RegionManager getRegionManager() {
+	public @NotNull RegionManager getRegionManager() {
+		Objects.requireNonNull(regionManager);
 		return regionManager;
 	}
 
-	public StatRegistry getStatRegistry() {
+	public @NotNull StatRegistry getStatRegistry() {
+		Objects.requireNonNull(statRegistry);
 		return statRegistry;
 	}
 
-	public SkillRegistry getSkillRegistry() {
+	public @NotNull SkillRegistry getSkillRegistry() {
+		Objects.requireNonNull(skillRegistry);
 		return skillRegistry;
 	}
 
-	public LuckPermsSupport getLuckPermsSupport() {
+	public @Nullable LuckPermsSupport getLuckPermsSupport() {
 		return luckPermsSupport;
 	}
 
-	public SourceRegistry getSourceRegistry() {
+	public @NotNull SourceRegistry getSourceRegistry() {
+		Objects.requireNonNull(sourceRegistry);
 		return sourceRegistry;
 	}
 
-	public ItemRegistry getItemRegistry() {
+	public @NotNull ItemRegistry getItemRegistry() {
+		Objects.requireNonNull(itemRegistry);
 		return itemRegistry;
 	}
 
-	@Nullable
-	public WorldGuardFlags getWorldGuardFlags() {
+	public @Nullable WorldGuardFlags getWorldGuardFlags() {
 		return worldGuardFlags;
 	}
 
-	public ProtocolLibSupport getProtocolLibSupport() {
+	public @Nullable ProtocolLibSupport getProtocolLibSupport() {
 		return protocolLibSupport;
 	}
 
@@ -839,19 +879,22 @@ public class AureliumSkills extends JavaPlugin {
 		return !nbtAPIEnabled;
 	}
 
-	public Slate getSlate() {
+	public @NotNull Slate getSlate() {
+		Objects.requireNonNull(slate);
 		return slate;
 	}
 
-	public MenuManager getMenuManager() {
+	public @NotNull MenuManager getMenuManager() {
 		return slate.getMenuManager();
 	}
 
-	public MenuFileManager getMenuFileManager() {
+	public @NotNull MenuFileManager getMenuFileManager() {
+		Objects.requireNonNull(menuFileManager);
 		return menuFileManager;
 	}
 
-	public ForgingLeveler getForgingLeveler() {
+	public @NotNull ForgingLeveler getForgingLeveler() {
+		Objects.requireNonNull(forgingLeveler);
 		return forgingLeveler;
 	}
 }

@@ -14,16 +14,19 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.projectiles.ProjectileSource;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class DefenseLeveler extends SkillLeveler implements Listener {
 
-	public DefenseLeveler(AureliumSkills plugin) {
+	public DefenseLeveler(@NotNull AureliumSkills plugin) {
 		super(plugin, Ability.DEFENDER);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	@SuppressWarnings("deprecation")
-	public void onDamage(EntityDamageByEntityEvent event) {
+	public void onDamage(@NotNull EntityDamageByEntityEvent event) {
 		if (OptionL.isEnabled(Skills.DEFENSE)) {
 			//Checks cancelled
 			if (OptionL.getBoolean(Option.DEFENSE_CHECK_CANCELLED)) {
@@ -59,8 +62,9 @@ public class DefenseLeveler extends SkillLeveler implements Listener {
 							// Make sure player didn't cause own damage
 							if (event.getDamager() instanceof Projectile) {
 								Projectile projectile = (Projectile) event.getDamager();
-								if (projectile.getShooter() instanceof Player) {
-									if (projectile.getShooter().equals(player)) return;
+								@Nullable ProjectileSource shooter = projectile.getShooter();
+								if (shooter != null && projectile.getShooter() instanceof Player) {
+									if (shooter.equals(player)) return;
 								}
 							}
 							if (originalDamage * getXp(DefenseSource.MOB_DAMAGE) <= OptionL.getDouble(Option.DEFENSE_MAX)) {

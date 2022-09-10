@@ -1,5 +1,8 @@
 package com.archyx.aureliumskills.lang;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Locale;
 
 public enum MenuMessage implements MessageKey {
@@ -108,7 +111,7 @@ public enum MenuMessage implements MessageKey {
     UNLOCKED_DESC(7),
     UNLOCKED_DESC_MAXED(7);
 
-    private String path;
+    private @Nullable String path;
     
     MenuMessage(int section) {
         String key = this.name().toLowerCase(Locale.ENGLISH);
@@ -129,10 +132,14 @@ public enum MenuMessage implements MessageKey {
         } else if (section == 7) {
             this.path = "menus.abilities." + key;
         }
+        else
+            throw new IndexOutOfBoundsException();
     }
 
     @Override
-    public String getPath() {
+    public @NotNull String getPath() {
+        assert (null != path);
+        
         return path;
     }
 }

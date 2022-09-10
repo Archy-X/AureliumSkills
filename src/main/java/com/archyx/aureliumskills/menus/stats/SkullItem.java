@@ -15,6 +15,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 
@@ -25,14 +27,13 @@ public class SkullItem extends AbstractItem implements SingleItemProvider {
     }
 
     @Override
-    public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu, PlaceholderType type) {
-        Locale locale = plugin.getLang().getLocale(player);
+    public @NotNull String onPlaceholderReplace(@NotNull String placeholder, @NotNull Player player, @NotNull ActiveMenu activeMenu, @NotNull PlaceholderType type) {
+        @Nullable Locale locale = plugin.getLang().getLocale(player);
         if (placeholder.equals("player")) {
             return player.getName();
         }
-        PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+        @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
         if (playerData != null) {
-            // Handle each stat entry
             Stat stat = plugin.getStatRegistry().getStat(placeholder);
             if (stat != null) {
                 return TextUtil.replace(Lang.getMessage(MenuMessage.PLAYER_STAT_ENTRY, locale),
@@ -46,11 +47,13 @@ public class SkullItem extends AbstractItem implements SingleItemProvider {
     }
 
     @Override
-    public ItemStack onItemModify(ItemStack baseItem, Player player, ActiveMenu activeMenu) {
+    public @NotNull ItemStack onItemModify(@NotNull ItemStack baseItem, @NotNull Player player, @NotNull ActiveMenu activeMenu) {
         if (baseItem.getItemMeta() instanceof SkullMeta) {
             SkullMeta meta = (SkullMeta) baseItem.getItemMeta();
-            meta.setOwningPlayer(Bukkit.getOfflinePlayer(player.getUniqueId()));
-            baseItem.setItemMeta(meta);
+            if (meta != null) {
+                meta.setOwningPlayer(Bukkit.getOfflinePlayer(player.getUniqueId()));
+                baseItem.setItemMeta(meta);
+            }
         }
         return baseItem;
     }

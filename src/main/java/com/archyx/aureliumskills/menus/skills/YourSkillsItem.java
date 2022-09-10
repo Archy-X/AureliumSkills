@@ -9,6 +9,8 @@ import com.archyx.slate.item.provider.PlaceholderType;
 import com.archyx.slate.item.provider.SingleItemProvider;
 import com.archyx.slate.menu.ActiveMenu;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 
@@ -19,8 +21,8 @@ public class YourSkillsItem extends AbstractItem implements SingleItemProvider {
     }
 
     @Override
-    public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu, PlaceholderType type) {
-        Locale locale = plugin.getLang().getLocale(player);
+    public @NotNull String onPlaceholderReplace(@NotNull String placeholder, @NotNull Player player, @NotNull ActiveMenu activeMenu, @NotNull PlaceholderType type) {
+        @Nullable Locale locale = plugin.getLang().getLocale(player);
         switch (placeholder) {
             case "your_skills":
                 return TextUtil.replace(Lang.getMessage(MenuMessage.YOUR_SKILLS, locale),

@@ -15,6 +15,8 @@ import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -28,37 +30,37 @@ public class AbilitiesItem extends AbstractItem implements SingleItemProvider {
     }
 
     @Override
-    public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu menu, PlaceholderType type) {
-        Locale locale = plugin.getLang().getLocale(player);
+    public @NotNull String onPlaceholderReplace(@NotNull String placeholder, @NotNull Player player, @NotNull ActiveMenu activeMenu, @NotNull PlaceholderType type) {
+        @Nullable Locale locale = plugin.getLang().getLocale(player);
         switch (placeholder) {
             case "abilities":
                 return Lang.getMessage(MenuMessage.ABILITIES, locale);
             case "abilities_desc":
                 return Lang.getMessage(MenuMessage.ABILITIES_DESC, locale);
             case "abilities_click":
-                Skill skill = (Skill) menu.getProperty("skill");
+                Skill skill = getSkill(activeMenu);
                 return TextUtil.replace(Lang.getMessage(MenuMessage.ABILITIES_CLICK, locale), "{skill}", skill.getDisplayName(locale));
         }
         return placeholder;
     }
 
     @Override
-    public void onClick(Player player, InventoryClickEvent event, ItemStack item, SlotPos pos, ActiveMenu activeMenu) {
+    public void onClick(@NotNull Player player, @NotNull InventoryClickEvent event, @NotNull ItemStack item, @NotNull SlotPos pos, @NotNull ActiveMenu activeMenu) {
         Map<String, Object> properties = new HashMap<>();
-        properties.put("skill", activeMenu.getProperty("skill"));
+        properties.put("skill", getSkill(activeMenu));
         properties.put("previous_menu", "level_progression");
         plugin.getMenuManager().openMenu(player, "abilities", properties);
     }
 
     @Override
-    public ItemStack onItemModify(ItemStack baseItem, Player player, ActiveMenu activeMenu) {
-        Skill skill = (Skill) activeMenu.getProperty("skill");
+    public @Nullable ItemStack onItemModify(@NotNull ItemStack baseItem, @NotNull Player player, @NotNull ActiveMenu activeMenu) {
+        @Nullable Skill skill = getSkill(activeMenu);
         if (skill == Skills.SORCERY) { // Disable for sorcery abilities REMOVE ONCE SORCERY ABILITIES ARE ADDED
             return null;
         }
         // Check if the skill has an enabled ability
         boolean hasEnabledAbility = false;
-        for (Supplier<Ability> abilitySupplier : skill.getAbilities()) {
+        for (Supplier<@NotNull Ability> abilitySupplier : skill.getAbilities()) {
            if (plugin.getAbilityManager().isEnabled(abilitySupplier.get())) {
                 hasEnabledAbility = true;
                 break;
@@ -66,8 +68,16 @@ public class AbilitiesItem extends AbstractItem implements SingleItemProvider {
         }
         if (hasEnabledAbility) {
             return baseItem;
-        } else {
-            return null; // Don't show item if no abilities are enabled
         }
+        return null; // Don't show item if no abilities are enabled
     }
+
+    private @NotNull Skill getSkill(@NotNull ActiveMenu activeMenu) {
+        @Nullable Object property = activeMenu.getProperty("skill");
+        if (!(property instanceof Skill)) {
+            throw new IllegalArgumentException("Could not get menu skill property");
+        }
+        return (Skill) property;
+    }
+
 }

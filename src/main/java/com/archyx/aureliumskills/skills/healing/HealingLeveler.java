@@ -27,16 +27,18 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.material.MaterialData;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class HealingLeveler extends SkillLeveler implements Listener {
 
-	public HealingLeveler(AureliumSkills plugin) {
+	public HealingLeveler(@NotNull AureliumSkills plugin) {
 		super(plugin, Ability.HEALER);
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	@SuppressWarnings("deprecation")
-	public void onConsume(PlayerItemConsumeEvent event) {
+	public void onConsume(@NotNull PlayerItemConsumeEvent event) {
 		if (OptionL.isEnabled(Skills.HEALING)) {
 			//Check cancelled
 			if (OptionL.getBoolean(Option.HEALING_CHECK_CANCELLED)) {
@@ -50,7 +52,9 @@ public class HealingLeveler extends SkillLeveler implements Listener {
 			Leveler leveler = plugin.getLeveler();
 			if (event.getItem().getType().equals(Material.POTION)) {
 				if (event.getItem().getItemMeta() instanceof PotionMeta) {
-					PotionMeta meta = (PotionMeta) event.getItem().getItemMeta();
+					@Nullable PotionMeta meta = (PotionMeta) event.getItem().getItemMeta();
+					if (meta == null)
+						return;
 					PotionData data = meta.getBasePotionData();
 					if (OptionL.getBoolean(Option.HEALING_EXCLUDE_NEGATIVE_POTIONS) && PotionUtil.isNegativePotion(data.getType())) {
 						return;
@@ -80,7 +84,7 @@ public class HealingLeveler extends SkillLeveler implements Listener {
 			}
 			else {
 				if (event.getItem().getType().equals(Material.GOLDEN_APPLE)) {
-					MaterialData materialData = event.getItem().getData();
+					@Nullable MaterialData materialData = event.getItem().getData();
 					if (materialData != null) {
 						if (materialData.getData() == 0) {
 							leveler.addXp(player, skill, getXp(player, HealingSource.GOLDEN_APPLE));
@@ -95,7 +99,7 @@ public class HealingLeveler extends SkillLeveler implements Listener {
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onThrow(PotionSplashEvent event) {
+	public void onThrow(@NotNull PotionSplashEvent event) {
 		if (OptionL.isEnabled(Skills.HEALING)) {
 			//Check cancelled
 			if (OptionL.getBoolean(Option.HEALING_CHECK_CANCELLED)) {
@@ -106,8 +110,10 @@ public class HealingLeveler extends SkillLeveler implements Listener {
 			if (event.getPotion().getEffects().size() > 0) {
 				if (event.getEntity().getShooter() instanceof Player) {
 					if (event.getPotion().getItem().getItemMeta() instanceof PotionMeta) {
-						Player player = (Player) event.getEntity().getShooter();
-						PotionMeta meta = (PotionMeta) event.getPotion().getItem().getItemMeta();
+						@Nullable Player player = (Player) event.getEntity().getShooter();
+						@Nullable PotionMeta meta = (PotionMeta) event.getPotion().getItem().getItemMeta();
+						if (player == null || meta == null)
+							return;
 						PotionData data = meta.getBasePotionData();
 						if (OptionL.getBoolean(Option.HEALING_EXCLUDE_NEGATIVE_POTIONS) && PotionUtil.isNegativePotion(data.getType())) {
 							return;
@@ -134,7 +140,7 @@ public class HealingLeveler extends SkillLeveler implements Listener {
 
 	@EventHandler
 	@SuppressWarnings("deprecation")
-	public void onLingeringPotionSplash(LingeringPotionSplashEvent event) {
+	public void onLingeringPotionSplash(@NotNull LingeringPotionSplashEvent event) {
 		if (!OptionL.isEnabled(Skills.HEALING)) return;
 		// Check cancelled
 		if (OptionL.getBoolean(Option.HEALING_CHECK_CANCELLED)) {
@@ -149,7 +155,7 @@ public class HealingLeveler extends SkillLeveler implements Listener {
 			return;
 		}
 
-		PotionMeta meta;
+		@Nullable PotionMeta meta;
 		Projectile projectile = projEvent.getEntity();
 		if (VersionUtils.isAtLeastVersion(14)) {
 			if (!(projectile instanceof ThrownPotion)) {
@@ -170,6 +176,8 @@ public class HealingLeveler extends SkillLeveler implements Listener {
 			if (!(lingeringPotion.getItem().getItemMeta() instanceof PotionMeta)) return;
 			meta = (PotionMeta) lingeringPotion.getItem().getItemMeta();
 		}
+		if (meta == null)
+			return;
 		PotionData data = meta.getBasePotionData();
 
 		if (OptionL.getBoolean(Option.HEALING_EXCLUDE_NEGATIVE_POTIONS) && PotionUtil.isNegativePotion(data.getType())) {

@@ -43,22 +43,24 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class AlchemyAbilities extends AbilityProvider implements Listener {
 
-    private final AgilityAbilities agilityAbilities;
+    private final @NotNull AgilityAbilities agilityAbilities;
 
-    public AlchemyAbilities(AureliumSkills plugin) {
+    public AlchemyAbilities(@NotNull AureliumSkills plugin) {
         super(plugin, Skills.ALCHEMY);
         this.agilityAbilities = new AgilityAbilities(plugin);
         wiseEffect();
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void alchemist(BrewEvent event) {
+    public void alchemist(@NotNull BrewEvent event) {
         if (blockDisabled(Ability.ALCHEMIST)) return;
         if (!event.isCancelled()) {
             if (event.getBlock().hasMetadata("skillsBrewingStandOwner")) {
@@ -68,7 +70,7 @@ public class AlchemyAbilities extends AbilityProvider implements Listener {
                     BrewerInventory inventory = event.getContents();
                     if (player != null) {
                         if (blockAbility(player)) return;
-                        PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+                        @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
                         if (playerData == null) return;
                         if (playerData.getAbilityLevel(Ability.ALCHEMIST) > 0) {
                             updateBrewingStand(inventory, playerData, playerData.getLocale());
@@ -79,14 +81,14 @@ public class AlchemyAbilities extends AbilityProvider implements Listener {
         }
     }
 
-    private void updateBrewingStand(BrewerInventory inventory, PlayerData playerData, Locale locale) {
+    private void updateBrewingStand(@NotNull BrewerInventory inventory, @NotNull PlayerData playerData, @Nullable Locale locale) {
         new BukkitRunnable() {
             @Override
             public void run() {
-                ItemStack[] contents = inventory.getContents();
+                @Nullable ItemStack[] contents = inventory.getContents();
                 double multiplier = 1 + (getValue(Ability.ALCHEMIST, playerData) / 100);
                 for (int i = 0; i < contents.length; i++) {
-                    ItemStack item = contents[i];
+                    @Nullable ItemStack item = contents[i];
                     if (item != null) {
                         if (item.getItemMeta() instanceof PotionMeta) {
                             contents[i] = applyDurationData(item, multiplier, locale);
@@ -98,7 +100,7 @@ public class AlchemyAbilities extends AbilityProvider implements Listener {
         }.runTaskLater(plugin, 1L);
     }
 
-    private boolean isApplicablePotion(PotionType potionType) {
+    private boolean isApplicablePotion(@NotNull PotionType potionType) {
         switch (potionType) {
             case INSTANT_DAMAGE:
             case INSTANT_HEAL:
@@ -112,7 +114,7 @@ public class AlchemyAbilities extends AbilityProvider implements Listener {
         }
     }
 
-    private ItemStack applyDurationData(ItemStack originalItem, double multiplier, Locale locale) {
+    private @NotNull ItemStack applyDurationData(@NotNull ItemStack originalItem, double multiplier, Locale locale) {
         if (NBTAPIUser.isNBTDisabled(plugin)) return originalItem;
         PotionMeta potionMeta = (PotionMeta) originalItem.getItemMeta();
         if (potionMeta != null) {
@@ -135,7 +137,7 @@ public class AlchemyAbilities extends AbilityProvider implements Listener {
                 if (duration != 0 && meta != null) {
                     // Add lore
                     if (plugin.getAbilityManager().getOptionAsBooleanElseTrue(Ability.ALCHEMIST, "add_item_lore")) {
-                        List<String> lore = new ArrayList<>();
+                        List<@NotNull String> lore = new ArrayList<>();
                         lore.add(TextUtil.replace(Lang.getMessage(AbilityMessage.ALCHEMIST_LORE, locale)
                                 , "{duration}", PotionUtil.formatDuration(durationBonus)
                                 , "{value}", NumberUtil.format1((multiplier - 1) * 100)));
@@ -150,7 +152,7 @@ public class AlchemyAbilities extends AbilityProvider implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDrink(PlayerItemConsumeEvent event) {
+    public void onDrink(@NotNull PlayerItemConsumeEvent event) {
         if (blockDisabled(Ability.ALCHEMIST)) return;
         Player player = event.getPlayer();
         if (blockAbility(player)) return;
@@ -205,14 +207,17 @@ public class AlchemyAbilities extends AbilityProvider implements Listener {
 
     // Handles duration boosts for splash potions. Includes Alchemist, Sugar Rush, and Splasher.
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onSplash(PotionSplashEvent event) {
+    public void onSplash(@NotNull PotionSplashEvent event) {
         if (blockDisabled(Ability.ALCHEMIST)) return;
         if (event.isCancelled()) return;
         ItemStack item = event.getPotion().getItem();
-        if (item.getItemMeta() instanceof PotionMeta && item.getItemMeta() != null) {
-            PotionMeta meta = (PotionMeta) item.getItemMeta();
-            PotionData potionData = meta.getBasePotionData();
-            if (meta.hasCustomEffects() && OptionL.getBoolean(Option.ALCHEMY_IGNORE_CUSTOM_POTIONS)) return;
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null)
+            return;
+        if (meta instanceof PotionMeta) {
+            PotionMeta potionMeta = (PotionMeta) meta;
+            PotionData potionData = potionMeta.getBasePotionData();
+            if (potionMeta.hasCustomEffects() && OptionL.getBoolean(Option.ALCHEMY_IGNORE_CUSTOM_POTIONS)) return;
             // Get potion duration bonus from Alchemist ability
             int durationBonus = 0;
             if (!NBTAPIUser.isNBTDisabled(plugin)) {
@@ -258,11 +263,11 @@ public class AlchemyAbilities extends AbilityProvider implements Listener {
         }
     }
 
-    private double getSplasherMultiplier(ProjectileSource source, Collection<LivingEntity> affectedEntities) {
+    private double getSplasherMultiplier(ProjectileSource source, @NotNull Collection<LivingEntity> affectedEntities) {
         double splasherMultiplier = 1.0;
         if (source instanceof Player) {
             Player player = (Player) source;
-            PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+            @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
             if (playerData != null && plugin.getAbilityManager().isEnabled(Ability.SPLASHER)) {
                 if (playerData.getAbilityLevel(Ability.SPLASHER) > 0) {
                     double splasherPercent = getValue(Ability.SPLASHER, playerData);
@@ -277,7 +282,7 @@ public class AlchemyAbilities extends AbilityProvider implements Listener {
     // Handles the Lingering ability
     @EventHandler
     @SuppressWarnings("deprecation")
-    public void lingering(LingeringPotionSplashEvent event) {
+    public void lingering(@NotNull LingeringPotionSplashEvent event) {
         if (blockDisabled(Ability.LINGERING)) return;
         if (event.isCancelled()) return;
         Player player = null;
@@ -298,7 +303,7 @@ public class AlchemyAbilities extends AbilityProvider implements Listener {
         }
         if (player != null) {
             if (blockAbility(player)) return;
-            PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+            @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
             if (playerData == null) return;
             if (playerData.getAbilityLevel(Ability.LINGERING) > 0) {
                 AreaEffectCloud cloud = event.getAreaEffectCloud();
@@ -322,7 +327,7 @@ public class AlchemyAbilities extends AbilityProvider implements Listener {
             public void run() {
                 if (!blockDisabled(Ability.WISE_EFFECT)) {
                     for (Player player : Bukkit.getOnlinePlayers()) {
-                        PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+                        @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
                         if (playerData != null) {
                             if (player.getActivePotionEffects().size() > 0) {
                                 if (playerData.getAbilityLevel(Ability.WISE_EFFECT) <= 0) {

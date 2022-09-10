@@ -86,8 +86,7 @@ public class ManaAbilityOption {
         return maxLevel;
     }
 
-    @Nullable
-    public OptionValue getOption(String key) {
+    public @Nullable OptionValue getOption(String key) {
         return options.get(key);
     }
 

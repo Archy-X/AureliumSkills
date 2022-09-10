@@ -1,5 +1,6 @@
 package com.archyx.aureliumskills.configuration;
 
+import org.jetbrains.annotations.NotNull;
 
 public enum Option {
 
@@ -201,19 +202,19 @@ public enum Option {
     WISDOM_ALLOW_OVER_MAX_MANA("wisdom.allow-over-max-mana", OptionType.BOOLEAN),
     WISDOM_MAX_MANA_PER_WISDOM("wisdom.max-mana-per-wisdom", OptionType.DOUBLE);
 
-    private final String path;
-    private final OptionType type;
+    private final @NotNull String path;
+    private final @NotNull OptionType type;
 
-    Option(String path, OptionType type) {
+    Option(@NotNull String path, @NotNull OptionType type) {
         this.path = path;
         this.type = type;
     }
 
-    public String getPath() {
+    public @NotNull String getPath() {
         return path;
     }
 
-    public OptionType getType() {
+    public @NotNull OptionType getType() {
         return type;
     }
 

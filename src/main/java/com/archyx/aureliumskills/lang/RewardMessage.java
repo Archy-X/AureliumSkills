@@ -1,5 +1,7 @@
 package com.archyx.aureliumskills.lang;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Locale;
 
 public enum RewardMessage implements MessageKey{
@@ -21,7 +23,7 @@ public enum RewardMessage implements MessageKey{
     }
 
     @Override
-    public String getPath() {
+    public @NotNull String getPath() {
         if (section != null && key != null) {
             return "rewards." + section + "." + key;
         } else {

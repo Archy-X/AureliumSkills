@@ -6,6 +6,8 @@ import com.archyx.aureliumskills.util.mechanics.DamageType;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,10 +18,10 @@ import java.util.logging.Logger;
 
 public class OptionL {
 
-    private final AureliumSkills plugin;
+    private final @NotNull AureliumSkills plugin;
     private static final Map<Option, OptionValue> options = new HashMap<>();
 
-    public OptionL(AureliumSkills plugin) {
+    public OptionL(@NotNull AureliumSkills plugin) {
         this.plugin = plugin;
     }
 
@@ -98,35 +100,53 @@ public class OptionL {
         }
     }
 
-    public static double getDouble(Option option) {
-        return options.get(option).asDouble();
+    public static double getDouble(@NotNull Option option) {
+        @Nullable OptionValue value = options.get(option);
+        if (value == null)
+            throw new IllegalStateException("Invalid or missing configuration option: " + option.getPath());
+        return value.asDouble();
     }
 
-    public static int getInt(Option option) {
-        return options.get(option).asInt();
+    public static int getInt(@NotNull Option option) {
+        @Nullable OptionValue value = options.get(option);
+        if (value == null)
+            throw new IllegalStateException("Invalid or missing configuration option: " + option.getPath());
+        return value.asInt();
     }
 
-    public static boolean getBoolean(Option option) {
-        return options.get(option).asBoolean();
+    public static boolean getBoolean(@NotNull Option option) {
+        @Nullable OptionValue value = options.get(option);
+        if (value == null)
+            throw new IllegalStateException("Invalid or missing configuration option: " + option.getPath());
+        return value.asBoolean();
     }
 
-    public static String getString(Option option) {
-        return options.get(option).asString();
+    public static @NotNull String getString(@NotNull Option option) {
+        @Nullable OptionValue value = options.get(option);
+        if (value == null)
+            throw new IllegalStateException("Invalid or missing configuration option: " + option.getPath());
+        return value.asString();
     }
 
-    public static List<String> getList(Option option) {
-        return options.get(option).asList();
+    public static @NotNull List<@NotNull String> getList(@NotNull Option option) {
+        @Nullable OptionValue value = options.get(option);
+        if (value == null)
+            throw new IllegalStateException("Invalid or missing configuration option: " + option.getPath());
+        return value.asList();
     }
 
-    public static ChatColor getColor(Option option) {
-        return options.get(option).asColor();
+    public static @NotNull ChatColor getColor(@NotNull Option option) {
+        @Nullable OptionValue value = options.get(option);
+        if (value == null)
+            throw new IllegalStateException("Invalid or missing configuration option: " + option.getPath());
+        return value.asColor();
     }
 
-    public static boolean isEnabled(Skill skill) {
+    public static boolean isEnabled(@NotNull Skill skill) {
         return getBoolean(Option.valueOf(skill.name() + "_ENABLED"));
     }
 
-    public static int getMaxLevel(Skill skill) {
+    public static int getMaxLevel(@NotNull Skill skill) {
         return getInt(Option.valueOf(skill.name() + "_MAX_LEVEL"));
     }
 
@@ -141,7 +161,7 @@ public class OptionL {
         return highest;
     }
 
-    public static boolean criticalEnabled(DamageType type) {
+    public static boolean criticalEnabled(@NotNull DamageType type) {
         return getBoolean(Option.valueOf("CRITICAL_ENABLED_" + type.name()));
     }
 

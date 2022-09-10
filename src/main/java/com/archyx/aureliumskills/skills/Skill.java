@@ -3,27 +3,27 @@ package com.archyx.aureliumskills.skills;
 import com.archyx.aureliumskills.ability.Ability;
 import com.archyx.aureliumskills.mana.MAbility;
 import com.google.common.collect.ImmutableList;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.function.Supplier;
 
 public interface Skill {
 
-    ImmutableList<Supplier<Ability>> getAbilities();
+    @NotNull ImmutableList<@NotNull Supplier<@NotNull Ability>> getAbilities();
 
-    String getDescription(Locale locale);
+    @NotNull String getDescription(@Nullable Locale locale);
 
-    String getDisplayName(Locale locale);
+    @NotNull String getDisplayName(@Nullable Locale locale);
 
-    @Nullable
-    MAbility getManaAbility();
+    @Nullable MAbility getManaAbility();
 
-    String name();
+    @NotNull String name();
 
     @Override
     String toString();
 
-    Ability getXpMultiplierAbility();
+    @NotNull Ability getXpMultiplierAbility();
 
 }

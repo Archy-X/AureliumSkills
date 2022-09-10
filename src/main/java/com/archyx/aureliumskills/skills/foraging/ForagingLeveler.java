@@ -13,18 +13,19 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class ForagingLeveler extends SkillLeveler implements Listener{
 
-	private final ForagingAbilities foragingAbilities;
+	private final @NotNull ForagingAbilities foragingAbilities;
 
-	public ForagingLeveler(AureliumSkills plugin) {
+	public ForagingLeveler(@NotNull AureliumSkills plugin) {
 		super(plugin, Ability.FORAGER);
 		this.foragingAbilities = new ForagingAbilities(plugin);
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onBlockBreak(BlockBreakEvent event) {
+	public void onBlockBreak(@NotNull BlockBreakEvent event) {
 		if (!OptionL.isEnabled(Skills.FORAGING)) return;
 		//Check cancelled
 		if (OptionL.getBoolean(Option.FORAGING_CHECK_CANCELLED) && event.isCancelled()) {

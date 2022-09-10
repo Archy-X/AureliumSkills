@@ -16,6 +16,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
@@ -23,12 +25,12 @@ public class EnduranceAbilities extends AbilityProvider implements Listener {
 
     private final Random r = new Random();
 
-    public EnduranceAbilities(AureliumSkills plugin) {
+    public EnduranceAbilities(@NotNull AureliumSkills plugin) {
         super(plugin, Skills.ENDURANCE);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void antiHunger(FoodLevelChangeEvent event) {
+    public void antiHunger(@NotNull FoodLevelChangeEvent event) {
         if (blockDisabled(Ability.ANTI_HUNGER)) return;
         if (!event.isCancelled()) {
             if (event.getEntity() instanceof Player) {
@@ -36,7 +38,7 @@ public class EnduranceAbilities extends AbilityProvider implements Listener {
                 if (blockAbility(player)) return;
                 // Checks if food level would be decreased
                 if (player.getFoodLevel() > event.getFoodLevel()) {
-                    PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+                    @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
                     if (playerData == null) return;
                     double chance = getValue(Ability.ANTI_HUNGER, playerData) / 100;
                     if (r.nextDouble() < chance) {
@@ -48,13 +50,13 @@ public class EnduranceAbilities extends AbilityProvider implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void goldenHealAndRecovery(EntityRegainHealthEvent event) {
+    public void goldenHealAndRecovery(@NotNull EntityRegainHealthEvent event) {
         if (OptionL.isEnabled(Skills.ENDURANCE)) {
             if (!event.isCancelled()) {
                 if (event.getEntity() instanceof Player) {
                     Player player = (Player) event.getEntity();
                     if (blockAbility(player)) return;
-                    PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+                    @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
                     if (playerData == null) return;
                     // Golden Heal
                     if (event.getRegainReason().equals(EntityRegainHealthEvent.RegainReason.MAGIC_REGEN)) {
@@ -87,11 +89,11 @@ public class EnduranceAbilities extends AbilityProvider implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void recoveryCustom(CustomRegenEvent event) {
+    public void recoveryCustom(@NotNull CustomRegenEvent event) {
         if (!event.isCancelled()) {
             if (isEnabled(Ability.RECOVERY)) {
                 Player player = event.getPlayer();
-                PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+                @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
                 if (playerData == null) return;
                 // Gets health
                 AttributeInstance attribute = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
@@ -110,7 +112,7 @@ public class EnduranceAbilities extends AbilityProvider implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void mealSteal(EntityDamageByEntityEvent event) {
+    public void mealSteal(@NotNull EntityDamageByEntityEvent event) {
         if (blockDisabled(Ability.MEAL_STEAL)) return;
         if (!event.isCancelled()) {
             // Checks if entity and damager are players
@@ -118,7 +120,7 @@ public class EnduranceAbilities extends AbilityProvider implements Listener {
                 Player player = (Player) event.getDamager();
                 Player enemy = (Player) event.getEntity();
                 if (blockAbility(player)) return;
-                PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+                @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
                 if (playerData == null) return;
                 // Calculates chance
                 double chance = getValue(Ability.MEAL_STEAL, playerData) / 100;

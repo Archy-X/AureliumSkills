@@ -20,6 +20,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,28 +30,28 @@ import java.util.UUID;
 
 public class Health implements Listener {
 
-	private final AureliumSkills plugin;
-	private final AgilityAbilities agilityAbilities;
+	private final @NotNull AureliumSkills plugin;
+	private final @NotNull AgilityAbilities agilityAbilities;
 	private final Map<UUID, Double> worldChangeHealth = new HashMap<>();
 	private final Map<Integer, Double> hearts = new HashMap<>();
 	private static final double threshold = 0.1;
 
-	public Health(AureliumSkills plugin) {
+	public Health(@NotNull AureliumSkills plugin) {
 		this.plugin = plugin;
 		this.agilityAbilities = new AgilityAbilities(plugin);
 	}
 
 	@EventHandler
-	public void onJoin(PlayerJoinEvent event) {
+	public void onJoin(@NotNull PlayerJoinEvent event) {
 		applyScaling(event.getPlayer());
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onLoad(PlayerDataLoadEvent event) {
+	public void onLoad(@NotNull PlayerDataLoadEvent event) {
 		setHealth(event.getPlayerData().getPlayer());
 	}
 
-	public void reload(Player player) {
+	public void reload(@Nullable Player player) {
 		if (player != null) {
 			setHealth(player);
 			agilityAbilities.removeFleeting(player);
@@ -57,7 +59,7 @@ public class Health implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void worldChange(PlayerChangedWorldEvent event) {
+	public void worldChange(@NotNull PlayerChangedWorldEvent event) {
 		Player player = event.getPlayer();
 		if (plugin.getWorldManager().isInDisabledWorld(player.getLocation()) && !plugin.getWorldManager().isDisabledWorld(event.getFrom())) {
 			worldChangeHealth.put(player.getUniqueId(), player.getHealth());
@@ -69,7 +71,10 @@ public class Health implements Listener {
 					setHealth(player);
 					if (plugin.getWorldManager().isDisabledWorld(event.getFrom()) && !plugin.getWorldManager().isInDisabledWorld(player.getLocation())) {
 						if (worldChangeHealth.containsKey(player.getUniqueId())) {
-							player.setHealth(worldChangeHealth.get(player.getUniqueId()));
+							Double health = worldChangeHealth.get(player.getUniqueId());
+							if (health == null)
+								throw new IllegalStateException("Invalid player index key for: " + player.getName());
+							player.setHealth(health);
 							worldChangeHealth.remove(player.getUniqueId());
 						}
 					}
@@ -79,14 +84,17 @@ public class Health implements Listener {
 			setHealth(player);
 			if (plugin.getWorldManager().isDisabledWorld(event.getFrom()) && !plugin.getWorldManager().isInDisabledWorld(player.getLocation())) {
 				if (worldChangeHealth.containsKey(player.getUniqueId())) {
-					player.setHealth(worldChangeHealth.get(player.getUniqueId()));
+					Double health = worldChangeHealth.get(player.getUniqueId());
+					if (health == null)
+						throw new IllegalStateException("Invalid player index key for: " + player.getName());
+					player.setHealth(health);
 					worldChangeHealth.remove(player.getUniqueId());
 				}
 			}
 		}
 	}
 
-	private void setHealth(Player player) {
+	private void setHealth(@NotNull Player player) {
 		// Calculates the amount of health to add
 		PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
 		if (playerData == null) return;
@@ -140,7 +148,7 @@ public class Health implements Listener {
 		applyScaling(player);
 	}
 
-	private void applyScaling(Player player) {
+	private void applyScaling(@NotNull Player player) {
 		AttributeInstance attribute = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 		if (attribute == null) return;
 		if (OptionL.getBoolean(Option.HEALTH_HEALTH_SCALING)) {
@@ -148,7 +156,9 @@ public class Health implements Listener {
 			player.setHealthScaled(true);
 			int scaledHearts = 0;
 			for (Integer heartNum : hearts.keySet()) {
-				double healthNum = hearts.get(heartNum);
+				Double healthNum = hearts.get(heartNum);
+				if (healthNum == null)
+					throw new IllegalStateException("Invalid heart index key [" + heartNum + "] for player: " + player.getName());
 				if (health >= healthNum) {
 					if (heartNum > scaledHearts) {
 						scaledHearts = heartNum;
@@ -164,7 +174,7 @@ public class Health implements Listener {
 		}
 	}
 
-	public void loadHearts(FileConfiguration config) {
+	public void loadHearts(@NotNull FileConfiguration config) {
 		// Load default hearts
 		this.hearts.clear();
 		this.hearts.put(10, 0.0);

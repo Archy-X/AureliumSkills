@@ -1,19 +1,22 @@
 package com.archyx.aureliumskills.util.misc;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class DataUtil {
 
-    public static Object getElement(Map<?, ?> map, String key) {
+    public static @NotNull Object getElement(@NotNull Map<?, ?> map, @NotNull String key) {
         // Check if not null
         Object object = map.get(key);
-        Validate.notNull(object, "Reward/loot requires entry with key " + key);
+        Objects.requireNonNull(object, "Reward/loot requires entry with key " + key);
         return object;
     }
 
-    public static String getString(Map<?, ?> map, String key) {
+    public static @NotNull String getString(@NotNull Map<?, ?> map, @NotNull String key) {
         Object object = getElement(map, key);
         if (!(object instanceof String)) {
             throw new IllegalArgumentException("Key " + key + " must have value of type String");
@@ -21,7 +24,7 @@ public class DataUtil {
         return (String) object;
     }
 
-    public static double getDouble(Map<?, ?> map, String key) {
+    public static double getDouble(@NotNull Map<?, ?> map, @NotNull String key) {
         Object object = getElement(map, key);
         if (object instanceof Double) {
             return (double) object;
@@ -32,7 +35,7 @@ public class DataUtil {
         }
     }
 
-    public static int getInt(Map<?, ?> map, String key) {
+    public static int getInt(@NotNull Map<?, ?> map, @NotNull String key) {
         Object object = getElement(map, key);
         if (!(object instanceof Integer)) {
             throw new IllegalArgumentException("Key " + key + " must have value of type int");
@@ -40,7 +43,7 @@ public class DataUtil {
         return (int) object;
     }
 
-    public static boolean getBoolean(Map<?, ?> map, String key) {
+    public static boolean getBoolean(@NotNull Map<?, ?> map, @NotNull String key) {
         Object object = getElement(map, key);
         if (!(object instanceof Boolean)) {
             throw new IllegalArgumentException("Key " + key + " must have value of type boolean");
@@ -48,7 +51,7 @@ public class DataUtil {
         return (boolean) object;
     }
 
-    public static List<String> getStringList(Map<?, ?> map, String key) {
+    public static @NotNull List<@NotNull String> getStringList(@NotNull Map<?, ?> map, @NotNull String key) {
         Object object = getElement(map, key);
         if (!(object instanceof List)) {
             throw new IllegalArgumentException("Key " + key + " must have value of type string list");
@@ -56,9 +59,9 @@ public class DataUtil {
         return castStringList(object);
     }
 
-    public static List<String> castStringList(Object listObj) {
+    public static @NotNull List<@NotNull String> castStringList(@NotNull Object listObj) {
         List<?> unknownList = (List<?>) listObj;
-        List<String> stringList = new ArrayList<>();
+        List<@NotNull String> stringList = new ArrayList<>();
         for (Object element : unknownList) {
             if (element instanceof String) {
                 stringList.add((String) element);
@@ -67,7 +70,7 @@ public class DataUtil {
         return stringList;
     }
 
-    public static Map<?, ?> getMap(Map<?, ?> map, String key) {
+    public static @NotNull Map<?, ?> getMap(@NotNull Map<?, ?> map, @NotNull String key) {
         Object object = getElement(map, key);
         if (!(object instanceof Map<?, ?>)) {
             throw new IllegalArgumentException("Key " + key + " must be a section map");
@@ -75,13 +78,13 @@ public class DataUtil {
         return (Map<?, ?>) object;
     }
 
-    public static List<Map<?, ?>> getMapList(Map<?, ?> map, String key) {
+    public static @NotNull List<@NotNull Map<?, ?>> getMapList(@NotNull Map<?, ?> map, @NotNull String key) {
         Object object = getElement(map, key);
         if (!(object instanceof List)) {
             throw new IllegalArgumentException("Key " + key + " must have value of type section map list");
         }
         List<?> unknownList = (List<?>) object;
-        List<Map<?, ?>> mapList = new ArrayList<>();
+        List<@NotNull Map<?, ?>> mapList = new ArrayList<>();
         for (Object element : unknownList) {
             if (element instanceof Map) {
                 mapList.add((Map<?, ?>) element);

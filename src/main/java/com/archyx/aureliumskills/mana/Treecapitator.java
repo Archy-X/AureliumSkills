@@ -15,26 +15,27 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 public class Treecapitator extends ReadiedManaAbility {
 
-    public Treecapitator(AureliumSkills plugin) {
+    public Treecapitator(@NotNull AureliumSkills plugin) {
         super(plugin, MAbility.TREECAPITATOR, ManaAbilityMessage.TREECAPITATOR_START, ManaAbilityMessage.TREECAPITATOR_END,
-                new String[] {"_AXE"}, new Action[] {Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK});
+                new @NotNull String[] {"_AXE"}, new @NotNull Action[] {Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK});
     }
 
     @Override
-    public void onActivate(Player player, PlayerData playerData) {
+    public void onActivate(@NotNull Player player, @NotNull PlayerData playerData) {
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
     }
 
     @Override
-    public void onStop(Player player, PlayerData playerData) {
+    public void onStop(@NotNull Player player, @NotNull PlayerData playerData) {
 
     }
 
     @Override
-    protected boolean materialMatches(String checked) {
+    protected boolean materialMatches(@NotNull String checked) {
         // Don't ready world edit axe
         if (checked.equals("WOODEN_AXE") || checked.equals("WOOD_AXE")) {
             if (plugin.getServer().getPluginManager().isPluginEnabled("WorldEdit")) {
@@ -51,7 +52,7 @@ public class Treecapitator extends ReadiedManaAbility {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onBreak(BlockBreakEvent event) {
+    public void onBreak(@NotNull BlockBreakEvent event) {
         if (event.isCancelled()) return;
         // Checks if block broken is log
         Block block = event.getBlock();
@@ -73,7 +74,7 @@ public class Treecapitator extends ReadiedManaAbility {
         }
     }
 
-    public void breakTree(Player player, Block block) {
+    public void breakTree(@NotNull Player player, @NotNull Block block) {
         if (plugin.getManaAbilityManager().isActivated(player.getUniqueId(), MAbility.TREECAPITATOR)) {
             ForagingSource source = ForagingSource.getSource(block);
             if (source != null) {
@@ -82,7 +83,7 @@ public class Treecapitator extends ReadiedManaAbility {
         }
     }
 
-    private void breakBlock(Player player, Block block, TreecapitatorTree tree) {
+    private void breakBlock(@NotNull Player player, @NotNull Block block, @NotNull TreecapitatorTree tree) {
         if (tree.getBlocksBroken() > tree.getMaxBlocks()) {
             return;
         }
@@ -114,7 +115,7 @@ public class Treecapitator extends ReadiedManaAbility {
         }
     }
 
-    private boolean isTrunk(Block block) {
+    private boolean isTrunk(@NotNull Block block) {
         ForagingSource source = ForagingSource.getSource(block);
         if (source != null) {
             return source.isTrunk();
@@ -122,7 +123,7 @@ public class Treecapitator extends ReadiedManaAbility {
         return false;
     }
 
-    private boolean isLeaf(Block block) {
+    private boolean isLeaf(@NotNull Block block) {
         ForagingSource source = ForagingSource.getSource(block);
         if (source != null) {
             return source.isLeaf();
@@ -132,18 +133,18 @@ public class Treecapitator extends ReadiedManaAbility {
 
     private static class TreecapitatorTree {
 
-        private final AureliumSkills plugin;
-        private final Block originalBlock;
+        private final @NotNull AureliumSkills plugin;
+        private final @NotNull Block originalBlock;
         private int blocksBroken;
         private int maxBlocks;
 
-        public TreecapitatorTree(AureliumSkills plugin, Block originalBlock) {
+        public TreecapitatorTree(@NotNull AureliumSkills plugin, @NotNull Block originalBlock) {
             this.plugin = plugin;
             this.originalBlock = originalBlock;
             setMaxBlocks();
         }
 
-        public Block getOriginalBlock() {
+        public @NotNull Block getOriginalBlock() {
             return originalBlock;
         }
 

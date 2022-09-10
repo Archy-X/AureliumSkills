@@ -28,6 +28,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,15 +38,15 @@ import java.util.UUID;
 
 public class AlchemyLeveler extends SkillLeveler implements Listener {
 
-	private final Map<BlockPosition, BrewingStandData> brewingStands;
+	private final @NotNull Map<BlockPosition, BrewingStandData> brewingStands;
 
-	public AlchemyLeveler(AureliumSkills plugin) {
+	public AlchemyLeveler(@NotNull AureliumSkills plugin) {
 		super(plugin, Ability.BREWER);
 		this.brewingStands = new HashMap<>();
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onBrew(BrewEvent event) {
+	public void onBrew(@NotNull BrewEvent event) {
 		if (!OptionL.isEnabled(Skills.ALCHEMY)) return;
 		// Check cancelled
 		if (OptionL.getBoolean(Option.ALCHEMY_CHECK_CANCELLED)) {
@@ -63,7 +65,9 @@ public class AlchemyLeveler extends SkillLeveler implements Listener {
 						if (player != null) {
 							if (blockXpGainLocation(event.getBlock().getLocation(), player)) return;
 							if (blockXpGainPlayer(player)) return;
-							addAlchemyXp(player, event.getContents().getIngredient().getType());
+							@Nullable ItemStack item = event.getContents().getIngredient();
+							if (item != null)
+								addAlchemyXp(player, item.getType());
 						}
 					}
 				}
@@ -71,7 +75,7 @@ public class AlchemyLeveler extends SkillLeveler implements Listener {
 		}
 	}
 
-	private void addAlchemyXp(Player player, Material mat) {
+	private void addAlchemyXp(@NotNull Player player, @NotNull Material mat) {
 		Leveler leveler = plugin.getLeveler();
 		if (mat.equals(Material.REDSTONE)) {
 			leveler.addXp(player, Skills.ALCHEMY, getXp(player, AlchemySource.EXTENDED));
@@ -88,7 +92,7 @@ public class AlchemyLeveler extends SkillLeveler implements Listener {
 		}
 	}
 
-	private void checkBrewedSlots(BrewEvent event) {
+	private void checkBrewedSlots(@NotNull BrewEvent event) {
 		BrewerInventory before = event.getContents();
 		ItemStack ingredient = before.getIngredient();
 		if (ingredient == null) return;
@@ -120,7 +124,7 @@ public class AlchemyLeveler extends SkillLeveler implements Listener {
 	}
 	
 	@EventHandler
-	public void onBlockPlace(BlockPlaceEvent event) {
+	public void onBlockPlace(@NotNull BlockPlaceEvent event) {
 		if (event.getBlock().getType().equals(Material.BREWING_STAND)) {
 			if (OptionL.isEnabled(Skills.ALCHEMY)) {
 				event.getBlock().setMetadata("skillsBrewingStandOwner", new FixedMetadataValue(plugin, event.getPlayer().getUniqueId()));
@@ -129,7 +133,7 @@ public class AlchemyLeveler extends SkillLeveler implements Listener {
 	}
 	
 	@EventHandler
-	public void onBlockBreak(BlockBreakEvent event) {
+	public void onBlockBreak(@NotNull BlockBreakEvent event) {
 		if (event.getBlock().getType().equals(Material.BREWING_STAND)) {
 			if (OptionL.isEnabled(Skills.ALCHEMY)) {
 				if (event.getBlock().hasMetadata("skillsBrewingStandOwner")) {
@@ -141,12 +145,15 @@ public class AlchemyLeveler extends SkillLeveler implements Listener {
 	}
 	
 	@EventHandler
-	public void onInventoryOpen(InventoryOpenEvent event) {
+	public void onInventoryOpen(@NotNull InventoryOpenEvent event) {
 		if (event.getInventory().getType().equals(InventoryType.BREWING)) {
 			if (OptionL.isEnabled(Skills.ALCHEMY)) {
 				if (event.getInventory().getHolder() != null) {
 					if (event.getInventory().getLocation() != null) {
-						Block block = event.getInventory().getLocation().getBlock();
+						@Nullable Location location = event.getInventory().getLocation();
+						if (location == null)
+							return;
+						Block block = location.getBlock();
 						if (!block.hasMetadata("skillsBrewingStandOwner")) {
 							block.setMetadata("skillsBrewingStandOwner", new FixedMetadataValue(plugin, event.getPlayer().getUniqueId()));
 						}
@@ -157,7 +164,7 @@ public class AlchemyLeveler extends SkillLeveler implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void onTakePotionOut(InventoryClickEvent event) {
+	public void onTakePotionOut(@NotNull InventoryClickEvent event) {
 		if (!OptionL.isEnabled(Skills.ALCHEMY)) return;
 		if (!OptionL.getBoolean(Option.ALCHEMY_GIVE_XP_ON_TAKEOUT)) return;
 		// Check cancelled

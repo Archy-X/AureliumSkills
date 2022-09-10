@@ -1,24 +1,25 @@
 package com.archyx.aureliumskills.rewards.builder;
 
 import com.archyx.aureliumskills.AureliumSkills;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class MessagedRewardBuilder extends RewardBuilder {
 
-    protected String menuMessage;
-    protected String chatMessage;
+    protected @NotNull String menuMessage;
+    protected @NotNull String chatMessage;
 
-    public MessagedRewardBuilder(AureliumSkills plugin) {
+    public MessagedRewardBuilder(@NotNull AureliumSkills plugin) {
         super(plugin);
         this.menuMessage = "";
         this.chatMessage = "";
     }
 
-    public MessagedRewardBuilder menuMessage(String menuMessage) {
+    public @NotNull MessagedRewardBuilder menuMessage(@NotNull String menuMessage) {
         this.menuMessage = menuMessage;
         return this;
     }
 
-    public MessagedRewardBuilder chatMessage(String chatMessage) {
+    public @NotNull MessagedRewardBuilder chatMessage(@NotNull String chatMessage) {
         this.chatMessage = chatMessage;
         return this;
     }

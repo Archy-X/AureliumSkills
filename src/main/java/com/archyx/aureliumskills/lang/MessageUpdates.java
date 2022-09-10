@@ -1,5 +1,8 @@
 package com.archyx.aureliumskills.lang;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 public enum MessageUpdates {
 
     LEVELER_FORMAT(9, "leveler", "The leveler section was changed to the new default messages due to significant format changes. If you had changed these messages before, you will need to change them again to follow the new format."),
@@ -15,10 +18,10 @@ public enum MessageUpdates {
     LIGHTNING_BLADE_MENU(25, "mana_abilities.lightning_blade.menu", null);
 
     private final int version;
-    private final String path;
-    private final String message;
+    private final @NotNull String path;
+    private final @Nullable String message;
 
-    MessageUpdates(int version, String path, String message) {
+    MessageUpdates(int version, @NotNull String path, @Nullable String message) {
         this.version = version;
         this.path = path;
         this.message = message;
@@ -28,11 +31,11 @@ public enum MessageUpdates {
         return version;
     }
 
-    public String getPath() {
+    public @NotNull String getPath() {
         return path;
     }
 
-    public String getMessage() {
+    public @Nullable String getMessage() {
         return message;
     }
 

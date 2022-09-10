@@ -1,5 +1,7 @@
 package com.archyx.aureliumskills.lang;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Locale;
 
 public enum ACFCoreMessage {
@@ -30,9 +32,9 @@ public enum ACFCoreMessage {
     HELP_DETAILED_PARAMETER_FORMAT,
     HELP_SEARCH_HEADER;
 
-    private final String path = "acf.core." + this.name().toLowerCase(Locale.ENGLISH);
+    private final @NotNull String path = "acf.core." + this.name().toLowerCase(Locale.ENGLISH);
 
-    public String getPath() {
+    public @NotNull String getPath() {
         return path;
     }
 

@@ -4,18 +4,18 @@ import com.archyx.aureliumskills.AureliumSkills;
 import com.archyx.aureliumskills.skills.Skill;
 import com.archyx.slate.context.ContextProvider;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
-public class SkillContext implements ContextProvider<Skill> {
+public class SkillContext implements ContextProvider<@NotNull Skill> {
 
-    private final AureliumSkills plugin;
+    private final @NotNull AureliumSkills plugin;
 
-    public SkillContext(AureliumSkills plugin) {
+    public SkillContext(@NotNull AureliumSkills plugin) {
         this.plugin = plugin;
     }
 
-    @Nullable
     @Override
-    public Skill parse(String input) {
+    public @Nullable Skill parse(@NotNull String input) {
         return plugin.getSkillRegistry().getSkill(input);
     }
 }

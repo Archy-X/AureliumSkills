@@ -1,20 +1,22 @@
 package com.archyx.aureliumskills.leaderboard;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.UUID;
 
 public class SkillValue {
 
-    private final UUID id;
+    private final @NotNull UUID id;
     private final int level;
     private final double xp;
 
-    public SkillValue(UUID id, int level, double xp) {
+    public SkillValue(@NotNull UUID id, int level, double xp) {
         this.id = id;
         this.level = level;
         this.xp = xp;
     }
 
-    public UUID getId() {
+    public @NotNull UUID getId() {
         return id;
     }
 

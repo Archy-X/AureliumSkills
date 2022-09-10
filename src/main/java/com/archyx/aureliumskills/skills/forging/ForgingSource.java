@@ -7,6 +7,8 @@ import com.archyx.aureliumskills.util.item.ItemUtils;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public enum ForgingSource implements Source {
     
@@ -16,29 +18,29 @@ public enum ForgingSource implements Source {
     COMBINE_TOOL_PER_LEVEL("IRON_SHOVEL", "combine_level"),
     GRINDSTONE_PER_LEVEL("GRINDSTONE", "grindstone_level");
 
-    private final String material;
-    private final String unitName;
+    private final @NotNull String material;
+    private final @NotNull String unitName;
 
-    ForgingSource(String material, String unitName) {
+    ForgingSource(@NotNull String material, @NotNull String unitName) {
         this.material = material;
         this.unitName = unitName;
     }
 
     @Override
-    public Skill getSkill() {
+    public @NotNull Skill getSkill() {
         return Skills.FORGING;
     }
 
     @Override
-    public String getUnitName() {
+    public @NotNull String getUnitName() {
         return unitName;
     }
 
     @Override
-    public ItemStack getMenuItem() {
-        ItemStack item = ItemUtils.parseItem(material);
+    public @Nullable ItemStack getMenuItem() {
+        @Nullable ItemStack item = ItemUtils.parseItem(material);
         if (item != null) {
-            ItemMeta meta = item.getItemMeta();
+            @Nullable ItemMeta meta = item.getItemMeta();
             if (meta != null && (ItemUtils.isArmor(item.getType()) || ItemUtils.isWeapon(item.getType()) || ItemUtils.isTool(item.getType()))) {
                 meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
                 item.setItemMeta(meta);

@@ -11,19 +11,20 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class SorceryLeveler extends SkillLeveler implements Listener {
 
-    public SorceryLeveler(AureliumSkills plugin) {
+    public SorceryLeveler(@NotNull AureliumSkills plugin) {
         super(plugin, Skills.SORCERY);
     }
 
-    public void level(Player player, double manaUsed) {
+    public void level(@NotNull Player player, double manaUsed) {
         plugin.getLeveler().addXp(player, Skills.SORCERY, manaUsed * getXp(player, SorcerySource.MANA_ABILITY_USE));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onBlockBreak(BlockBreakEvent event) {
+    public void onBlockBreak(@NotNull BlockBreakEvent event) {
         if (!OptionL.isEnabled(Skills.SORCERY)) {
             return;
         }

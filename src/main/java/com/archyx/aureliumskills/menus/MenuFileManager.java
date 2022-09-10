@@ -8,6 +8,7 @@ import com.archyx.slate.menu.MenuManager;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,10 +18,10 @@ import java.util.Locale;
 
 public class MenuFileManager {
 
-    private final AureliumSkills plugin;
+    private final @NotNull AureliumSkills plugin;
     private final MenuManager manager;
 
-    public MenuFileManager(AureliumSkills plugin) {
+    public MenuFileManager(@NotNull AureliumSkills plugin) {
         this.plugin = plugin;
         this.manager = plugin.getMenuManager();
     }
@@ -63,7 +64,7 @@ public class MenuFileManager {
         if (!legacyFile.exists()) return;
 
         FileConfiguration config = YamlConfiguration.loadConfiguration(legacyFile);
-        String[] legacyNames = new String[] {"skills_menu", "stats_menu", "level_progression_menu"};
+        @NotNull String[] legacyNames = {"skills_menu", "stats_menu", "level_progression_menu"};
         for (String legacyName : legacyNames) {
             ConfigurationSection oldSection = config.getConfigurationSection(legacyName);
             if (oldSection == null) continue;
@@ -80,13 +81,14 @@ public class MenuFileManager {
             ConfigurationSection fillSection = newConfig.getConfigurationSection("fill");
             if (fillSection != null) {
                 fillSection.set("enabled", oldSection.getBoolean("fill.enabled"));
-                migrateBaseItem(fillSection, oldSection.getString("fill.material", "black_stained_glass_pane"));
+                String material = oldSection.getString("fill.material");
+                migrateBaseItem(fillSection, material != null ? material : "black_stained_glass_pane");
             }
             // Migrate items
             ConfigurationSection itemsSection = oldSection.getConfigurationSection("items");
             ConfigurationSection newItemsSection = newConfig.getConfigurationSection("items");
             ConfigurationSection newTemplatesSection = newConfig.getConfigurationSection("templates");
-            if (itemsSection != null && newItemsSection != null) {
+            if (itemsSection != null && newItemsSection != null && newTemplatesSection != null) {
                 migrateItems(itemsSection, newItemsSection, newTemplatesSection);
             }
             // Migrate templates
@@ -108,7 +110,7 @@ public class MenuFileManager {
         }
     }
 
-    private void migrateItems(ConfigurationSection oldSection, ConfigurationSection newSection, ConfigurationSection templatesSection) {
+    private void migrateItems(@NotNull ConfigurationSection oldSection, @NotNull ConfigurationSection newSection, @NotNull ConfigurationSection templatesSection) {
         for (String itemName : oldSection.getKeys(false)) {
             // Get the configuration sections of new and old items
             ConfigurationSection oldItem = oldSection.getConfigurationSection(itemName);
@@ -140,7 +142,7 @@ public class MenuFileManager {
                 }
                 // Migrate material item contexts
                 for (String material : materialList) {
-                    String[] splitMaterial = material.split(" ", 2);
+                    @NotNull String @NotNull [] splitMaterial = material.split(" ", 2);
                     if (splitMaterial.length < 2) continue;
                     String contextString = splitMaterial[0].toLowerCase(Locale.ROOT);
 
@@ -156,7 +158,7 @@ public class MenuFileManager {
             newItem.set("display_name", displayName);
 
             if (!itemName.equals("rank")) { // Migrate lore except the rank item
-                List<String> lore = oldItem.getStringList("lore");
+                List<@NotNull String> lore = oldItem.getStringList("lore");
                 if (lore.size() > 0) {
                     newItem.set("lore", lore);
                 }
@@ -164,7 +166,7 @@ public class MenuFileManager {
         }
     }
 
-    private void migrateTemplates(ConfigurationSection oldSection, ConfigurationSection newSection) {
+    private void migrateTemplates(@NotNull ConfigurationSection oldSection, @NotNull ConfigurationSection newSection) {
         for (String templateName : oldSection.getKeys(false)) {
             ConfigurationSection oldTemplate = oldSection.getConfigurationSection(templateName);
             if (oldTemplate == null) continue;
@@ -176,9 +178,9 @@ public class MenuFileManager {
                 String oldMaterial = ((String) materialObj).toLowerCase(Locale.ROOT);
                 migrateBaseItem(newTemplate, oldMaterial);
             } else if (materialObj instanceof List) { // Context dependent material
-                List<String> oldMaterials = DataUtil.castStringList(materialObj);
+                List<@NotNull String> oldMaterials = DataUtil.castStringList(materialObj);
                 for (String oldMaterialEntry : oldMaterials) { // For each entry on the old list
-                    String[] splitMaterial = oldMaterialEntry.split(" ", 2); // Split into context and rest of material
+                    @NotNull String[] splitMaterial = oldMaterialEntry.split(" ", 2); // Split into context and rest of material
                     if (splitMaterial.length < 2) continue;
                     String contextString = splitMaterial[0].toLowerCase(Locale.ROOT);
                     // Get context section in new template
@@ -192,14 +194,14 @@ public class MenuFileManager {
 
             String displayName = oldTemplate.getString("display_name");
             newTemplate.set("display_name", displayName);
-            List<String> lore = oldTemplate.getStringList("lore");
+            List<@NotNull String> lore = oldTemplate.getStringList("lore");
             if (lore.size() > 0) {
                 newTemplate.set("lore", lore);
             }
 
             // Migrate template position
             if (oldTemplate.contains("pos")) {
-                List<String> posList = oldTemplate.getStringList("pos");
+                List<@NotNull String> posList = oldTemplate.getStringList("pos");
                 for (String posEntry : posList) {
                     String[] splitEntry = posEntry.split(" ", 3);
                     if (splitEntry.length < 3) continue;
@@ -217,7 +219,7 @@ public class MenuFileManager {
         }
     }
 
-    private void migrateBaseItem(ConfigurationSection newItem, String oldMaterial) {
+    private void migrateBaseItem(@NotNull ConfigurationSection newItem, @NotNull String oldMaterial) {
         String[] tokens = oldMaterial.split(" ", 2);
         if (tokens.length == 0) return;
         // Migrate material

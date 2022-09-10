@@ -12,14 +12,15 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.StructureModifier;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class ActionBarCompatHandler {
 
-    private final AureliumSkills plugin;
+    private final @NotNull AureliumSkills plugin;
     private final ActionBar actionBar;
     private static final int PAUSE_TICKS = 50;
 
-    public ActionBarCompatHandler(AureliumSkills plugin) {
+    public ActionBarCompatHandler(@NotNull AureliumSkills plugin) {
         this.plugin = plugin;
         this.actionBar = plugin.getActionBar();
     }
@@ -37,10 +38,10 @@ public class ActionBarCompatHandler {
         registerChatListener(manager);
     }
 
-    private void registerNewListener(ProtocolManager manager) {
+    private void registerNewListener(@NotNull ProtocolManager manager) {
         manager.addPacketListener(new PacketAdapter(plugin, ListenerPriority.MONITOR, PacketType.Play.Server.SET_ACTION_BAR_TEXT) {
             @Override
-            public void onPacketSending(PacketEvent event) {
+            public void onPacketSending(@NotNull PacketEvent event) {
                 Player player = event.getPlayer();
                 PacketContainer packet = event.getPacket();
                 if (packet.getMeta("AureliumSkills").isPresent()) return; // Ignore Aurelium Skills action bars
@@ -49,10 +50,10 @@ public class ActionBarCompatHandler {
         });
     }
 
-    private void registerSystemChatListener(ProtocolManager manager) {
+    private void registerSystemChatListener(@NotNull ProtocolManager manager) {
         manager.addPacketListener(new PacketAdapter(plugin, ListenerPriority.MONITOR, PacketType.Play.Server.SYSTEM_CHAT) {
             @Override
-            public void onPacketSending(PacketEvent event) {
+            public void onPacketSending(@NotNull PacketEvent event) {
                 Player player = event.getPlayer();
                 PacketContainer packet = event.getPacket();
                 if (packet.getMeta("AureliumSkills").isPresent()) return;
@@ -68,10 +69,10 @@ public class ActionBarCompatHandler {
         });
     }
 
-    private void registerLegacyListener(ProtocolManager manager) {
+    private void registerLegacyListener(@NotNull ProtocolManager manager) {
         manager.addPacketListener(new PacketAdapter(plugin, ListenerPriority.MONITOR, PacketType.Play.Server.TITLE) {
             @Override
-            public void onPacketSending(PacketEvent event) {
+            public void onPacketSending(@NotNull PacketEvent event) {
                 Player player = event.getPlayer();
                 PacketContainer packet = event.getPacket();
                 // Make sure the title packet is for the action bar
@@ -84,10 +85,10 @@ public class ActionBarCompatHandler {
         });
     }
 
-    private void registerChatListener(ProtocolManager manager) {
+    private void registerChatListener(@NotNull ProtocolManager manager) {
         manager.addPacketListener(new PacketAdapter(plugin, ListenerPriority.MONITOR, PacketType.Play.Server.CHAT) {
             @Override
-            public void onPacketSending(PacketEvent event) {
+            public void onPacketSending(@NotNull PacketEvent event) {
                 Player player = event.getPlayer();
                 PacketContainer packet = event.getPacket();
                 // Make sure the chat packet is for the action bar

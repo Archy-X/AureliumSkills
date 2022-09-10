@@ -18,6 +18,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -25,12 +27,12 @@ public class Requirements extends NBTAPIUser {
 
     private final RequirementManager manager;
 
-    public Requirements(AureliumSkills plugin) {
+    public Requirements(@NotNull AureliumSkills plugin) {
         super(plugin);
         this.manager = plugin.getRequirementManager();
     }
 
-    public Map<Skill, Integer> getRequirements(ModifierType type, ItemStack item) {
+    public @NotNull Map<Skill, Integer> getRequirements(@NotNull ModifierType type, @NotNull ItemStack item) {
         if (isNBTDisabled()) return new HashMap<>();
         NBTItem nbtItem = new NBTItem(item);
         Map<Skill, Integer> requirements = new HashMap<>();
@@ -49,7 +51,7 @@ public class Requirements extends NBTAPIUser {
     }
 
     @SuppressWarnings("deprecation")
-    public Map<Skill, Integer> getGlobalRequirements(ModifierType type, ItemStack item) {
+    public @NotNull Map<Skill, Integer> getGlobalRequirements(@NotNull ModifierType type, @NotNull ItemStack item) {
         Map<Skill, Integer> requirements = new HashMap<>();
         for (GlobalRequirement global : manager.getGlobalRequirementsType(type)) {
             if (XMaterial.isNewVersion()) {
@@ -73,8 +75,7 @@ public class Requirements extends NBTAPIUser {
         return requirements;
     }
 
-
-    public ItemStack addRequirement(ModifierType type, ItemStack item, Skill skill, int level) {
+    public @NotNull ItemStack addRequirement(@NotNull ModifierType type, @NotNull ItemStack item, @NotNull Skill skill, int level) {
         if (isNBTDisabled()) return item;
         NBTItem nbtItem = new NBTItem(item);
         NBTCompound compound = ItemUtils.getRequirementsTypeCompound(nbtItem, type);
@@ -82,7 +83,7 @@ public class Requirements extends NBTAPIUser {
         return nbtItem.getItem();
     }
 
-    public ItemStack removeRequirement(ModifierType type, ItemStack item, Skill skill) {
+    public @NotNull ItemStack removeRequirement(@NotNull ModifierType type, @NotNull ItemStack item, @NotNull Skill skill) {
         if (isNBTDisabled()) return item;
         NBTItem nbtItem = new NBTItem(item);
         NBTCompound compound = ItemUtils.getRequirementsTypeCompound(nbtItem, type);
@@ -95,7 +96,7 @@ public class Requirements extends NBTAPIUser {
         return nbtItem.getItem();
     }
 
-    public ItemStack removeAllRequirements(ModifierType type, ItemStack item) {
+    public @NotNull ItemStack removeAllRequirements(@NotNull ModifierType type, @NotNull ItemStack item) {
         if (isNBTDisabled()) return item;
         NBTItem nbtItem = new NBTItem(item);
         NBTCompound compound = ItemUtils.getRequirementsTypeCompound(nbtItem, type);
@@ -104,7 +105,7 @@ public class Requirements extends NBTAPIUser {
         return nbtItem.getItem();
     }
 
-    public boolean hasRequirement(ModifierType type, ItemStack item, Skill skill) {
+    public boolean hasRequirement(@NotNull ModifierType type, @NotNull ItemStack item, @NotNull Skill skill) {
         if (isNBTDisabled()) return false;
         NBTItem nbtItem = new NBTItem(item);
         NBTCompound compound = ItemUtils.getRequirementsTypeCompound(nbtItem, type);
@@ -116,7 +117,7 @@ public class Requirements extends NBTAPIUser {
         return false;
     }
 
-    public ItemStack convertFromLegacy(ItemStack item) {
+    public @NotNull ItemStack convertFromLegacy(@NotNull ItemStack item) {
         if (isNBTDisabled()) return item;
         NBTItem nbtItem = new NBTItem(item);
         NBTCompound oldRequirementsCompound = nbtItem.getCompound("skillRequirements");
@@ -135,13 +136,11 @@ public class Requirements extends NBTAPIUser {
         return nbtItem.getItem();
     }
 
-    public void addLore(ModifierType type, ItemStack item, Skill skill, int level, Locale locale) {
+    public void addLore(@NotNull ModifierType type, @NotNull ItemStack item, @NotNull Skill skill, int level, @Nullable Locale locale) {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             String text = TextUtil.replace(Lang.getMessage(CommandMessage.valueOf(type.name() + "_REQUIREMENT_ADD_LORE"), locale), "{skill}", skill.getDisplayName(locale), "{level}", String.valueOf(level));
-            List<String> lore;
-            if (meta.hasLore()) lore = meta.getLore();
-            else lore = new ArrayList<>();
+            @Nullable List<@NotNull String> lore = meta.getLore();
             if (lore != null) {
                 lore.add(text);
                 meta.setLore(lore);
@@ -150,10 +149,10 @@ public class Requirements extends NBTAPIUser {
         }
     }
 
-    public void removeLore(ItemStack item, Skill skill) {
+    public void removeLore(@NotNull ItemStack item, @NotNull Skill skill) {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            List<String> lore = meta.getLore();
+            @Nullable List<@NotNull String> lore = meta.getLore();
             if (lore != null) {
                 for (int i = 0; i < lore.size(); i++) {
                     String line = lore.get(i);
@@ -167,9 +166,9 @@ public class Requirements extends NBTAPIUser {
         }
     }
 
-    public boolean meetsRequirements(ModifierType type, ItemStack item, Player player) {
+    public boolean meetsRequirements(@NotNull ModifierType type, @NotNull ItemStack item, @NotNull Player player) {
         if (!OptionL.getBoolean(Option.REQUIREMENT_ENABLED)) return true;
-        PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+        @Nullable PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
         if (playerData == null) return true;
         // Check global requirements
         for (Map.Entry<Skill, Integer> entry : getGlobalRequirements(type, item).entrySet()) {
@@ -185,7 +184,7 @@ public class Requirements extends NBTAPIUser {
         return true;
     }
 
-    private String getName(Skill skill) {
+    private @NotNull String getName(@NotNull Skill skill) {
         return TextUtil.capitalize(skill.name().toLowerCase(Locale.ENGLISH));
     }
 

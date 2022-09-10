@@ -6,6 +6,7 @@ import com.archyx.aureliumskills.lang.Lang;
 import com.archyx.aureliumskills.lang.ManaAbilityMessage;
 import com.archyx.aureliumskills.skills.Skill;
 import com.archyx.aureliumskills.skills.Skills;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -16,41 +17,41 @@ import java.util.function.Supplier;
 public enum MAbility implements AbstractAbility {
 
     REPLENISH(() -> Skills.FARMING, 5.0, 5.0, 200, -5, 20, 20,
-            new String[] {"require_sneak", "check_offhand", "sneak_offhand_bypass", "replant_delay", "show_particles", "prevent_unripe_break"}, new Object[] {false, true, true, 4, true, true},
+            new @NotNull String[] {"require_sneak", "check_offhand", "sneak_offhand_bypass", "replant_delay", "show_particles", "prevent_unripe_break"}, new @NotNull Object[] {false, true, true, 4, true, true},
             Replenish.class),
     TREECAPITATOR(() -> Skills.FORAGING, 5.0, 5.0, 200, -5, 20, 20,
-            new String[] {"require_sneak", "check_offhand", "sneak_offhand_bypass", "max_blocks_multiplier"}, new Object[] {false, true, true, 1.0},
+            new @NotNull String[] {"require_sneak", "check_offhand", "sneak_offhand_bypass", "max_blocks_multiplier"}, new @NotNull Object[] {false, true, true, 1.0},
             Treecapitator.class),
     SPEED_MINE(() -> Skills.MINING, 5.0, 5.0, 200, -5, 20 ,20,
-            new String[] {"require_sneak", "check_offhand", "sneak_offhand_bypass", "haste_level"}, new Object[] {false, true, true, 10},
+            new @NotNull String[] {"require_sneak", "check_offhand", "sneak_offhand_bypass", "haste_level"}, new @NotNull Object[] {false, true, true, 10},
             SpeedMine.class),
     SHARP_HOOK(() -> Skills.FISHING, 0.5, 0.5, 2, -0.1, 5, 2,
-            new String[] {"display_damage_with_scaling", "enable_sound"}, new Object[] {true, true},
+            new @NotNull String[] {"display_damage_with_scaling", "enable_sound"}, new @NotNull Object[] {true, true},
             SharpHook.class),
     TERRAFORM(() -> Skills.EXCAVATION, 5.0, 4.0, 200, -5, 20, 20,
-            new String[] {"require_sneak", "check_offhand", "sneak_offhand_bypass"}, new Object[] {false, true, true},
+            new @NotNull String[] {"require_sneak", "check_offhand", "sneak_offhand_bypass"}, new @NotNull Object[] {false, true, true},
             Terraform.class),
     CHARGED_SHOT(() -> Skills.ARCHERY, 0.5, 0.3, 0, 0, 5, 5,
-            new String[] {"enable_message", "enable_sound"}, new Object[] {true, true},
+            new @NotNull String[] {"enable_message", "enable_sound"}, new @NotNull Object[] {true, true},
             ChargedShot.class),
     ABSORPTION(() -> Skills.DEFENSE, 2.0, 3.0, 200, -5, 10, 10,
-            new String[] {"enable_particles"}, new Object[] {true},
+            new @NotNull String[] {"enable_particles"}, new @NotNull Object[] {true},
             Absorption.class),
     LIGHTNING_BLADE(() -> Skills.FIGHTING, 5.0, 5.0, 200, -5, 20, 20,
-            new String[] {"base_duration", "duration_per_level"}, new Object[] {5.0, 4.0},
+            new @NotNull String[] {"base_duration", "duration_per_level"}, new @NotNull Object[] {5.0, 4.0},
             LightningBlade.class);
 
-    private final Supplier<Skill> skill;
+    private final @NotNull Supplier<@NotNull Skill> skill;
     private final double baseValue;
     private final double valuePerLevel;
     private final double baseCooldown;
     private final double cooldownPerLevel;
     private final int baseManaCost;
     private final int manaCostPerLevel;
-    private Map<String, OptionValue> options;
-    private Class<? extends ManaAbilityProvider> provider;
+    private @NotNull Map<@NotNull String, OptionValue> options;
+    private @Nullable Class<? extends @NotNull ManaAbilityProvider> provider;
 
-    MAbility(Supplier<Skill> skill, double baseValue, double valuePerLevel, double baseCooldown, double cooldownPerLevel, int baseManaCost, int manaCostPerLevel) {
+    MAbility(@NotNull Supplier<@NotNull Skill> skill, double baseValue, double valuePerLevel, double baseCooldown, double cooldownPerLevel, int baseManaCost, int manaCostPerLevel) {
         this.skill = skill;
         this.baseValue = baseValue;
         this.valuePerLevel = valuePerLevel;
@@ -58,9 +59,10 @@ public enum MAbility implements AbstractAbility {
         this.cooldownPerLevel = cooldownPerLevel;
         this.baseManaCost = baseManaCost;
         this.manaCostPerLevel = manaCostPerLevel;
+        this.options = new HashMap<>();
     }
 
-    MAbility(Supplier<Skill> skill, double baseValue, double valuePerLevel, double baseCooldown, double cooldownPerLevel, int baseManaCost, int manaCostPerLevel, String[] optionKeys, Object[] optionValues) {
+    MAbility(@NotNull Supplier<@NotNull Skill> skill, double baseValue, double valuePerLevel, double baseCooldown, double cooldownPerLevel, int baseManaCost, int manaCostPerLevel, @NotNull String @NotNull [] optionKeys, @NotNull Object @NotNull [] optionValues) {
         this(skill, baseValue, valuePerLevel, baseCooldown, cooldownPerLevel, baseManaCost, manaCostPerLevel);
         this.options = new HashMap<>();
         for (int i = 0; i < optionKeys.length; i++) {
@@ -70,13 +72,13 @@ public enum MAbility implements AbstractAbility {
         }
     }
 
-    MAbility(Supplier<Skill> skill, double baseValue, double valuePerLevel, double baseCooldown, double cooldownPerLevel, int baseManaCost, int manaCostPerLevel, String[] optionKeys, Object[] optionValues, Class<? extends ManaAbilityProvider> provider) {
+    MAbility(@NotNull Supplier<@NotNull Skill> skill, double baseValue, double valuePerLevel, double baseCooldown, double cooldownPerLevel, int baseManaCost, int manaCostPerLevel, @NotNull String @NotNull [] optionKeys, @NotNull Object @NotNull [] optionValues, @NotNull Class<? extends @NotNull ManaAbilityProvider> provider) {
         this(skill, baseValue, valuePerLevel, baseCooldown, cooldownPerLevel, baseManaCost, manaCostPerLevel, optionKeys, optionValues);
         this.provider = provider;
     }
 
     @Override
-    public Skill getSkill() {
+    public @NotNull Skill getSkill() {
         return skill.get();
     }
 
@@ -127,20 +129,19 @@ public enum MAbility implements AbstractAbility {
         return 0;
     }
 
-    public String getDisplayName(Locale locale) {
+    public @NotNull String getDisplayName(Locale locale) {
         return Lang.getMessage(ManaAbilityMessage.valueOf(this.name().toUpperCase() + "_NAME"), locale);
     }
 
-    public String getDescription(Locale locale) {
+    public @NotNull String getDescription(Locale locale) {
         return Lang.getMessage(ManaAbilityMessage.valueOf(this.name().toUpperCase() + "_DESC"), locale);
     }
 
-    public Map<String, OptionValue> getDefaultOptions() {
+    public @NotNull Map<@NotNull String, OptionValue> getDefaultOptions() {
         return options;
     }
 
-    @Nullable
-    public Class<? extends ManaAbilityProvider> getProvider() {
+    public @Nullable Class<? extends @NotNull ManaAbilityProvider> getProvider() {
         return provider;
     }
 

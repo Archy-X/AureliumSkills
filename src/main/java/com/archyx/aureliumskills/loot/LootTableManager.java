@@ -9,6 +9,7 @@ import com.archyx.lootmanager.loot.LootTable;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -21,8 +22,8 @@ import java.util.Map;
 public class LootTableManager extends Parser {
 
 	private final AureliumSkills plugin;
-	private final LootManager lootManager;
-	private final Map<Skill, LootTable> lootTables;
+	private final @NotNull LootManager lootManager;
+	private final @NotNull Map<Skill, LootTable> lootTables;
 	
 	public LootTableManager(AureliumSkills plugin) {
 		this.plugin = plugin;
@@ -103,12 +104,11 @@ public class LootTableManager extends Parser {
 		plugin.getLogger().info("Loaded " + lootLoaded + " loot entries in " + poolsLoaded + " pools and " + tablesLoaded + " tables");
 	}
 
-	@Nullable
-	public LootTable getLootTable(Skill skill) {
+	public @Nullable LootTable getLootTable(Skill skill) {
 		return lootTables.get(skill);
 	}
 	
-	public void matchConfig(FileConfiguration config, File file) {
+	public void matchConfig(@NotNull FileConfiguration config, @NotNull File file) {
 		config.options().copyDefaults(true);
 		try {
 			boolean changesMade = false;

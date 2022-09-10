@@ -11,6 +11,8 @@ import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 
@@ -21,13 +23,13 @@ public class BackItem extends AbstractItem implements SingleItemProvider {
     }
 
     @Override
-    public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu, PlaceholderType type) {
-        Locale locale = plugin.getLang().getLocale(player);
+    public @NotNull String onPlaceholderReplace(@NotNull String placeholder, @NotNull Player player, @NotNull ActiveMenu activeMenu, @NotNull PlaceholderType type) {
+        @Nullable Locale locale = plugin.getLang().getLocale(player);
         switch (placeholder) {
             case "back":
                 return Lang.getMessage(MenuMessage.BACK, locale);
             case "back_click":
-                String previousMenu = (String) activeMenu.getProperty("previous_menu");
+                String previousMenu = getPreviousMenu(activeMenu);
                 String formattedPreviousMenu = TextUtil.capitalizeWord(TextUtil.replace(previousMenu, "_", " "));
                 return TextUtil.replace(Lang.getMessage(MenuMessage.BACK_CLICK, locale),
                         "{menu_name}", formattedPreviousMenu);
@@ -36,19 +38,26 @@ public class BackItem extends AbstractItem implements SingleItemProvider {
     }
 
     @Override
-    public void onClick(Player player, InventoryClickEvent event, ItemStack item, SlotPos pos, ActiveMenu activeMenu) {
-        Object object = activeMenu.getProperty("previous_menu");
-        if (object != null) {
-            String previousMenu = (String) object;
+    public void onClick(@NotNull Player player, @NotNull InventoryClickEvent event, @NotNull ItemStack item, @NotNull SlotPos pos, @NotNull ActiveMenu activeMenu) {
+        String previousMenu = getPreviousMenu(activeMenu);
+        if (!previousMenu.isEmpty())
             plugin.getMenuManager().openMenu(player, previousMenu);
-        }
     }
 
     @Override
-    public ItemStack onItemModify(ItemStack baseItem, Player player, ActiveMenu activeMenu) {
-        if (activeMenu.getProperty("previous_menu") == null) {
+    public @Nullable ItemStack onItemModify(@NotNull ItemStack baseItem, @NotNull Player player, @NotNull ActiveMenu activeMenu) {
+        if (getPreviousMenu(activeMenu).isEmpty()) {
             return null;
         }
         return baseItem;
     }
+
+    private @NotNull String getPreviousMenu(@NotNull ActiveMenu activeMenu) {
+        @Nullable Object property = activeMenu.getProperty("previous_menu");
+        if (!(property instanceof String)) {
+            property = "";
+        }
+        return (String) property;
+    }
+
 }

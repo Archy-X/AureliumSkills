@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ManaAbilityActivateEvent extends Event {
 
-    private static final HandlerList handlers = new HandlerList();
+    private static final @NotNull HandlerList handlers = new HandlerList();
 
     private final Player player;
     private final MAbility manaAbility;
@@ -46,13 +46,12 @@ public class ManaAbilityActivateEvent extends Event {
         this.duration = duration;
     }
 
-    @NotNull
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return handlers;
     }
 
-    public static HandlerList getHandlerList() {
+    public static @NotNull HandlerList getHandlerList() {
         return handlers;
     }
 

@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ManaRegenerateEvent extends Event {
 
-    private static final HandlerList handlers = new HandlerList();
+    private static final @NotNull HandlerList handlers = new HandlerList();
 
     private final Player player;
     private double amount;
@@ -39,13 +39,12 @@ public class ManaRegenerateEvent extends Event {
         this.isCancelled = cancelled;
     }
 
-    @NotNull
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return handlers;
     }
 
-    public static HandlerList getHandlerList() {
+    public static @NotNull HandlerList getHandlerList() {
         return handlers;
     }
 }

@@ -1,5 +1,7 @@
 package com.archyx.aureliumskills.lang;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Locale;
 
 public enum UnitMessage implements MessageKey {
@@ -8,10 +10,10 @@ public enum UnitMessage implements MessageKey {
     HP,
     XP;
 
-    private final String path = "units." + this.toString().toLowerCase(Locale.ENGLISH);
+    private final @NotNull String path = "units." + this.toString().toLowerCase(Locale.ENGLISH);
 
     @Override
-    public String getPath() {
+    public @NotNull String getPath() {
         return path;
     }
 }

@@ -1,0 +1,11 @@
+<root>
+    <item name='com.archyx.lootmanager.loot.context.ContextManager ContextManager(java.lang.String) 0'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.lootmanager.loot.context.ContextManager java.lang.String getContextKey()'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+    <item name='com.archyx.lootmanager.loot.context.ContextManager java.util.Set&lt;com.archyx.lootmanager.loot.context.LootContext&gt; parseContext(java.util.Map&lt;?,?&gt;) 0'>
+        <annotation name='org.jetbrains.annotations.NotNull'/>
+    </item>
+</root>
