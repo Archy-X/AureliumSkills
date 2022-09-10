@@ -23,7 +23,7 @@ public class SourcesMenu extends AbstractMenu implements MenuProvider {
     public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu) {
         Locale locale = plugin.getLang().getLocale(player);
         if (placeholder.equals("sources_title")) {
-            Skill skill = (Skill) activeMenu.getProperty("skill");
+            Skill skill = getSkill(activeMenu);
             return TextUtil.replace(Lang.getMessage(MenuMessage.SOURCES_TITLE, locale),
                     "{skill}", skill.getDisplayName(locale),
                     "{current_page}", String.valueOf(activeMenu.getCurrentPage() + 1),
@@ -34,9 +34,28 @@ public class SourcesMenu extends AbstractMenu implements MenuProvider {
 
     @Override
     public int getPages(Player player, ActiveMenu activeMenu) {
-        Skill skill = (Skill) activeMenu.getProperty("skill");
-        int itemsPerPage = (Integer) activeMenu.getProperty("items_per_page");
+        Skill skill = getSkill(activeMenu);
+        int itemsPerPage = getItemsPerPage(activeMenu);
         Source[] sources = plugin.getSourceRegistry().values(skill);
         return (sources.length - 1) / itemsPerPage + 1;
+    }
+
+    protected int getItemsPerPage(ActiveMenu activeMenu) {
+        Object property = activeMenu.getProperty("items_per_page");
+        int itemsPerPage;
+        if (property instanceof Integer) {
+            itemsPerPage = (Integer) property;
+        } else {
+            itemsPerPage = 24;
+        }
+        return itemsPerPage;
+    }
+
+    private Skill getSkill(ActiveMenu activeMenu) {
+        Object property = activeMenu.getProperty("skill");
+        if (!(property instanceof Skill)) {
+            throw new IllegalArgumentException("Could not get menu skill property");
+        }
+        return (Skill) property;
     }
 }

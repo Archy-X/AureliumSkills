@@ -1,6 +1,5 @@
 package com.archyx.aureliumskills.configuration;
 
-
 public enum Option {
 
     // Mysql Options

@@ -28,7 +28,7 @@ public class ArcheryLeveler extends SkillLeveler implements Listener {
 			if (e.getKiller() != null) {
 				if (e.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
 					EntityDamageByEntityEvent ee = (EntityDamageByEntityEvent) e.getLastDamageCause();
-					if (ee.getDamager() instanceof Projectile) {
+					if (ee != null && ee.getDamager() instanceof Projectile) {
 						EntityType type = e.getType();
 						Player p = e.getKiller();
 						Skill skill = Skills.ARCHERY;
@@ -39,6 +39,8 @@ public class ArcheryLeveler extends SkillLeveler implements Listener {
 								return;
 							}
 						}
+						if (p == null)
+							return;
 						if (blockXpGainLocation(e.getLocation(), p)) return;
 						if (blockXpGainPlayer(p)) return;
 						if (e.equals(p)) return;
@@ -82,7 +84,7 @@ public class ArcheryLeveler extends SkillLeveler implements Listener {
 				}
 				if (projectile.getShooter() instanceof Player) {
 					Player player = (Player) projectile.getShooter();
-					if (event.getEntity() instanceof LivingEntity) {
+					if (player != null && event.getEntity() instanceof LivingEntity) {
 						LivingEntity entity = (LivingEntity) event.getEntity();
 						if (blockXpGainLocation(entity.getLocation(), player)) return;
 						EntityType type = entity.getType();

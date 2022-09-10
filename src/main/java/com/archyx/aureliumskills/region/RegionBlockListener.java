@@ -9,6 +9,7 @@ import com.archyx.aureliumskills.skills.foraging.ForagingSource;
 import com.archyx.aureliumskills.skills.mining.MiningSource;
 import com.archyx.aureliumskills.skills.sorcery.SorcerySource;
 import com.archyx.aureliumskills.source.SourceManager;
+import com.archyx.aureliumskills.support.WorldGuardSupport;
 import com.archyx.aureliumskills.util.block.BlockFaceUtil;
 import com.cryptomorin.xseries.XBlock;
 import com.cryptomorin.xseries.XMaterial;
@@ -66,8 +67,9 @@ public class RegionBlockListener implements Listener {
             return;
         }
         // Checks if region is blocked
-        if (plugin.isWorldGuardEnabled()) {
-            if (plugin.getWorldGuardSupport().isInBlockedCheckRegion(event.getBlock().getLocation())) {
+        WorldGuardSupport worldGuardSupport = plugin.getWorldGuardSupport();
+        if (plugin.isWorldGuardEnabled() && worldGuardSupport != null) {
+            if (worldGuardSupport.isInBlockedCheckRegion(event.getBlock().getLocation())) {
                 return;
             }
         }

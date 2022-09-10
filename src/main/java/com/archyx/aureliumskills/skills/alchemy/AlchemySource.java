@@ -39,9 +39,11 @@ public enum AlchemySource implements Source {
         ItemStack baseItem = ItemUtils.parseItem(material);
         if (baseItem != null && baseItem.getItemMeta() instanceof PotionMeta) {
             PotionMeta meta = (PotionMeta) baseItem.getItemMeta();
-            meta.setBasePotionData(new PotionData(potionType));
-            meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-            baseItem.setItemMeta(meta);
+            if (meta != null) {
+                meta.setBasePotionData(new PotionData(potionType));
+                meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+                baseItem.setItemMeta(meta);
+            }
         }
         return baseItem;
     }

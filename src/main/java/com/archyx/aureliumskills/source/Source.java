@@ -26,10 +26,14 @@ public interface Source extends LootContext {
         if (skill == Skills.ARCHERY || skill == Skills.FIGHTING) {
             messagePath = "sources.mobs." + toString().toLowerCase(Locale.ROOT);
         }
-        String message = Lang.getMessage(new CustomMessageKey(messagePath), locale);
-        if (message == null) {
-            Bukkit.getLogger().warning("[AureliumSkills] Unknown message with path " + messagePath);
-            return messagePath;
+        CustomMessageKey key = new CustomMessageKey(messagePath);
+        String message = messagePath;
+        try {
+            message = Lang.getMessage(key, locale);
+        }
+        catch (IllegalStateException ex) {
+            // No custom message exists when using the message as a key
+            Bukkit.getLogger().warning("[AureliumSkills] Unknown custom message with path: " + key);
         }
         return message;
     }

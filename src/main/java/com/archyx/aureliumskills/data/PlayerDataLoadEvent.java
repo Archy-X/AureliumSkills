@@ -2,7 +2,6 @@ package com.archyx.aureliumskills.data;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.NotNull;
 
 public class PlayerDataLoadEvent extends Event {
 
@@ -18,7 +17,6 @@ public class PlayerDataLoadEvent extends Event {
         return playerData;
     }
 
-    @NotNull
     @Override
     public HandlerList getHandlers() {
         return handlers;

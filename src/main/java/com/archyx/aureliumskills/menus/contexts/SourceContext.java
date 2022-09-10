@@ -3,7 +3,6 @@ package com.archyx.aureliumskills.menus.contexts;
 import com.archyx.aureliumskills.AureliumSkills;
 import com.archyx.aureliumskills.source.Source;
 import com.archyx.slate.context.ContextProvider;
-import org.jetbrains.annotations.Nullable;
 
 public class SourceContext implements ContextProvider<Source> {
 
@@ -14,7 +13,6 @@ public class SourceContext implements ContextProvider<Source> {
     }
 
     @Override
-    @Nullable
     public Source parse(String input) {
         return plugin.getSourceRegistry().valueOf(input);
     }

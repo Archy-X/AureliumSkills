@@ -7,7 +7,6 @@ import com.archyx.aureliumskills.source.Source;
 import com.archyx.aureliumskills.util.item.ItemUtils;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.Nullable;
 
 public enum ExcavationSource implements Source, BlockSource {
 
@@ -52,7 +51,6 @@ public enum ExcavationSource implements Source, BlockSource {
         this.allowBothIfLegacy = allowBothIfLegacy;
     }
 
-    @Nullable
     @Override
     public String getLegacyMaterial() {
         return legacyMaterial;
@@ -73,7 +71,6 @@ public enum ExcavationSource implements Source, BlockSource {
         return Skills.EXCAVATION;
     }
 
-    @Nullable
     public static ExcavationSource getSource(Block block) {
         for (ExcavationSource source : values()) {
             if (source.isMatch(block)) {

@@ -27,7 +27,7 @@ public class BackItem extends AbstractItem implements SingleItemProvider {
             case "back":
                 return Lang.getMessage(MenuMessage.BACK, locale);
             case "back_click":
-                String previousMenu = (String) activeMenu.getProperty("previous_menu");
+                String previousMenu = getPreviousMenu(activeMenu);
                 String formattedPreviousMenu = TextUtil.capitalizeWord(TextUtil.replace(previousMenu, "_", " "));
                 return TextUtil.replace(Lang.getMessage(MenuMessage.BACK_CLICK, locale),
                         "{menu_name}", formattedPreviousMenu);
@@ -37,18 +37,25 @@ public class BackItem extends AbstractItem implements SingleItemProvider {
 
     @Override
     public void onClick(Player player, InventoryClickEvent event, ItemStack item, SlotPos pos, ActiveMenu activeMenu) {
-        Object object = activeMenu.getProperty("previous_menu");
-        if (object != null) {
-            String previousMenu = (String) object;
+        String previousMenu = getPreviousMenu(activeMenu);
+        if (!previousMenu.isEmpty())
             plugin.getMenuManager().openMenu(player, previousMenu);
-        }
     }
 
     @Override
     public ItemStack onItemModify(ItemStack baseItem, Player player, ActiveMenu activeMenu) {
-        if (activeMenu.getProperty("previous_menu") == null) {
+        if (getPreviousMenu(activeMenu).isEmpty()) {
             return null;
         }
         return baseItem;
     }
+
+    private String getPreviousMenu(ActiveMenu activeMenu) {
+        Object property = activeMenu.getProperty("previous_menu");
+        if (!(property instanceof String)) {
+            property = "";
+        }
+        return (String) property;
+    }
+
 }

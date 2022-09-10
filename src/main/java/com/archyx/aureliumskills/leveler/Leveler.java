@@ -158,6 +158,8 @@ public class Leveler {
 		// Reloads modifiers
 		for (String key : playerData.getStatModifiers().keySet()) {
 			StatModifier modifier = playerData.getStatModifiers().get(key);
+			if (modifier == null)
+				throw new IllegalStateException("Invalid stat modifier index key: " + key);
 			playerData.addStatLevel(modifier.getStat(), modifier.getValue());
 		}
 		statLeveler.reloadStat(player, Stats.HEALTH);

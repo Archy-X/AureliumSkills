@@ -7,6 +7,7 @@ import com.archyx.aureliumskills.data.PlayerData;
 import com.archyx.aureliumskills.lang.ActionBarMessage;
 import com.archyx.aureliumskills.lang.Lang;
 import com.archyx.aureliumskills.skills.Skill;
+import com.archyx.aureliumskills.support.ProtocolLibSupport;
 import com.archyx.aureliumskills.util.math.BigNumber;
 import com.archyx.aureliumskills.util.math.NumberUtil;
 import com.archyx.aureliumskills.util.text.TextUtil;
@@ -117,8 +118,13 @@ public class ActionBar implements Listener {
 						currentAction.put(player, 0);
 					}
 					//Add to current action
-					currentAction.put(player, currentAction.get(player) + 1);
-					int thisAction = this.currentAction.get(player);
+					Integer action = currentAction.get(player);
+					if (action == null) {
+						plugin.getLogger().warning("Current action is not cached for player: " + player.getName());
+						return;
+					}
+					int thisAction = action + 1;
+					currentAction.put(player, thisAction);
 					new BukkitRunnable() {
 						@Override
 						public void run() {
@@ -278,11 +284,12 @@ public class ActionBar implements Listener {
 		if (OptionL.getBoolean(Option.ACTION_BAR_PLACEHOLDER_API) && plugin.isPlaceholderAPIEnabled()) {
 			message = PlaceholderAPI.setPlaceholders(player, message);
 		}
-		if (plugin.isProtocolLibEnabled()) {
+		ProtocolLibSupport protocolLibSupport = plugin.getProtocolLibSupport();
+		if (plugin.isProtocolLibEnabled() && protocolLibSupport != null) {
 			if (VersionUtils.isAtLeastVersion(17)) {
-				plugin.getProtocolLibSupport().sendNewActionBar(player, message);
+				protocolLibSupport.sendNewActionBar(player, message);
 			} else {
-				plugin.getProtocolLibSupport().sendLegacyActionBar(player, message);
+				protocolLibSupport.sendLegacyActionBar(player, message);
 			}
 		} else {
 			player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
@@ -315,7 +322,9 @@ public class ActionBar implements Listener {
 		} else {
 			currentAction.put(player, 0);
 		}
-		int thisAction = this.currentAction.get(player);
+		Integer thisAction = this.currentAction.get(player);
+		if (thisAction == null)
+			throw new IllegalStateException("Invalid player index key for: " + player.getName());
 		new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -450,7 +459,7 @@ public class ActionBar implements Listener {
 				if (item != null) {
 					if (item.getType().isBlock()) {
 						if (block.getY() == block.getWorld().getMaxHeight() - 1) {
-							if (event.getBlockFace() == BlockFace.UP)	 {
+							if (event.getBlockFace() == BlockFace.UP)	{
 								setPaused(player, 40);
 							}
 						}

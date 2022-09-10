@@ -56,12 +56,10 @@ public abstract class AbilityProvider {
         PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
         if (playerData != null) {
             double output = plugin.getSourceManager().getXp(source);
-            if (ability != null) {
-                if (plugin.getAbilityManager().isEnabled(ability)) {
-                    double modifier = 1;
-                    modifier += plugin.getAbilityManager().getValue(ability, playerData.getAbilityLevel(ability)) / 100;
-                    output *= modifier;
-                }
+            if (plugin.getAbilityManager().isEnabled(ability)) {
+                double modifier = 1;
+                modifier += plugin.getAbilityManager().getValue(ability, playerData.getAbilityLevel(ability)) / 100;
+                output *= modifier;
             }
             return output;
         }

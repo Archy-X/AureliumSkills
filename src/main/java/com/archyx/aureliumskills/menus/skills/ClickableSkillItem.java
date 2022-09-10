@@ -43,8 +43,7 @@ public class ClickableSkillItem extends AbstractSkillItem {
     public ItemStack onItemModify(ItemStack baseItem, Player player, ActiveMenu activeMenu, Skill skill) {
         if (OptionL.isEnabled(skill)) {
             return baseItem;
-        } else {
-            return null; // Hide item if skill is disabled
         }
+        return null; // Hide item if skill is disabled
     }
 }

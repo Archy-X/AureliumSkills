@@ -2,7 +2,6 @@ package com.archyx.aureliumskills.item;
 
 import com.archyx.slate.item.provider.KeyedItemProvider;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.Nullable;
 
 public class ItemRegistryMenuProvider implements KeyedItemProvider {
 
@@ -13,7 +12,7 @@ public class ItemRegistryMenuProvider implements KeyedItemProvider {
     }
 
     @Override
-    public @Nullable ItemStack getItem(String key) {
+    public ItemStack getItem(String key) {
         return itemRegistry.getItem(key);
     }
 }

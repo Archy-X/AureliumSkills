@@ -38,7 +38,7 @@ public class SorterItem extends AbstractItem implements SingleItemProvider {
     @Override
     public void onClick(Player player, InventoryClickEvent event, ItemStack item, SlotPos pos, ActiveMenu activeMenu) {
         SortType[] sortTypes = SortType.values();
-        SortType currentType = (SortType) activeMenu.getProperty("sort_type");
+        SortType currentType = getSortType(activeMenu);
         // Get the index of the current sort type in the array
         int currentTypeIndex = 0;
         for (int i = 0; i < sortTypes.length; i++) {
@@ -62,7 +62,7 @@ public class SorterItem extends AbstractItem implements SingleItemProvider {
 
     private String getSortedTypesLore(Locale locale, ActiveMenu activeMenu) {
         StringBuilder builder = new StringBuilder();
-        SortType selectedSort = (SortType) activeMenu.getProperty("sort_type");
+        SortType selectedSort = getSortType(activeMenu);
         for (SortType sortType : SortType.values()) {
             String typeString = TextUtil.replace(Lang.getMessage(MenuMessage.SORT_TYPE, locale)
                     , "{type_name}", Lang.getMessage(MenuMessage.valueOf(sortType.toString()), locale));
@@ -96,6 +96,14 @@ public class SorterItem extends AbstractItem implements SingleItemProvider {
             }
         }
 
+    }
+
+    private SortType getSortType(ActiveMenu activeMenu) {
+        Object property = activeMenu.getProperty("sort_type");
+        if (!(property instanceof SortType)) {
+            throw new IllegalArgumentException("Could not get menu sort_type property");
+        }
+        return (SortType) property;
     }
 
 }

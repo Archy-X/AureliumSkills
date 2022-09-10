@@ -6,6 +6,7 @@ import java.util.Locale;
 
 public enum ManaAbilityMessage implements MessageKey {
     
+    NONE,
     REPLENISH_NAME,
     REPLENISH_DESC,
     REPLENISH_RAISE,
@@ -59,6 +60,10 @@ public enum ManaAbilityMessage implements MessageKey {
     private final String path;
 
     ManaAbilityMessage() {
+        if (this.name().equals("NONE")) {
+            this.path = "";
+            return;
+        }
         MAbility manaAbility = MAbility.valueOf(this.name().substring(0, this.name().lastIndexOf("_")));
         this.path = "mana_abilities." + manaAbility.name().toLowerCase(Locale.ENGLISH) + "." + this.name().substring(this.name().lastIndexOf("_") + 1).toLowerCase(Locale.ENGLISH);
     }

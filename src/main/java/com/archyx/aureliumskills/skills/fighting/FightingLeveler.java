@@ -32,7 +32,7 @@ public class FightingLeveler extends SkillLeveler implements Listener {
 			if (e.getKiller() != null) {
 				if (e.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
 					EntityDamageByEntityEvent ee = (EntityDamageByEntityEvent) e.getLastDamageCause();
-					if (ee.getDamager() instanceof Player) {
+					if (ee != null && ee.getDamager() instanceof Player) {
 						EntityType type = e.getType();
 						Player p = (Player) ee.getDamager();
 						if (blockXpGainLocation(e.getLocation(), p)) return;

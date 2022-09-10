@@ -19,14 +19,22 @@ public class AbilitiesMenu extends AbstractMenu implements MenuProvider {
     }
 
     @Override
-    public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu menu) {
+    public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu) {
         Locale locale = plugin.getLang().getLocale(player);
         if ("abilities_title".equals(placeholder)) {
-            Skill skill = (Skill) menu.getProperty("skill");
+            Skill skill = getSkill(activeMenu);
             return TextUtil.replace(Lang.getMessage(MenuMessage.ABILITIES_TITLE, locale),
                     "{skill}", skill.getDisplayName(locale));
         }
         return placeholder;
+    }
+
+    private Skill getSkill(ActiveMenu activeMenu) {
+        Object property = activeMenu.getProperty("skill");
+        if (!(property instanceof Skill)) {
+            throw new IllegalArgumentException("Could not get menu skill property");
+        }
+        return (Skill) property;
     }
 
 }

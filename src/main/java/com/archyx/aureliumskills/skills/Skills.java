@@ -5,7 +5,6 @@ import com.archyx.aureliumskills.lang.Lang;
 import com.archyx.aureliumskills.lang.SkillMessage;
 import com.archyx.aureliumskills.mana.MAbility;
 import com.google.common.collect.ImmutableList;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,16 +59,17 @@ public enum Skills implements Skill {
 
 	@Override
 	public String getDescription(Locale locale) {
-		return Lang.getMessage(SkillMessage.valueOf(this.name() + "_DESC"), locale);
+	    String description = Lang.getMessage(SkillMessage.valueOf(this.name() + "_DESC"), locale);
+		return description;
 	}
 
 	@Override
 	public String getDisplayName(Locale locale) {
-		return Lang.getMessage(SkillMessage.valueOf(this.name().toUpperCase() + "_NAME"), locale);
+	    String displayName = Lang.getMessage(SkillMessage.valueOf(this.name().toUpperCase() + "_NAME"), locale);
+		return displayName;
 	}
 
 	@Override
-	@Nullable
 	public MAbility getManaAbility() {
 		return manaAbility;
 	}

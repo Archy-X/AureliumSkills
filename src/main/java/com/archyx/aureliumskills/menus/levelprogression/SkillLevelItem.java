@@ -57,9 +57,9 @@ public abstract class SkillLevelItem extends AbstractItem implements TemplateIte
     public ItemStack onItemModify(ItemStack baseItem, Player player, ActiveMenu activeMenu, Integer num) {
         // Functionality for showing the level as the amount on the item
         int page = activeMenu.getCurrentPage();
-        int level = num + page * (int) activeMenu.getProperty("items_per_page");
+        int level = num + page * getItemsPerPage(activeMenu);
         // Don't show if level is more than max skill level
-        Skill skill = (Skill) activeMenu.getProperty("skill");
+        Skill skill = getSkill(activeMenu);
         if (level > OptionL.getMaxLevel(skill)) {
             return null;
         }
@@ -109,8 +109,8 @@ public abstract class SkillLevelItem extends AbstractItem implements TemplateIte
                         abilityLore.append(TextUtil.replace(Lang.getMessage(MenuMessage.ABILITY_UNLOCK, locale)
                                 , "{ability}", ability.getDisplayName(locale)
                                 , "{desc}", TextUtil.replace(ability.getDescription(locale)
-                                        , "{value_2}", NumberUtil.format1(manager.getValue2(ability, 1))
-                                        , "{value}", NumberUtil.format1(manager.getValue(ability, 1)))));
+                                , "{value_2}", NumberUtil.format1(manager.getValue2(ability, 1))
+                                , "{value}", NumberUtil.format1(manager.getValue(ability, 1)))));
                     } else {
                         int abilityLevel = ((level - manager.getUnlock(ability)) / manager.getLevelUp(ability)) + 1;
                         if (abilityLevel <= manager.getMaxLevel(ability) || manager.getMaxLevel(ability) == 0) { // Check max level
@@ -118,8 +118,8 @@ public abstract class SkillLevelItem extends AbstractItem implements TemplateIte
                                     , "{ability}", ability.getDisplayName(locale)
                                     , "{level}", RomanNumber.toRoman(abilityLevel)
                                     , "{desc}", TextUtil.replace(ability.getDescription(locale)
-                                            , "{value_2}", NumberUtil.format1(manager.getValue2(ability, abilityLevel))
-                                            , "{value}", NumberUtil.format1(manager.getValue(ability, abilityLevel)))));
+                                    , "{value_2}", NumberUtil.format1(manager.getValue2(ability, abilityLevel))
+                                    , "{value}", NumberUtil.format1(manager.getValue(ability, abilityLevel)))));
                         }
                     }
                 }
@@ -138,9 +138,9 @@ public abstract class SkillLevelItem extends AbstractItem implements TemplateIte
                     manaAbilityLore.append(TextUtil.replace(Lang.getMessage(MenuMessage.MANA_ABILITY_UNLOCK, locale)
                             , "{mana_ability}", mAbility.getDisplayName(locale)
                             , "{desc}", TextUtil.replace(mAbility.getDescription(locale)
-                                    , "{value}", NumberUtil.format1(manager.getDisplayValue(mAbility, 1))
-                                    , "{duration}", NumberUtil.format1(getDuration(mAbility, 1))
-                                    , "{haste_level}", String.valueOf(manager.getOptionAsInt(MAbility.SPEED_MINE, "haste_level", 10)))));
+                            , "{value}", NumberUtil.format1(manager.getDisplayValue(mAbility, 1))
+                            , "{duration}", NumberUtil.format1(getDuration(mAbility, 1))
+                            , "{haste_level}", String.valueOf(manager.getOptionAsInt(MAbility.SPEED_MINE, "haste_level", 10)))));
                 }
                 else {
                     int manaAbilityLevel = ((level - manager.getUnlock(mAbility)) / manager.getLevelUp(mAbility)) + 1;
@@ -149,9 +149,9 @@ public abstract class SkillLevelItem extends AbstractItem implements TemplateIte
                                 , "{mana_ability}", mAbility.getDisplayName(locale)
                                 , "{level}", RomanNumber.toRoman(manaAbilityLevel)
                                 , "{desc}", TextUtil.replace(mAbility.getDescription(locale)
-                                        , "{value}", NumberUtil.format1(manager.getDisplayValue(mAbility, manaAbilityLevel))
-                                        , "{duration}", NumberUtil.format1(getDuration(mAbility, manaAbilityLevel))
-                                        , "{haste_level}", String.valueOf(manager.getOptionAsInt(MAbility.SPEED_MINE, "haste_level", 10)))));
+                                , "{value}", NumberUtil.format1(manager.getDisplayValue(mAbility, manaAbilityLevel))
+                                , "{duration}", NumberUtil.format1(getDuration(mAbility, manaAbilityLevel))
+                                , "{haste_level}", String.valueOf(manager.getOptionAsInt(MAbility.SPEED_MINE, "haste_level", 10)))));
                     }
                 }
             }
@@ -184,6 +184,14 @@ public abstract class SkillLevelItem extends AbstractItem implements TemplateIte
         int itemsPerPage = getItemsPerPage(activeMenu);
         int currentPage = activeMenu.getCurrentPage();
         return currentPage * itemsPerPage + position;
+    }
+
+    private Skill getSkill(ActiveMenu activeMenu) {
+        Object property = activeMenu.getProperty("skill");
+        if (!(property instanceof Skill)) {
+            throw new IllegalArgumentException("Could not get menu skill property");
+        }
+        return (Skill) property;
     }
 
 }

@@ -7,7 +7,6 @@ import com.archyx.aureliumskills.util.item.ItemUtils;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 
@@ -39,7 +38,6 @@ public enum FishingSource implements Source {
     }
 
     @SuppressWarnings("deprecation")
-    @Nullable
     public static FishingSource valueOf(ItemStack item) {
         Material mat = item.getType();
         if (XMaterial.isNewVersion()) {

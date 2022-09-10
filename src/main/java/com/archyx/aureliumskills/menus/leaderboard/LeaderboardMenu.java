@@ -21,12 +21,20 @@ public class LeaderboardMenu extends AbstractMenu implements MenuProvider {
     @Override
     public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu) {
         Locale locale = plugin.getLang().getLocale(player);
-        Skill skill = (Skill) activeMenu.getProperty("skill");
+        Skill skill = getSkill(activeMenu);
         if (placeholder.equals("leaderboard_menu_title")) {
             return TextUtil.replace(Lang.getMessage(MenuMessage.LEADERBOARD_TITLE, locale),
                     "{skill}", skill.getDisplayName(locale));
         }
         return placeholder;
+    }
+
+    private Skill getSkill(ActiveMenu activeMenu) {
+        Object property = activeMenu.getProperty("skill");
+        if (!(property instanceof Skill)) {
+            throw new IllegalArgumentException("Could not get menu skill property");
+        }
+        return (Skill) property;
     }
 
 }

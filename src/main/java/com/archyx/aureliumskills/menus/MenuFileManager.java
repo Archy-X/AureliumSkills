@@ -63,7 +63,7 @@ public class MenuFileManager {
         if (!legacyFile.exists()) return;
 
         FileConfiguration config = YamlConfiguration.loadConfiguration(legacyFile);
-        String[] legacyNames = new String[] {"skills_menu", "stats_menu", "level_progression_menu"};
+        String[] legacyNames = {"skills_menu", "stats_menu", "level_progression_menu"};
         for (String legacyName : legacyNames) {
             ConfigurationSection oldSection = config.getConfigurationSection(legacyName);
             if (oldSection == null) continue;
@@ -80,13 +80,14 @@ public class MenuFileManager {
             ConfigurationSection fillSection = newConfig.getConfigurationSection("fill");
             if (fillSection != null) {
                 fillSection.set("enabled", oldSection.getBoolean("fill.enabled"));
-                migrateBaseItem(fillSection, oldSection.getString("fill.material", "black_stained_glass_pane"));
+                String material = oldSection.getString("fill.material");
+                migrateBaseItem(fillSection, material != null ? material : "black_stained_glass_pane");
             }
             // Migrate items
             ConfigurationSection itemsSection = oldSection.getConfigurationSection("items");
             ConfigurationSection newItemsSection = newConfig.getConfigurationSection("items");
             ConfigurationSection newTemplatesSection = newConfig.getConfigurationSection("templates");
-            if (itemsSection != null && newItemsSection != null) {
+            if (itemsSection != null && newItemsSection != null && newTemplatesSection != null) {
                 migrateItems(itemsSection, newItemsSection, newTemplatesSection);
             }
             // Migrate templates

@@ -31,7 +31,8 @@ public class ManaCommand extends BaseCommand {
         if (sender instanceof Player && player == null) {
             Player target = (Player) sender;
             PlayerData playerData = plugin.getPlayerManager().getPlayerData(target);
-            if (playerData == null) return;
+            if (playerData == null)
+                return;
             Locale locale = playerData.getLocale();
             sender.sendMessage(AureliumSkills.getPrefix(locale) + TextUtil.replace(Lang.getMessage(CommandMessage.MANA_DISPLAY, locale)
                     , "{current}", NumberUtil.format1(playerData.getMana())

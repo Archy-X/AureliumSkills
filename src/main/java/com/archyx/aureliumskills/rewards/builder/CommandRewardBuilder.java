@@ -4,7 +4,8 @@ import com.archyx.aureliumskills.AureliumSkills;
 import com.archyx.aureliumskills.commands.CommandExecutor;
 import com.archyx.aureliumskills.rewards.CommandReward;
 import com.archyx.aureliumskills.rewards.Reward;
-import com.archyx.aureliumskills.util.misc.Validate;
+
+import java.util.Objects;
 
 public class CommandRewardBuilder extends MessagedRewardBuilder {
 
@@ -40,7 +41,7 @@ public class CommandRewardBuilder extends MessagedRewardBuilder {
 
     @Override
     public Reward build() {
-        Validate.notNull(command, "You must specify a command");
+        Objects.requireNonNull(command, "You must specify a command");
         return new CommandReward(plugin, menuMessage, chatMessage, executor, command, revertExecutor, revertCommand);
     }
 }

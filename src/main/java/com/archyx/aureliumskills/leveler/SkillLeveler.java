@@ -10,6 +10,7 @@ import com.archyx.aureliumskills.source.Source;
 import com.archyx.aureliumskills.source.SourceManager;
 import com.archyx.aureliumskills.source.SourceTag;
 import com.archyx.aureliumskills.support.WorldGuardFlags;
+import com.archyx.aureliumskills.support.WorldGuardSupport;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -48,6 +49,7 @@ public abstract class SkillLeveler {
         PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
         if (playerData != null) {
             double output = getXp(source);
+            Ability ability = this.ability;
             if (ability != null) {
                 if (plugin.getAbilityManager().isEnabled(ability)) {
                     double modifier = 1;
@@ -64,6 +66,7 @@ public abstract class SkillLeveler {
         PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
         if (playerData != null) {
             double output = input;
+            Ability ability = this.ability;
             if (ability != null) {
                 if (plugin.getAbilityManager().isEnabled(ability)) {
                     double modifier = 1;
@@ -80,12 +83,10 @@ public abstract class SkillLeveler {
         PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
         if (playerData != null) {
             double output = input;
-            if (ability != null) {
-                if (plugin.getAbilityManager().isEnabled(ability)) {
-                    double modifier = 1;
-                    modifier += plugin.getAbilityManager().getValue(ability, playerData.getAbilityLevel(ability)) / 100;
-                    output *= modifier;
-                }
+            if (plugin.getAbilityManager().isEnabled(ability)) {
+                double modifier = 1;
+                modifier += plugin.getAbilityManager().getValue(ability, playerData.getAbilityLevel(ability)) / 100;
+                output *= modifier;
             }
             return output;
         }
@@ -144,12 +145,14 @@ public abstract class SkillLeveler {
             return player.getGameMode().equals(GameMode.CREATIVE);
         }
         //Checks if in blocked region
-        if (plugin.isWorldGuardEnabled()) {
-            if (plugin.getWorldGuardSupport().isInBlockedRegion(location)) {
+        WorldGuardSupport worldGuardSupport = plugin.getWorldGuardSupport();
+        if (plugin.isWorldGuardEnabled() && worldGuardSupport != null) {
+            if (worldGuardSupport.isInBlockedRegion(location)) {
                 return true;
             }
             // Check if blocked by flags
-            else return plugin.getWorldGuardSupport().blockedByFlag(location, player, WorldGuardFlags.FlagKey.XP_GAIN);
+            else
+                return worldGuardSupport.blockedByFlag(location, player, WorldGuardFlags.FlagKey.XP_GAIN);
         }
         return false;
     }
@@ -160,12 +163,14 @@ public abstract class SkillLeveler {
             return true;
         }
         //Checks if in blocked region
-        if (plugin.isWorldGuardEnabled()) {
-            if (plugin.getWorldGuardSupport().isInBlockedRegion(location)) {
+        WorldGuardSupport worldGuardSupport = plugin.getWorldGuardSupport();
+        if (plugin.isWorldGuardEnabled() && worldGuardSupport != null) {
+            if (worldGuardSupport.isInBlockedRegion(location)) {
                 return true;
             }
             // Check if blocked by flags
-            else return plugin.getWorldGuardSupport().blockedByFlag(location, player, WorldGuardFlags.FlagKey.XP_GAIN);
+            else
+                return worldGuardSupport.blockedByFlag(location, player, WorldGuardFlags.FlagKey.XP_GAIN);
         }
         return false;
     }

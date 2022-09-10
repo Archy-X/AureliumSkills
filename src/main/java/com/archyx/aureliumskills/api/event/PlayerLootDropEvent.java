@@ -5,7 +5,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Called when an ability or luck causes extra items to drop from an action. Does not include the original or normal items dropped except for Fishing Lucky Catch.
@@ -60,7 +59,6 @@ public class PlayerLootDropEvent extends Event {
         this.isCancelled = cancelled;
     }
 
-    @NotNull
     @Override
     public HandlerList getHandlers() {
         return handlers;

@@ -1,7 +1,6 @@
 package com.archyx.aureliumskills.region;
 
 import org.bukkit.World;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,7 +36,6 @@ public class Region {
         return z;
     }
 
-    @Nullable
     public ChunkData getChunkData(ChunkCoordinate chunkCoordinate) {
         return chunks.get(chunkCoordinate);
     }

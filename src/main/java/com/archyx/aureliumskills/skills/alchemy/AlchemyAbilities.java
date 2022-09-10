@@ -209,10 +209,13 @@ public class AlchemyAbilities extends AbilityProvider implements Listener {
         if (blockDisabled(Ability.ALCHEMIST)) return;
         if (event.isCancelled()) return;
         ItemStack item = event.getPotion().getItem();
-        if (item.getItemMeta() instanceof PotionMeta && item.getItemMeta() != null) {
-            PotionMeta meta = (PotionMeta) item.getItemMeta();
-            PotionData potionData = meta.getBasePotionData();
-            if (meta.hasCustomEffects() && OptionL.getBoolean(Option.ALCHEMY_IGNORE_CUSTOM_POTIONS)) return;
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null)
+            return;
+        if (meta instanceof PotionMeta) {
+            PotionMeta potionMeta = (PotionMeta) meta;
+            PotionData potionData = potionMeta.getBasePotionData();
+            if (potionMeta.hasCustomEffects() && OptionL.getBoolean(Option.ALCHEMY_IGNORE_CUSTOM_POTIONS)) return;
             // Get potion duration bonus from Alchemist ability
             int durationBonus = 0;
             if (!NBTAPIUser.isNBTDisabled(plugin)) {

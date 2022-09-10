@@ -34,7 +34,7 @@ public class LevelProgressionMenu extends AbstractMenu implements MenuProvider {
 
     @Override
     public int getPages(Player player, ActiveMenu activeMenu) {
-        Skill skill = (Skill) activeMenu.getProperty("skill");
+        Skill skill = getSkill(activeMenu);
         int itemsPerPage = 24;
         ConfigurableMenu levelProgressionMenu = plugin.getSlate().getMenuManager().getMenu("level_progression");
         if (levelProgressionMenu != null) {
@@ -48,10 +48,10 @@ public class LevelProgressionMenu extends AbstractMenu implements MenuProvider {
 
     private Skill getSkill(ActiveMenu activeMenu) {
         Object property = activeMenu.getProperty("skill");
-        if (property instanceof Skill) {
-            return (Skill) property;
-        } else {
-            throw new IllegalArgumentException("Could not get skill property");
+        if (!(property instanceof Skill)) {
+            throw new IllegalArgumentException("Could not get menu skill property");
         }
+        return (Skill) property;
     }
+
 }

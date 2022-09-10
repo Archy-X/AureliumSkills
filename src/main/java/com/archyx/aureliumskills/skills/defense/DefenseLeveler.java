@@ -14,6 +14,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.projectiles.ProjectileSource;
 
 public class DefenseLeveler extends SkillLeveler implements Listener {
 
@@ -59,8 +60,9 @@ public class DefenseLeveler extends SkillLeveler implements Listener {
 							// Make sure player didn't cause own damage
 							if (event.getDamager() instanceof Projectile) {
 								Projectile projectile = (Projectile) event.getDamager();
-								if (projectile.getShooter() instanceof Player) {
-									if (projectile.getShooter().equals(player)) return;
+								ProjectileSource shooter = projectile.getShooter();
+								if (shooter != null && projectile.getShooter() instanceof Player) {
+									if (shooter.equals(player)) return;
 								}
 							}
 							if (originalDamage * getXp(DefenseSource.MOB_DAMAGE) <= OptionL.getDouble(Option.DEFENSE_MAX)) {

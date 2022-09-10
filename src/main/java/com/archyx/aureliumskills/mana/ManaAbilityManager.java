@@ -14,7 +14,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -65,7 +64,6 @@ public class ManaAbilityManager implements Listener {
         Bukkit.getPluginManager().registerEvents(provider, plugin);
     }
 
-    @Nullable
     public ManaAbilityProvider getProvider(MAbility mAbility) {
         return providers.get(mAbility);
     }
@@ -181,7 +179,9 @@ public class ManaAbilityManager implements Listener {
                     Map<MAbility, Integer> abilityCooldowns = cooldowns.get(id);
                     if (abilityCooldowns != null) {
                         for (MAbility ab : abilityCooldowns.keySet()) {
-                            int cooldown = abilityCooldowns.get(ab);
+                            Integer cooldown = abilityCooldowns.get(ab);
+                            if (cooldown == null)
+                                throw new IllegalStateException("Invalid ability cooldown index key: " + ab);
                             if (cooldown >= 2) {
                                 abilityCooldowns.put(ab, cooldown - 2);
                             } else if (cooldown == 1) {
@@ -208,7 +208,9 @@ public class ManaAbilityManager implements Listener {
                     Map<MAbility, Integer> errorTimers = errorTimer.get(id);
                     if (errorTimers != null) {
                         for (MAbility ab : errorTimers.keySet()) {
-                            int timer = errorTimers.get(ab);
+                            Integer timer = errorTimers.get(ab);
+                            if (timer == null)
+                                throw new IllegalStateException("Invalid ability timer index key: " + timer);
                             if (timer > 0) {
                                 errorTimers.put(ab, timer - 1);
                             }
@@ -385,7 +387,6 @@ public class ManaAbilityManager implements Listener {
      * @param level The skill level
      * @return The mana ability unlocked or leveled up, or null
      */
-    @Nullable
     public MAbility getManaAbility(Skill skill, int level) {
         MAbility mAbility = skill.getManaAbility();
         if (mAbility != null) {
@@ -396,7 +397,6 @@ public class ManaAbilityManager implements Listener {
         return null;
     }
 
-    @Nullable
     public OptionValue getOption(MAbility mAbility, String key) {
         ManaAbilityOption option = plugin.getAbilityManager().getAbilityOption(mAbility);
         if (option != null) {
@@ -435,12 +435,14 @@ public class ManaAbilityManager implements Listener {
         if (value != null) {
             return value.asDouble();
         }
-        return mAbility.getDefaultOptions().get(key).asDouble();
+        value = mAbility.getDefaultOptions().get(key);
+        if (value == null)
+            throw new IllegalStateException("Invalid option index key: " + key);
+        return value.asDouble();
     }
 
-    @Nullable
     public Set<String> getOptionKeys(MAbility mAbility) {
-        if (mAbility.getDefaultOptions() != null) {
+        if (!mAbility.getDefaultOptions().isEmpty()) {
             return mAbility.getDefaultOptions().keySet();
         }
         return null;

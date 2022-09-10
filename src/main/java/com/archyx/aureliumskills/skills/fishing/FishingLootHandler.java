@@ -9,12 +9,14 @@ import com.archyx.aureliumskills.loot.handler.LootHandler;
 import com.archyx.aureliumskills.skills.Skills;
 import com.archyx.aureliumskills.source.Source;
 import com.archyx.aureliumskills.support.WorldGuardFlags;
+import com.archyx.aureliumskills.support.WorldGuardSupport;
 import com.archyx.aureliumskills.util.version.VersionUtils;
 import com.archyx.lootmanager.loot.Loot;
 import com.archyx.lootmanager.loot.LootPool;
 import com.archyx.lootmanager.loot.LootTable;
 import com.archyx.lootmanager.loot.type.CommandLoot;
 import com.archyx.lootmanager.loot.type.ItemLoot;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -41,12 +43,13 @@ public class FishingLootHandler extends LootHandler implements Listener {
         if (plugin.getWorldManager().isInBlockedWorld(player.getLocation())) {
             return;
         }
-        if (plugin.isWorldGuardEnabled()) {
-            if (plugin.getWorldGuardSupport().isInBlockedRegion(player.getLocation())) {
+        WorldGuardSupport worldGuardSupport = plugin.getWorldGuardSupport();
+        if (plugin.isWorldGuardEnabled() && worldGuardSupport != null) {
+            if (worldGuardSupport.isInBlockedRegion(player.getLocation())) {
                 return;
             }
             // Check if blocked by flags
-            else if (plugin.getWorldGuardSupport().blockedByFlag(player.getLocation(), player, WorldGuardFlags.FlagKey.CUSTOM_LOOT)) {
+            else if (worldGuardSupport.blockedByFlag(player.getLocation(), player, WorldGuardFlags.FlagKey.CUSTOM_LOOT)) {
                 return;
             }
         }
@@ -57,10 +60,13 @@ public class FishingLootHandler extends LootHandler implements Listener {
 
         PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
         if (playerData == null) return;
-
-        ItemStack originalItem = ((Item) event.getCaught()).getItemStack();
+        Entity caught = event.getCaught();
+        if (caught == null)
+            return;
+        ItemStack originalItem = ((Item)caught).getItemStack();
         FishingSource originalSource = FishingSource.valueOf(originalItem);
-
+        if (originalSource == null)
+            return;
         LootTable table = plugin.getLootTableManager().getLootTable(Skills.FISHING);
         if (table == null) return;
         for (LootPool pool : table.getPools()) {

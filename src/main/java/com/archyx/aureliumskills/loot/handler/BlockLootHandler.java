@@ -8,6 +8,7 @@ import com.archyx.aureliumskills.data.PlayerData;
 import com.archyx.aureliumskills.skills.Skill;
 import com.archyx.aureliumskills.source.Source;
 import com.archyx.aureliumskills.support.WorldGuardFlags;
+import com.archyx.aureliumskills.support.WorldGuardSupport;
 import com.archyx.lootmanager.loot.Loot;
 import com.archyx.lootmanager.loot.LootPool;
 import com.archyx.lootmanager.loot.LootTable;
@@ -52,8 +53,9 @@ public abstract class BlockLootHandler extends LootHandler implements Listener {
             return;
         }
 
-        if (plugin.isWorldGuardEnabled()) {
-            if (plugin.getWorldGuardSupport().blockedByFlag(block.getLocation(), player, WorldGuardFlags.FlagKey.CUSTOM_LOOT)) {
+        WorldGuardSupport worldGuardSupport = plugin.getWorldGuardSupport();
+        if (plugin.isWorldGuardEnabled() && worldGuardSupport != null) {
+            if (worldGuardSupport.blockedByFlag(block.getLocation(), player, WorldGuardFlags.FlagKey.CUSTOM_LOOT)) {
                 return;
             }
         }
@@ -71,7 +73,7 @@ public abstract class BlockLootHandler extends LootHandler implements Listener {
             LootDropCause cause = getCause(pool);
 
             // Select pool and give loot
-            if (selectBlockLoot(pool, player, chance, originalSource, event, cause)) {
+            if (originalSource != null && selectBlockLoot(pool, player, chance, originalSource, event, cause)) {
                 break;
             }
         }

@@ -14,10 +14,8 @@ import de.tr7zw.changeme.nbtapi.NBTCompound;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -57,7 +55,7 @@ public class Multipliers extends NBTAPIUser {
         return multipliers;
     }
 
-    public ItemStack addMultiplier(ModifierType type, ItemStack item, @Nullable Skill skill, double value) {
+    public ItemStack addMultiplier(ModifierType type, ItemStack item, Skill skill, double value) {
         if (isNBTDisabled()) return item;
         NBTItem nbtItem = new NBTItem(item);
         NBTCompound compound = ItemUtils.getMultipliersTypeCompound(nbtItem, type);
@@ -65,7 +63,7 @@ public class Multipliers extends NBTAPIUser {
         return nbtItem.getItem();
     }
 
-    public ItemStack removeMultiplier(ModifierType type, ItemStack item, @Nullable Skill skill) {
+    public ItemStack removeMultiplier(ModifierType type, ItemStack item, Skill skill) {
         if (isNBTDisabled()) return item;
         NBTItem nbtItem = new NBTItem(item);
         NBTCompound compound = ItemUtils.getMultipliersTypeCompound(nbtItem, type);
@@ -88,16 +86,9 @@ public class Multipliers extends NBTAPIUser {
     public void addLore(ModifierType type, ItemStack item, Skill skill, double value, Locale locale) {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            List<String> lore;
-            if (meta.getLore() != null) {
-                if (meta.getLore().size() > 0) {
-                    lore = meta.getLore();
-                } else {
-                    lore = new LinkedList<>();
-                }
-            } else {
-                lore = new LinkedList<>();
-            }
+            List<String> lore = meta.getLore();
+            if (lore == null)
+                lore = new ArrayList<>();
             if (skill != null) { // Skill multiplier
                 CommandMessage message;
                 if (value >= 0) {
@@ -129,7 +120,7 @@ public class Multipliers extends NBTAPIUser {
         item.setItemMeta(meta);
     }
 
-    private String getNBTName(@Nullable Skill skill) {
+    private String getNBTName(Skill skill) {
         if (skill != null) {
             return TextUtil.capitalize(skill.toString().toLowerCase(Locale.ROOT));
         } else {

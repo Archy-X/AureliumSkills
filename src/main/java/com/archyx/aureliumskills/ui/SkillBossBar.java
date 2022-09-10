@@ -114,7 +114,10 @@ public class SkillBossBar implements Listener {
         }
         else {
             if (!bossBars.containsKey(player)) bossBars.put(player, new HashMap<>());
-            bossBar = bossBars.get(player).get(skill);
+            Map<Skill, BossBar> bars = bossBars.get(player);
+            if (bars == null)
+                throw new IllegalStateException("Invalid boss bar player index key: " + player.getName());
+            bossBar = bars.get(skill);
         }
         // If player does not have a boss bar in that skill
         if (bossBar == null) {
@@ -152,7 +155,10 @@ public class SkillBossBar implements Listener {
                 singleBossBars.put(player, bossBar);
             }
             else {
-                bossBars.get(player).put(skill, bossBar);
+                Map<Skill, BossBar> bars = bossBars.get(player);
+                if (bars == null)
+                    throw new IllegalStateException("Invalid boss bar player index key " + player.getName());
+                bars.put(skill, bossBar);
             }
         }
         // Use existing one
@@ -198,37 +204,51 @@ public class SkillBossBar implements Listener {
             }
         }
         else {
-            if (!currentActions.containsKey(player)) currentActions.put(player, new HashMap<>());
-            Integer currentAction = currentActions.get(player).get(skill);
+            Map<Skill, Integer> actions = checkCurrentActions.get(player);
+            if (actions == null) {
+                actions = new HashMap<>();
+                checkCurrentActions.put(player, actions);
+            }
+            Integer currentAction = actions.get(skill);
             if (currentAction != null) {
-                currentActions.get(player).put(skill, currentAction + 1);
+                actions.put(skill, currentAction + 1);
             } else {
-                currentActions.get(player).put(skill, 0);
+                actions.put(skill, 0);
             }
         }
         scheduleHide(player, skill, bossBar);
     }
 
     public void incrementAction(Player player, Skill skill) {
-        if (!singleCheckCurrentActions.containsKey(player)) singleCheckCurrentActions.put(player, 0);
-        if (!checkCurrentActions.containsKey(player)) checkCurrentActions.put(player, new HashMap<>());
+        Map<Skill, Integer> actions = checkCurrentActions.get(player);
+        if (actions == null) {
+            actions = new HashMap<>();
+            checkCurrentActions.put(player, actions);
+        }
+        Integer currentAction = singleCheckCurrentActions.get(player);
+        if (currentAction == null) {
+            currentAction = 0;
+            singleCheckCurrentActions.put(player, currentAction);
+        }
         // Increment current action
         if (mode.equals("single")) {
-            singleCheckCurrentActions.put(player, singleCheckCurrentActions.get(player) + 1);
+            singleCheckCurrentActions.put(player, currentAction + 1);
         }
         else {
-            Integer currentAction = checkCurrentActions.get(player).get(skill);
+            currentAction = actions.get(skill);
             if (currentAction != null) {
-                checkCurrentActions.get(player).put(skill, currentAction + 1);
+                actions.put(skill, currentAction + 1);
             } else {
-                checkCurrentActions.get(player).put(skill, 0);
+                actions.put(skill, 0);
             }
         }
     }
 
     private void scheduleHide(Player player, Skill skill, BossBar bossBar) {
         if (mode.equals("single")) {
-            final int currentAction = singleCurrentActions.get(player);
+            Integer currentAction = singleCurrentActions.get(player);
+            if (currentAction == null)
+                throw new IllegalStateException("Invalid boss bar actions index key: " + player.getName());
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -244,7 +264,9 @@ public class SkillBossBar implements Listener {
         else {
             Map<Skill, Integer> multiCurrentActions = currentActions.get(player);
             if (multiCurrentActions != null) {
-                final int currentAction = multiCurrentActions.get(skill);
+                Integer currentAction = multiCurrentActions.get(skill);
+                if (currentAction == null)
+                    throw new IllegalStateException("Invalid boss bar actions index key: " + player.getName());
                 new BukkitRunnable() {
                     @Override
                     public void run() {
@@ -277,12 +299,18 @@ public class SkillBossBar implements Listener {
 
     public int getCurrentAction(Player player, Skill skill) {
         if (mode.equals("single")) {
-            return singleCheckCurrentActions.get(player);
+            Integer currentAction = singleCheckCurrentActions.get(player);
+            if (currentAction == null)
+                throw new IllegalStateException("Invalid boss bar actions index key: " + player.getName());
+            return currentAction;
         }
         else {
             Map<Skill, Integer> multiCurrentActions = checkCurrentActions.get(player);
             if (multiCurrentActions != null) {
-                return multiCurrentActions.get(skill);
+            Integer currentAction = multiCurrentActions.get(skill);
+            if (currentAction == null)
+                throw new IllegalStateException("Invalid boss bar actions index key: " + player.getName());
+                return currentAction;
             }
         }
         return -1;

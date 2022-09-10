@@ -25,9 +25,10 @@ public class InProgressItem extends SkillLevelItem {
     @Override
     public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu, PlaceholderType placeholderType, Integer position) {
         Locale locale = plugin.getLang().getLocale(player);
-        Skill skill = (Skill) activeMenu.getProperty("skill");
+        Skill skill = getSkill(activeMenu);
         PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
-        if (playerData == null) return placeholder;
+        if (playerData == null)
+            return placeholder;
         int level = getLevel(activeMenu, position);
         switch (placeholder) {
             case "level_in_progress":
@@ -55,25 +56,32 @@ public class InProgressItem extends SkillLevelItem {
 
     @Override
     public Set<Integer> getDefinedContexts(Player player, ActiveMenu activeMenu) {
+        Set<Integer> levels = new HashSet<>();
         PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
-        Skill skill = (Skill) activeMenu.getProperty("skill");
+        if (playerData == null)
+            return levels;
+        Skill skill = getSkill(activeMenu);
         int itemsPerPage = getItemsPerPage(activeMenu);
         int currentPage = activeMenu.getCurrentPage();
-        if (playerData != null) {
-            int level = playerData.getSkillLevel(skill);
-            if (level >= 1 + currentPage * itemsPerPage && level < (currentPage + 1) * itemsPerPage + 2) {
-                Set<Integer> levels = new HashSet<>();
-                int position = (level + 1) % itemsPerPage; // Calculate the first-page equivalent next level
-                if (position == 0) { // Account for next skill level 24
-                    position = 24;
-                } else if (position == 1) { // Account for next skill level 25
-                    position = 25;
-                }
-                levels.add(position);
-                return levels;
+        int level = playerData.getSkillLevel(skill);
+        if (level >= 1 + currentPage * itemsPerPage && level < (currentPage + 1) * itemsPerPage + 2) {
+            int position = (level + 1) % itemsPerPage; // Calculate the first-page equivalent next level
+            if (position == 0) { // Account for next skill level 24
+                position = 24;
+            } else if (position == 1) { // Account for next skill level 25
+                position = 25;
             }
+            levels.add(position);
         }
-        return new HashSet<>();
+        return levels;
+    }
+
+    private Skill getSkill(ActiveMenu activeMenu) {
+        Object property = activeMenu.getProperty("skill");
+        if (!(property instanceof Skill)) {
+            throw new IllegalArgumentException("Could not get menu skill property");
+        }
+        return (Skill) property;
     }
 
 }

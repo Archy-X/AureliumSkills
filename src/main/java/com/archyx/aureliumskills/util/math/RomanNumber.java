@@ -48,7 +48,9 @@ public class RomanNumber {
 	    	if (OptionL.getBoolean(Option.ENABLE_ROMAN_NUMERALS)) {
 		        int l =  map.floorKey(number);
 		        if ( number == l ) {
-		            return map.get(number);
+		            String roman = map.get(number);
+		            assert (null != roman);
+		            return roman;
 		        }
 		        return map.get(l) + toRoman(number-l);
 	    	}

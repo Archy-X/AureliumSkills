@@ -18,7 +18,10 @@ public class LeaderboardManager {
     }
 
     public List<SkillValue> getLeaderboard(Skill skill) {
-        return skillLeaderboards.get(skill);
+        List<SkillValue> leaderboard = skillLeaderboards.get(skill);
+        if (leaderboard == null)
+            throw new IllegalStateException("Invalid leaderboard skill index key: " + skill.name());
+        return leaderboard;
     }
 
     public void setLeaderboard(Skill skill, List<SkillValue> leaderboard) {
@@ -27,6 +30,8 @@ public class LeaderboardManager {
 
     public List<SkillValue> getLeaderboard(Skill skill, int page, int numPerPage) {
         List<SkillValue> leaderboard = skillLeaderboards.get(skill);
+        if (leaderboard == null)
+            throw new IllegalStateException("Invalid leaderboard skill index key: " + skill.name());
         int from = (Math.max(page, 1) - 1) * numPerPage;
         int to = from + numPerPage;
         return leaderboard.subList(Math.min(from, leaderboard.size()), Math.min(to, leaderboard.size()));
@@ -62,6 +67,8 @@ public class LeaderboardManager {
 
     public int getSkillRank(Skill skill, UUID id) {
         List<SkillValue> leaderboard = skillLeaderboards.get(skill);
+        if (leaderboard == null)
+            throw new IllegalStateException("Invalid leaderboard skill index key: " + skill.name());
         for (SkillValue skillValue : leaderboard) {
             if (skillValue.getId().equals(id)) {
                 return leaderboard.indexOf(skillValue) + 1;

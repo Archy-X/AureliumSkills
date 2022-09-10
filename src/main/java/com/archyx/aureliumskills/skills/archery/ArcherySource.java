@@ -101,15 +101,17 @@ public enum ArcherySource implements Source {
 
     @Override
     public String toString() {
-        return configName != null ? configName.toUpperCase(Locale.ROOT) : name();
+        String name = configName;
+        return name != null ? name.toUpperCase(Locale.ROOT) : name();
     }
 
     @Override
     public String getPath() {
-        if (configName == null) {
+        String name = configName;
+        if (name == null) {
             return getSkill().toString().toLowerCase(Locale.ROOT) + "." + toString().toLowerCase(Locale.ROOT);
         } else {
-            return getSkill().toString().toLowerCase(Locale.ROOT) + "." + configName.toLowerCase(Locale.ROOT);
+            return getSkill().toString().toLowerCase(Locale.ROOT) + "." + name.toLowerCase(Locale.ROOT);
         }
     }
 

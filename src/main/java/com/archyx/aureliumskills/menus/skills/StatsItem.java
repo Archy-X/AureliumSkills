@@ -49,8 +49,10 @@ public class StatsItem extends AbstractItem implements SingleItemProvider {
     public ItemStack onItemModify(ItemStack baseItem, Player player, ActiveMenu activeMenu) {
         if (baseItem.getItemMeta() instanceof SkullMeta) {
             SkullMeta meta = (SkullMeta) baseItem.getItemMeta();
-            meta.setOwningPlayer(Bukkit.getOfflinePlayer(player.getUniqueId()));
-            baseItem.setItemMeta(meta);
+            if (meta != null) {
+                meta.setOwningPlayer(Bukkit.getOfflinePlayer(player.getUniqueId()));
+                baseItem.setItemMeta(meta);
+            }
         }
         return baseItem;
     }

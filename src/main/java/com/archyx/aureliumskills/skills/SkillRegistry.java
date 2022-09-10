@@ -1,7 +1,5 @@
 package com.archyx.aureliumskills.skills;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
@@ -23,7 +21,6 @@ public class SkillRegistry {
         return skills.values();
     }
 
-    @Nullable
     public Skill getSkill(String key) {
         return this.skills.get(key.toLowerCase(Locale.ROOT));
     }

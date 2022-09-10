@@ -9,7 +9,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -115,7 +114,6 @@ public class ItemUtils {
 		return true;
 	}
 
-	@Nullable
 	public static ItemStack addItemToInventory(Player player, ItemStack item) {
 		PlayerInventory inventory = player.getInventory();
 		int amountRemaining = item.getAmount();
@@ -170,8 +168,6 @@ public class ItemUtils {
 		return amountRemaining <= 0;
 	}
 
-
-	@Nullable
 	public static ItemStack parseItem(String name) {
 		Material material = Material.getMaterial(name);
 		if (material != null) {

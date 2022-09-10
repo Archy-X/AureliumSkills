@@ -14,7 +14,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -127,14 +126,9 @@ public class Modifiers extends NBTAPIUser {
     public void addLore(ModifierType type, ItemStack item, Stat stat, double value, Locale locale) {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            List<String> lore;
-            if (meta.getLore() != null) {
-                if (meta.getLore().size() > 0) lore = meta.getLore();
-                else lore = new LinkedList<>();
-            }
-            else {
-                lore = new LinkedList<>();
-            }
+            List<String> lore = meta.getLore();
+            if (lore == null)
+                lore = new ArrayList<>();
             CommandMessage message;
             if (value >= 0) {
                 message = CommandMessage.valueOf(type.name() + "_MODIFIER_ADD_LORE");
@@ -154,8 +148,10 @@ public class Modifiers extends NBTAPIUser {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             List<String> lore = meta.getLore();
-            if (lore != null && lore.size() > 0) lore.removeIf(line -> line.contains(stat.getDisplayName(locale)));
-            meta.setLore(lore);
+            if (lore != null) {
+                lore.removeIf(line -> line.contains(stat.getDisplayName(locale)));
+                meta.setLore(lore);
+            }
         }
         item.setItemMeta(meta);
     }

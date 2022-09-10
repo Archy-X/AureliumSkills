@@ -81,7 +81,7 @@ public class ForagingAbilities extends AbilityProvider implements Listener {
 				if (event.getPlayer().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
 					EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event.getPlayer().getLastDamageCause();
 					//If last damage was from player
-					if (e.getDamager() instanceof Player) {
+					if (e != null && e.getDamager() instanceof Player) {
 						Player player = (Player) e.getDamager();
 						if (blockAbility(player)) return;
 						//If damage was an attack

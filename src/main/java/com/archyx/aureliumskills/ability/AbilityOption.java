@@ -1,7 +1,6 @@
 package com.archyx.aureliumskills.ability;
 
 import com.archyx.aureliumskills.configuration.OptionValue;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
@@ -91,7 +90,6 @@ public class AbilityOption {
         return maxLevel;
     }
 
-    @Nullable
     public OptionValue getOption(String key) {
         return options.get(key);
     }

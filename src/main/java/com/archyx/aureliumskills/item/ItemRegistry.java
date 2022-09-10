@@ -5,7 +5,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +31,6 @@ public class ItemRegistry {
         items.remove(key);
     }
 
-    @Nullable
     public ItemStack getItem(String key) {
         ItemStack item = items.get(key);
         if (item != null) {

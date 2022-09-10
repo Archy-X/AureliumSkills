@@ -72,6 +72,8 @@ public class HealingAbilities extends AbilityProvider implements Listener {
         if (hostile) {
             if (entity.getKiller() == null) return;
             Player player = entity.getKiller();
+            if (player == null)
+                return;
             if (player.equals(entity)) return;
             if (blockAbility(player)) return;
             PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
@@ -151,6 +153,8 @@ public class HealingAbilities extends AbilityProvider implements Listener {
         if (VersionUtils.isAtLeastVersion(14, 4)) {
             return player.getAbsorptionAmount();
         } else {
+            Class<?> entityLivingClass = this.entityLivingClass;
+            Class<?> craftPlayerClass = this.craftPlayerClass;
             if (entityLivingClass == null) {
                 entityLivingClass = ReflectionUtils.getNMSClass("EntityLiving");
             }

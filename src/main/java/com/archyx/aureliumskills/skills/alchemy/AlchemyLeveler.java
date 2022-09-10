@@ -63,7 +63,9 @@ public class AlchemyLeveler extends SkillLeveler implements Listener {
 						if (player != null) {
 							if (blockXpGainLocation(event.getBlock().getLocation(), player)) return;
 							if (blockXpGainPlayer(player)) return;
-							addAlchemyXp(player, event.getContents().getIngredient().getType());
+							ItemStack item = event.getContents().getIngredient();
+							if (item != null)
+								addAlchemyXp(player, item.getType());
 						}
 					}
 				}
@@ -146,7 +148,10 @@ public class AlchemyLeveler extends SkillLeveler implements Listener {
 			if (OptionL.isEnabled(Skills.ALCHEMY)) {
 				if (event.getInventory().getHolder() != null) {
 					if (event.getInventory().getLocation() != null) {
-						Block block = event.getInventory().getLocation().getBlock();
+						Location location = event.getInventory().getLocation();
+						if (location == null)
+							return;
+						Block block = location.getBlock();
 						if (!block.hasMetadata("skillsBrewingStandOwner")) {
 							block.setMetadata("skillsBrewingStandOwner", new FixedMetadataValue(plugin, event.getPlayer().getUniqueId()));
 						}

@@ -18,11 +18,19 @@ public class BackToLevelProgressionItem extends BackItem {
 
     @Override
     public void onClick(Player player, InventoryClickEvent event, ItemStack item, SlotPos pos, ActiveMenu activeMenu) {
-        Skill skill = (Skill) activeMenu.getProperty("skill");
+        Skill skill = getSkill(activeMenu);
         PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
         if (playerData != null) {
             new LevelProgressionOpener(plugin).open(player, playerData, skill);
         }
+    }
+
+    private Skill getSkill(ActiveMenu activeMenu) {
+        Object property = activeMenu.getProperty("skill");
+        if (!(property instanceof Skill)) {
+            throw new IllegalArgumentException("Could not get menu skill property");
+        }
+        return (Skill) property;
     }
 
 }

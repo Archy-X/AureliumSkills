@@ -3,7 +3,6 @@ package com.archyx.aureliumskills.menus.contexts;
 import com.archyx.aureliumskills.AureliumSkills;
 import com.archyx.aureliumskills.skills.Skill;
 import com.archyx.slate.context.ContextProvider;
-import org.jetbrains.annotations.Nullable;
 
 public class SkillContext implements ContextProvider<Skill> {
 
@@ -13,7 +12,6 @@ public class SkillContext implements ContextProvider<Skill> {
         this.plugin = plugin;
     }
 
-    @Nullable
     @Override
     public Skill parse(String input) {
         return plugin.getSkillRegistry().getSkill(input);

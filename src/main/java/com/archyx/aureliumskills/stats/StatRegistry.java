@@ -1,7 +1,5 @@
 package com.archyx.aureliumskills.stats;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
@@ -23,7 +21,6 @@ public class StatRegistry {
         return stats.values();
     }
 
-    @Nullable
     public Stat getStat(String key) {
         return this.stats.get(key.toLowerCase(Locale.ROOT));
     }

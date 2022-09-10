@@ -1,7 +1,6 @@
 package com.archyx.aureliumskills.data;
 
 import com.archyx.aureliumskills.ability.AbstractAbility;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +19,6 @@ public class AbilityData {
         return ability;
     }
 
-    @Nullable
     public Object getData(String key) {
         return data.get(key);
     }

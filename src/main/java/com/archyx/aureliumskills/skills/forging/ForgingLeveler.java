@@ -8,6 +8,8 @@ import com.archyx.aureliumskills.leveler.SkillLeveler;
 import com.archyx.aureliumskills.skills.Skill;
 import com.archyx.aureliumskills.skills.Skills;
 import com.archyx.aureliumskills.util.item.ItemUtils;
+
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -62,8 +64,9 @@ public class ForgingLeveler extends SkillLeveler implements Listener {
 					if (event.getSlot() == 2) {
 						ItemStack addedItem = inventory.getItem(1);
 						ItemStack baseItem = inventory.getItem(0);
-						if (inventory.getLocation() != null) {
-							if (blockXpGainLocation(inventory.getLocation(), player)) return;
+						Location location = inventory.getLocation();
+						if (location != null) {
+							if (blockXpGainLocation(location, player)) return;
 						} else {
 							if (blockXpGainLocation(event.getWhoClicked().getLocation(), player)) return;
 						}
@@ -87,8 +90,9 @@ public class ForgingLeveler extends SkillLeveler implements Listener {
 					}
 				} else if (inventory.getType().toString().equals("GRINDSTONE")) {
 					if (event.getSlotType() != InventoryType.SlotType.RESULT) return;
-					if (inventory.getLocation() != null) {
-						if (blockXpGainLocation(inventory.getLocation(), player)) return;
+					Location location = inventory.getLocation();
+					if (location != null) {
+						if (blockXpGainLocation(location, player)) return;
 					} else {
 						if (blockXpGainLocation(event.getWhoClicked().getLocation(), player)) return;
 					}
@@ -115,11 +119,12 @@ public class ForgingLeveler extends SkillLeveler implements Listener {
 			}
 			if (item.getItemMeta() instanceof EnchantmentStorageMeta) {
 				EnchantmentStorageMeta esm = (EnchantmentStorageMeta) item.getItemMeta();
-				for (Map.Entry<Enchantment, Integer> entry : esm.getStoredEnchants().entrySet()) {
-					if (isDisenchantable(entry.getKey())) {
-						totalLevel += entry.getValue();
+				if (esm != null)
+					for (Map.Entry<Enchantment, Integer> entry : esm.getStoredEnchants().entrySet()) {
+						if (isDisenchantable(entry.getKey())) {
+							totalLevel += entry.getValue();
+						}
 					}
-				}
 			}
 		}
 		return totalLevel;

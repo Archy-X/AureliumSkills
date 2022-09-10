@@ -4,6 +4,8 @@ import com.archyx.aureliumskills.AureliumSkills;
 import com.archyx.aureliumskills.lang.CommandMessage;
 import com.archyx.aureliumskills.lang.Lang;
 import com.archyx.aureliumskills.stats.Luck;
+import com.archyx.aureliumskills.support.WorldGuardSupport;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -48,8 +50,9 @@ public class ReloadManager {
         plugin.getLootTableManager().loadLootTables();
         // Load worlds and regions
         plugin.getWorldManager().loadWorlds();
-        if (plugin.isWorldGuardEnabled()) {
-            plugin.getWorldGuardSupport().loadRegions();
+        WorldGuardSupport worldGuardSupport = plugin.getWorldGuardSupport();
+        if (plugin.isWorldGuardEnabled() && worldGuardSupport != null) {
+            worldGuardSupport.loadRegions();
         }
         // Recalculate health and luck stats
         Luck luck = new Luck(plugin);

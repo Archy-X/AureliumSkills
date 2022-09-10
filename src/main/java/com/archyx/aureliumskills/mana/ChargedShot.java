@@ -27,7 +27,7 @@ import java.util.Locale;
 public class ChargedShot extends ManaAbilityProvider {
 
     public ChargedShot(AureliumSkills plugin) {
-        super(plugin, MAbility.CHARGED_SHOT, ManaAbilityMessage.CHARGED_SHOT_SHOOT, null);
+        super(plugin, MAbility.CHARGED_SHOT, ManaAbilityMessage.CHARGED_SHOT_SHOOT, ManaAbilityMessage.NONE);
         tickChargedShotCooldown();
     }
 

@@ -7,7 +7,6 @@ import com.archyx.aureliumskills.source.Source;
 import com.archyx.aureliumskills.util.item.ItemUtils;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.Nullable;
 
 public enum SorcerySource implements Source, BlockSource {
 
@@ -47,7 +46,6 @@ public enum SorcerySource implements Source, BlockSource {
         return ItemUtils.parseItem(material);
     }
 
-    @Nullable
     public static SorcerySource getSource(Block block) {
         for (SorcerySource source : values()) {
             if (source.isMatch(block)) {

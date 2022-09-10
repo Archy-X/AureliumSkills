@@ -7,6 +7,8 @@ import com.archyx.aureliumskills.configuration.OptionL;
 import com.archyx.aureliumskills.leveler.Leveler;
 import com.archyx.aureliumskills.leveler.SkillLeveler;
 import com.archyx.aureliumskills.skills.Skills;
+
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -35,11 +37,14 @@ public class FishingLeveler extends SkillLeveler implements Listener {
 				Player player = event.getPlayer();
 				if (blockXpGain(player)) return;
 				if (event.getCaught() instanceof Item) {
-					ItemStack item = ((Item) event.getCaught()).getItemStack();
-					Leveler leveler = plugin.getLeveler();
-					FishingSource source = FishingSource.valueOf(item);
-					if (source != null) {
-						leveler.addXp(player, Skills.FISHING, getXp(player, source));
+					Entity caught = event.getCaught();
+					if (caught != null) {
+						ItemStack item = ((Item) caught).getItemStack();
+						Leveler leveler = plugin.getLeveler();
+						FishingSource source = FishingSource.valueOf(item);
+						if (source != null) {
+							leveler.addXp(player, Skills.FISHING, getXp(player, source));
+						}
 					}
 				}
 			}

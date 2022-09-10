@@ -69,7 +69,10 @@ public class Health implements Listener {
 					setHealth(player);
 					if (plugin.getWorldManager().isDisabledWorld(event.getFrom()) && !plugin.getWorldManager().isInDisabledWorld(player.getLocation())) {
 						if (worldChangeHealth.containsKey(player.getUniqueId())) {
-							player.setHealth(worldChangeHealth.get(player.getUniqueId()));
+							Double health = worldChangeHealth.get(player.getUniqueId());
+							if (health == null)
+								throw new IllegalStateException("Invalid player index key for: " + player.getName());
+							player.setHealth(health);
 							worldChangeHealth.remove(player.getUniqueId());
 						}
 					}
@@ -79,7 +82,10 @@ public class Health implements Listener {
 			setHealth(player);
 			if (plugin.getWorldManager().isDisabledWorld(event.getFrom()) && !plugin.getWorldManager().isInDisabledWorld(player.getLocation())) {
 				if (worldChangeHealth.containsKey(player.getUniqueId())) {
-					player.setHealth(worldChangeHealth.get(player.getUniqueId()));
+					Double health = worldChangeHealth.get(player.getUniqueId());
+					if (health == null)
+						throw new IllegalStateException("Invalid player index key for: " + player.getName());
+					player.setHealth(health);
 					worldChangeHealth.remove(player.getUniqueId());
 				}
 			}
@@ -148,7 +154,9 @@ public class Health implements Listener {
 			player.setHealthScaled(true);
 			int scaledHearts = 0;
 			for (Integer heartNum : hearts.keySet()) {
-				double healthNum = hearts.get(heartNum);
+				Double healthNum = hearts.get(heartNum);
+				if (healthNum == null)
+					throw new IllegalStateException("Invalid heart index key [" + heartNum + "] for player: " + player.getName());
 				if (health >= healthNum) {
 					if (heartNum > scaledHearts) {
 						scaledHearts = heartNum;

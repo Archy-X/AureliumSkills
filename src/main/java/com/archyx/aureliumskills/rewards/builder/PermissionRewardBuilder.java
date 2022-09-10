@@ -3,7 +3,8 @@ package com.archyx.aureliumskills.rewards.builder;
 import com.archyx.aureliumskills.AureliumSkills;
 import com.archyx.aureliumskills.rewards.PermissionReward;
 import com.archyx.aureliumskills.rewards.Reward;
-import com.archyx.aureliumskills.util.misc.Validate;
+
+import java.util.Objects;
 
 public class PermissionRewardBuilder extends MessagedRewardBuilder {
 
@@ -27,7 +28,7 @@ public class PermissionRewardBuilder extends MessagedRewardBuilder {
 
     @Override
     public Reward build() {
-        Validate.notNull(permission, "You must specify a permission");
+        Objects.requireNonNull(permission, "You must specify a permission");
         return new PermissionReward(plugin, menuMessage, chatMessage, permission, value);
     }
     

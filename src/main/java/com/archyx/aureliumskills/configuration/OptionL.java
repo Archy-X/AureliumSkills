@@ -99,27 +99,45 @@ public class OptionL {
     }
 
     public static double getDouble(Option option) {
-        return options.get(option).asDouble();
+        OptionValue value = options.get(option);
+        if (value == null)
+            throw new IllegalStateException("Invalid or missing configuration option: " + option.getPath());
+        return value.asDouble();
     }
 
     public static int getInt(Option option) {
-        return options.get(option).asInt();
+        OptionValue value = options.get(option);
+        if (value == null)
+            throw new IllegalStateException("Invalid or missing configuration option: " + option.getPath());
+        return value.asInt();
     }
 
     public static boolean getBoolean(Option option) {
-        return options.get(option).asBoolean();
+        OptionValue value = options.get(option);
+        if (value == null)
+            throw new IllegalStateException("Invalid or missing configuration option: " + option.getPath());
+        return value.asBoolean();
     }
 
     public static String getString(Option option) {
-        return options.get(option).asString();
+        OptionValue value = options.get(option);
+        if (value == null)
+            throw new IllegalStateException("Invalid or missing configuration option: " + option.getPath());
+        return value.asString();
     }
 
     public static List<String> getList(Option option) {
-        return options.get(option).asList();
+        OptionValue value = options.get(option);
+        if (value == null)
+            throw new IllegalStateException("Invalid or missing configuration option: " + option.getPath());
+        return value.asList();
     }
 
     public static ChatColor getColor(Option option) {
-        return options.get(option).asColor();
+        OptionValue value = options.get(option);
+        if (value == null)
+            throw new IllegalStateException("Invalid or missing configuration option: " + option.getPath());
+        return value.asColor();
     }
 
     public static boolean isEnabled(Skill skill) {

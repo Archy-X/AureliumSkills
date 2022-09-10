@@ -7,7 +7,6 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import org.bukkit.Bukkit;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -21,7 +20,6 @@ public class WorldGuardFlags {
         this.stateFlags = new HashMap<>();
     }
 
-    @Nullable
     public StateFlag getStateFlag(FlagKey flagKey) {
         return stateFlags.get(flagKey);
     }

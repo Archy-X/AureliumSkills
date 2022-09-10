@@ -64,7 +64,7 @@ public class SkillsCommand extends BaseCommand {
 			player.sendMessage(Lang.getMessage(CommandMessage.NO_PROFILE, Lang.getDefaultLanguage()));
 		}
 	}
-	
+
 	@Subcommand("xp add")
 	@CommandCompletion("@players @skills")
 	@CommandPermission("aureliumskills.xp.add")
@@ -402,10 +402,10 @@ public class SkillsCommand extends BaseCommand {
 	@Description("Resets all skills or a specific skill to level 1 for a player.")
 	public void onSkillReset(CommandSender sender, @Flags("other") Player player, @Optional Skill skill) {
 		Locale locale = plugin.getLang().getLocale(sender);
+		PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+		if (playerData == null) return;
 		if (skill != null) {
 			if (OptionL.isEnabled(skill)) {
-				PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
-				if (playerData == null) return;
 				resetPlayerSkills(player, playerData, skill);
 				// Reload items and armor to check for newly met requirements
 				this.plugin.getModifierManager().reloadPlayer(player);
@@ -417,9 +417,8 @@ public class SkillsCommand extends BaseCommand {
 			}
 		}
 		else {
-			PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
-			if (playerData == null) return;
 			for (Skill s : plugin.getSkillRegistry().getSkills()) {
+			playerData.clearInvalidItems();
 				resetPlayerSkills(player, playerData, s);
 			}
 			sender.sendMessage(AureliumSkills.getPrefix(locale) + Lang.getMessage(CommandMessage.SKILL_RESET_RESET_ALL, locale)
@@ -539,12 +538,16 @@ public class SkillsCommand extends BaseCommand {
 				message = new StringBuilder(StatModifier.applyPlaceholders(Lang.getMessage(CommandMessage.MODIFIER_LIST_ALL_STATS_HEADER, locale), player));
 				for (String key : playerData.getStatModifiers().keySet()) {
 					StatModifier modifier = playerData.getStatModifiers().get(key);
+					if (modifier == null)
+						throw new IllegalStateException("Invalid stat modifier index key: " + key);
 					message.append("\n").append(StatModifier.applyPlaceholders(Lang.getMessage(CommandMessage.MODIFIER_LIST_ALL_STATS_ENTRY, locale), modifier, player, locale));
 				}
 			} else {
 				message = new StringBuilder(StatModifier.applyPlaceholders(Lang.getMessage(CommandMessage.MODIFIER_LIST_ONE_STAT_HEADER, locale), stat, player, locale));
 				for (String key : playerData.getStatModifiers().keySet()) {
 					StatModifier modifier = playerData.getStatModifiers().get(key);
+					if (modifier == null)
+						throw new IllegalStateException("Invalid stat modifier index key: " + key);
 					if (modifier.getStat() == stat) {
 						message.append("\n").append(StatModifier.applyPlaceholders(Lang.getMessage(CommandMessage.MODIFIER_LIST_ONE_STAT_ENTRY, locale), modifier, player, locale));
 					}
@@ -589,9 +592,12 @@ public class SkillsCommand extends BaseCommand {
 					toRemove.add(key);
 					removed++;
 				}
-				else if (playerData.getStatModifiers().get(key).getStat() == stat) {
-					toRemove.add(key);
-					removed++;
+				else {
+					StatModifier modifier = playerData.getStatModifiers().get(key);
+					if (modifier.getStat() == stat) {
+						toRemove.add(key);
+						removed++;
+					}
 				}
 			}
 			for (String key : toRemove) {
@@ -1031,11 +1037,9 @@ public class SkillsCommand extends BaseCommand {
 	@CommandPermission("aureliumskills.backup.save")
 	public void onBackupSave(CommandSender sender) {
 		BackupProvider backupProvider = plugin.getBackupProvider();
-		if (backupProvider != null) {
-			Locale locale = plugin.getLang().getLocale(sender);
-			sender.sendMessage(AureliumSkills.getPrefix(locale) + Lang.getMessage(CommandMessage.BACKUP_SAVE_SAVING, locale));
-			backupProvider.saveBackup(sender, true);
-		}
+		Locale locale = plugin.getLang().getLocale(sender);
+		sender.sendMessage(AureliumSkills.getPrefix(locale) + Lang.getMessage(CommandMessage.BACKUP_SAVE_SAVING, locale));
+		backupProvider.saveBackup(sender, true);
 	}
 
 	@Subcommand("backup load")
@@ -1043,40 +1047,32 @@ public class SkillsCommand extends BaseCommand {
 	public void onBackupLoad(CommandSender sender, String fileName) {
 		StorageProvider storageProvider = plugin.getStorageProvider();
 		Locale locale = plugin.getLang().getLocale(sender);
-		if (storageProvider != null) {
-			File file = new File(plugin.getDataFolder() + "/backups/" + fileName);
-			if (file.exists()) {
-				if (file.getName().endsWith(".yml")) {
-					// Require player to double type command
-					if (sender instanceof Player) {
-						PlayerData playerData = plugin.getPlayerManager().getPlayerData((Player) sender);
-						if (playerData == null) return;
-						Object typed = playerData.getMetadata().get("backup_command");
-						if (typed != null) {
-							if (typed instanceof String) {
-								String typedFile = (String) typed;
-								if (typedFile.equals(file.getName())) {
-									sender.sendMessage(AureliumSkills.getPrefix(locale) + Lang.getMessage(CommandMessage.BACKUP_LOAD_LOADING, locale));
-									storageProvider.loadBackup(YamlConfiguration.loadConfiguration(file), sender);
-									playerData.getMetadata().remove("backup_command");
-								} else {
-									backupLoadConfirm(playerData, sender, file);
-								}
-							} else {
-								backupLoadConfirm(playerData, sender, file);
-							}
+		File file = new File(plugin.getDataFolder() + "/backups/" + fileName);
+		if (file.exists()) {
+			if (file.getName().endsWith(".yml")) {
+				// Require player to double type command
+				if (sender instanceof Player) {
+					PlayerData playerData = plugin.getPlayerManager().getPlayerData((Player) sender);
+					if (playerData == null) return;
+					Object typed = playerData.getMetadata().get("backup_command");
+					if (typed instanceof String) {
+						String typedFile = (String) typed;
+						if (typedFile.equals(file.getName())) {
+							sender.sendMessage(AureliumSkills.getPrefix(locale) + Lang.getMessage(CommandMessage.BACKUP_LOAD_LOADING, locale));
+							storageProvider.loadBackup(YamlConfiguration.loadConfiguration(file), sender);
+							playerData.getMetadata().remove("backup_command");
 						} else {
 							backupLoadConfirm(playerData, sender, file);
 						}
 					} else {
-						sender.sendMessage(AureliumSkills.getPrefix(locale) + Lang.getMessage(CommandMessage.BACKUP_LOAD_LOADING, locale));
-						storageProvider.loadBackup(YamlConfiguration.loadConfiguration(file), sender);
+						backupLoadConfirm(playerData, sender, file);
 					}
 				} else {
-					sender.sendMessage(AureliumSkills.getPrefix(locale) + Lang.getMessage(CommandMessage.BACKUP_LOAD_MUST_BE_YAML, locale));
+					sender.sendMessage(AureliumSkills.getPrefix(locale) + Lang.getMessage(CommandMessage.BACKUP_LOAD_LOADING, locale));
+					storageProvider.loadBackup(YamlConfiguration.loadConfiguration(file), sender);
 				}
-			} else { // If file does not exist
-				sender.sendMessage(AureliumSkills.getPrefix(locale) + Lang.getMessage(CommandMessage.BACKUP_LOAD_FILE_NOT_FOUND, locale));
+			} else {
+				sender.sendMessage(AureliumSkills.getPrefix(locale) + Lang.getMessage(CommandMessage.BACKUP_LOAD_MUST_BE_YAML, locale));
 			}
 		}
 	}
@@ -1261,8 +1257,9 @@ public class SkillsCommand extends BaseCommand {
 		Multipliers multipliers = new Multipliers(plugin);
 		for (Multiplier multiplier : multipliers.getMultipliers(ModifierType.ITEM, item)) {
 			String targetName;
-			if (multiplier.getSkill() != null) {
-				targetName = multiplier.getSkill().getDisplayName(locale);
+			Skill skill = multiplier.getSkill();
+			if (skill != null) {
+				targetName = skill.getDisplayName(locale);
 			} else {
 				targetName = Lang.getMessage(CommandMessage.MULTIPLIER_GLOBAL, locale);
 			}
@@ -1376,8 +1373,9 @@ public class SkillsCommand extends BaseCommand {
 		Multipliers multipliers = new Multipliers(plugin);
 		for (Multiplier multiplier : multipliers.getMultipliers(ModifierType.ARMOR, item)) {
 			String targetName;
-			if (multiplier.getSkill() != null) {
-				targetName = multiplier.getSkill().getDisplayName(locale);
+			Skill skill = multiplier.getSkill();
+			if (skill != null) {
+				targetName = skill.getDisplayName(locale);
 			} else {
 				targetName = Lang.getMessage(CommandMessage.MULTIPLIER_GLOBAL, locale);
 			}

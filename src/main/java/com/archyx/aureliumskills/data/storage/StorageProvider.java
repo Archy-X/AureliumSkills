@@ -15,6 +15,7 @@ import com.archyx.aureliumskills.skills.Skills;
 import com.archyx.aureliumskills.stats.Stat;
 import com.archyx.aureliumskills.stats.StatLeveler;
 import com.archyx.aureliumskills.stats.Stats;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -62,9 +63,14 @@ public abstract class StorageProvider {
         }
         // Apply to object if in memory
         for (Skill skill : Skills.values()) {
-            int level = levels.get(skill);
+            Integer level = levels.get(skill);
+            if (level == null)
+                throw new IllegalStateException("Invalid level for skill index key: " + skill.name());
             playerData.setSkillLevel(skill, level);
-            playerData.setSkillXp(skill, xpLevels.get(skill));
+            Double xpLevel = xpLevels.get(skill);
+            if (xpLevel == null)
+                throw new IllegalStateException("Invalid experience level for skill index key: " + skill.name());
+            playerData.setSkillXp(skill, xpLevel);
             // Add stat levels
             plugin.getRewardManager().getRewardTable(skill).applyStats(playerData, level);
         }
@@ -106,8 +112,10 @@ public abstract class StorageProvider {
                 double xp = playerData.getSkillXp(skill);
                 // Add to lists
                 SkillValue skillLevel = new SkillValue(id, level, xp);
-                leaderboards.get(skill).add(skillLevel);
-
+                List<SkillValue> skillList = leaderboards.get(skill);
+                if (skillList == null)
+                    throw new IllegalStateException("Invalid skill leaderboard skill index key: " + skill);
+                skillList.add(skillLevel);
                 if (OptionL.isEnabled(skill)) {
                     powerLevel += level;
                     powerXp += xp;

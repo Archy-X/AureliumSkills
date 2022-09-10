@@ -14,7 +14,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
-
 public class MiningLeveler extends SkillLeveler implements Listener {
 
 	private final MiningAbilities miningAbilities;

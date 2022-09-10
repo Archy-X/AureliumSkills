@@ -28,7 +28,7 @@ import java.util.Locale;
 public class SharpHook extends ManaAbilityProvider {
 
     public SharpHook(AureliumSkills plugin) {
-        super(plugin, MAbility.SHARP_HOOK, ManaAbilityMessage.SHARP_HOOK_USE, null);
+        super(plugin, MAbility.SHARP_HOOK, ManaAbilityMessage.SHARP_HOOK_USE, ManaAbilityMessage.NONE);
     }
 
     @Override

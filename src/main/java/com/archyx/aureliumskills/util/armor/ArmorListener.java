@@ -3,6 +3,7 @@ package com.archyx.aureliumskills.util.armor;
 import com.archyx.aureliumskills.util.armor.ArmorEquipEvent.EquipMethod;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
@@ -14,6 +15,7 @@ import org.bukkit.event.inventory.*;
 import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemBreakEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -65,7 +67,10 @@ public class ArmorListener implements Listener{
             numberkey = true;
         }
         if(e.getSlotType() != SlotType.ARMOR && e.getSlotType() != SlotType.QUICKBAR && e.getSlotType() != SlotType.CONTAINER) return;
-        if(e.getClickedInventory() != null && !e.getClickedInventory().getType().equals(InventoryType.PLAYER)) return;
+        Inventory inventory = e.getClickedInventory();
+        if (inventory == null)
+            return;
+        if(!inventory.getType().equals(InventoryType.PLAYER)) return;
         if (!e.getInventory().getType().equals(InventoryType.CRAFTING) && !e.getInventory().getType().equals(InventoryType.PLAYER)) return;
         if(!(e.getWhoClicked() instanceof Player)) return;
         ArmorType newArmorType = ArmorType.matchType(shift ? e.getCurrentItem() : e.getCursor());
@@ -92,16 +97,16 @@ public class ArmorListener implements Listener{
             ItemStack newArmorPiece = e.getCursor();
             ItemStack oldArmorPiece = e.getCurrentItem();
             if(numberkey){
-                if(e.getClickedInventory().getType().equals(InventoryType.PLAYER)){// Prevents shit in the 2by2 crafting
+                if(inventory.getType().equals(InventoryType.PLAYER)){// Prevents shit in the 2by2 crafting
                     // e.getClickedInventory() == The players inventory
                     // e.getHotBarButton() == key people are pressing to equip or unequip the item to or from.
                     // e.getRawSlot() == The slot the item is going to.
                     // e.getSlot() == Armor slot, can't use e.getRawSlot() as that gives a hotbar slot ;-;
-                    ItemStack hotbarItem = e.getClickedInventory().getItem(e.getHotbarButton());
+                    ItemStack hotbarItem = inventory.getItem(e.getHotbarButton());
                     if(!isAirOrNull(hotbarItem)){// Equipping
                         newArmorType = ArmorType.matchType(hotbarItem);
                         newArmorPiece = hotbarItem;
-                        oldArmorPiece = e.getClickedInventory().getItem(e.getSlot());
+                        oldArmorPiece = inventory.getItem(e.getSlot());
                     }else{// Unequipping
                         newArmorType = ArmorType.matchType(!isAirOrNull(e.getCurrentItem()) ? e.getCurrentItem() : e.getCursor());
                     }
@@ -134,7 +139,10 @@ public class ArmorListener implements Listener{
         if(e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK){
             Player player = e.getPlayer();
             if (e.getItem() != null) {
-                Material mat = e.getItem().getType();
+                ItemStack itemStack = e.getItem();
+                if (itemStack == null)
+                    return;
+                Material mat = itemStack.getType();
                 if (mat.name().endsWith("_HEAD") || mat.name().endsWith("_SKULL") || mat.name().endsWith("SKULL_ITEM")) {
                     return;
                 }
@@ -142,7 +150,10 @@ public class ArmorListener implements Listener{
             if(!e.useInteractedBlock().equals(Result.DENY)){
                 if(e.getClickedBlock() != null && e.getAction() == Action.RIGHT_CLICK_BLOCK && !player.isSneaking()){// Having both of these checks is useless, might as well do it though.
                     // Some blocks have actions when you right click them which stops the client from equipping the armor in hand.
-                    Material mat = e.getClickedBlock().getType();
+                    Block clickedBlock = e.getClickedBlock();
+                    if (clickedBlock == null)
+                        return;
+                    Material mat = clickedBlock.getType();
                     for (String s : blockedMaterials){
                         String[] split = s.split("!");
                         String checked = split[0];

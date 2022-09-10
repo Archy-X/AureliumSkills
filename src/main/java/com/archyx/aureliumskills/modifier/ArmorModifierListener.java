@@ -73,24 +73,24 @@ public class ArmorModifierListener implements Listener {
         PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
         if (playerData != null) {
             // Equip
-            if (event.getNewArmorPiece() != null && event.getNewArmorPiece().getType() != Material.AIR) {
-                ItemStack item = event.getNewArmorPiece();
-                if (requirements.meetsRequirements(ModifierType.ARMOR, item, player)) {
-                    for (StatModifier modifier : modifiers.getModifiers(ModifierType.ARMOR, item)) {
+            ItemStack armorPiece = event.getNewArmorPiece();
+            if (armorPiece != null && armorPiece.getType() != Material.AIR) {
+                if (requirements.meetsRequirements(ModifierType.ARMOR, armorPiece, player)) {
+                    for (StatModifier modifier : modifiers.getModifiers(ModifierType.ARMOR, armorPiece)) {
                         playerData.addStatModifier(modifier);
                     }
-                    for (Multiplier multiplier : multipliers.getMultipliers(ModifierType.ARMOR, item)) {
+                    for (Multiplier multiplier : multipliers.getMultipliers(ModifierType.ARMOR, armorPiece)) {
                         playerData.addMultiplier(multiplier);
                     }
                 }
             }
             // Un-equip
-            if (event.getOldArmorPiece() != null && event.getOldArmorPiece().getType() != Material.AIR) {
-                ItemStack item = event.getOldArmorPiece();
-                for (StatModifier modifier : modifiers.getModifiers(ModifierType.ARMOR, item)) {
+            armorPiece = event.getOldArmorPiece();
+            if (armorPiece != null && armorPiece.getType() != Material.AIR) {
+                for (StatModifier modifier : modifiers.getModifiers(ModifierType.ARMOR, armorPiece)) {
                     playerData.removeStatModifier(modifier.getName());
                 }
-                for (Multiplier multiplier : multipliers.getMultipliers(ModifierType.ARMOR, item)) {
+                for (Multiplier multiplier : multipliers.getMultipliers(ModifierType.ARMOR, armorPiece)) {
                     playerData.removeMultiplier(multiplier.getName());
                 }
             }
@@ -116,6 +116,7 @@ public class ArmorModifierListener implements Listener {
                         } else if (stored.equals(wearing)) { // Don't check if stored and wearing are the same item
                             continue;
                         }
+                        assert (null != stored);
 
                         Set<Stat> statsToReload = new HashSet<>();
                         // Remove modifiers and multipliers that are on stored item from player

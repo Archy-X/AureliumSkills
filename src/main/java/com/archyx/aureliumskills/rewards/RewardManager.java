@@ -60,7 +60,7 @@ public class RewardManager {
         levelsLoaded += loadLevels(globalTable, globalConfig, globalFile);
         // Apply global rewards table to each skill reward table
         for (Map.Entry<Integer, List<Reward>> entry : globalTable.getRewardsMap().entrySet()) {
-            int level = entry.getKey();
+            Integer level = entry.getKey();
             List<Reward> rewards = entry.getValue();
             for (Skill skill : plugin.getSkillRegistry().getSkills()) {
                 RewardTable rewardTable = this.rewardTables.get(skill);

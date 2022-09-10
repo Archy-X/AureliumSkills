@@ -129,10 +129,14 @@ public enum MenuMessage implements MessageKey {
         } else if (section == 7) {
             this.path = "menus.abilities." + key;
         }
+        else
+            throw new IndexOutOfBoundsException();
     }
 
     @Override
     public String getPath() {
+        assert (null != path);
+        
         return path;
     }
 }

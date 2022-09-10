@@ -3,7 +3,6 @@ package com.archyx.aureliumskills.api.event;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.NotNull;
 
 public class ManaRegenerateEvent extends Event {
 
@@ -39,7 +38,6 @@ public class ManaRegenerateEvent extends Event {
         this.isCancelled = cancelled;
     }
 
-    @NotNull
     @Override
     public HandlerList getHandlers() {
         return handlers;

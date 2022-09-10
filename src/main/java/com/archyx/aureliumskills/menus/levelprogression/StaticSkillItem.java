@@ -17,11 +17,17 @@ public class StaticSkillItem extends AbstractSkillItem {
 
     @Override
     public Set<Skill> getDefinedContexts(Player player, ActiveMenu activeMenu) {
-        Object property = activeMenu.getProperty("skill");
-        Skill skill = (Skill) property;
         Set<Skill> skills = new HashSet<>();
-        skills.add(skill);
+        skills.add(getSkill(activeMenu));
         return skills;
+    }
+
+    private Skill getSkill(ActiveMenu activeMenu) {
+        Object property = activeMenu.getProperty("skill");
+        if (!(property instanceof Skill)) {
+            throw new IllegalArgumentException("Could not get menu skill property");
+        }
+        return (Skill) property;
     }
 
 }

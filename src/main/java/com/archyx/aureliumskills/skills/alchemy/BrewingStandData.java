@@ -16,7 +16,10 @@ public class BrewingStandData {
     }
 
     public boolean isSlotBrewed(int slot) {
-        return potionSlots.getOrDefault(slot, false);
+        Boolean isBrewed = potionSlots.get(slot);
+        if (isBrewed == null)
+            throw new IndexOutOfBoundsException();
+        return isBrewed;
     }
 
     public void setSlotBrewed(int slot, boolean isSlotBrewed) {

@@ -73,7 +73,6 @@ public class Requirements extends NBTAPIUser {
         return requirements;
     }
 
-
     public ItemStack addRequirement(ModifierType type, ItemStack item, Skill skill, int level) {
         if (isNBTDisabled()) return item;
         NBTItem nbtItem = new NBTItem(item);
@@ -139,9 +138,7 @@ public class Requirements extends NBTAPIUser {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             String text = TextUtil.replace(Lang.getMessage(CommandMessage.valueOf(type.name() + "_REQUIREMENT_ADD_LORE"), locale), "{skill}", skill.getDisplayName(locale), "{level}", String.valueOf(level));
-            List<String> lore;
-            if (meta.hasLore()) lore = meta.getLore();
-            else lore = new ArrayList<>();
+            List<String> lore = meta.getLore();
             if (lore != null) {
                 lore.add(text);
                 meta.setLore(lore);

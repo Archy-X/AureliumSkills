@@ -6,7 +6,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +49,6 @@ public class EntityData extends Parser {
      * @param location The location to spawn
      * @return The Entity spawned, null if the location does not have a World
      */
-    @Nullable
     public Entity spawn(Location location) {
         // Spawn entity
         World world = location.getWorld();

@@ -28,7 +28,7 @@ public class AbilitiesItem extends AbstractItem implements SingleItemProvider {
     }
 
     @Override
-    public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu menu, PlaceholderType type) {
+    public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu, PlaceholderType type) {
         Locale locale = plugin.getLang().getLocale(player);
         switch (placeholder) {
             case "abilities":
@@ -36,7 +36,7 @@ public class AbilitiesItem extends AbstractItem implements SingleItemProvider {
             case "abilities_desc":
                 return Lang.getMessage(MenuMessage.ABILITIES_DESC, locale);
             case "abilities_click":
-                Skill skill = (Skill) menu.getProperty("skill");
+                Skill skill = getSkill(activeMenu);
                 return TextUtil.replace(Lang.getMessage(MenuMessage.ABILITIES_CLICK, locale), "{skill}", skill.getDisplayName(locale));
         }
         return placeholder;
@@ -45,14 +45,14 @@ public class AbilitiesItem extends AbstractItem implements SingleItemProvider {
     @Override
     public void onClick(Player player, InventoryClickEvent event, ItemStack item, SlotPos pos, ActiveMenu activeMenu) {
         Map<String, Object> properties = new HashMap<>();
-        properties.put("skill", activeMenu.getProperty("skill"));
+        properties.put("skill", getSkill(activeMenu));
         properties.put("previous_menu", "level_progression");
         plugin.getMenuManager().openMenu(player, "abilities", properties);
     }
 
     @Override
     public ItemStack onItemModify(ItemStack baseItem, Player player, ActiveMenu activeMenu) {
-        Skill skill = (Skill) activeMenu.getProperty("skill");
+        Skill skill = getSkill(activeMenu);
         if (skill == Skills.SORCERY) { // Disable for sorcery abilities REMOVE ONCE SORCERY ABILITIES ARE ADDED
             return null;
         }
@@ -66,8 +66,16 @@ public class AbilitiesItem extends AbstractItem implements SingleItemProvider {
         }
         if (hasEnabledAbility) {
             return baseItem;
-        } else {
-            return null; // Don't show item if no abilities are enabled
         }
+        return null; // Don't show item if no abilities are enabled
     }
+
+    private Skill getSkill(ActiveMenu activeMenu) {
+        Object property = activeMenu.getProperty("skill");
+        if (!(property instanceof Skill)) {
+            throw new IllegalArgumentException("Could not get menu skill property");
+        }
+        return (Skill) property;
+    }
+
 }

@@ -68,8 +68,10 @@ public class YamlStorageProvider extends StorageProvider {
                             double value = modifierEntry.getDouble("value");
                             if (name != null && statName != null) {
                                 Stat stat = plugin.getStatRegistry().getStat(statName);
-                                StatModifier modifier = new StatModifier(name, stat, value);
-                                playerData.addStatModifier(modifier);
+                                if (stat != null) {
+                                    StatModifier modifier = new StatModifier(name, stat, value);
+                                    playerData.addStatModifier(modifier);
+                                }
                             }
                         }
                     }
@@ -91,6 +93,8 @@ public class YamlStorageProvider extends StorageProvider {
                                 AbilityData abilityData = playerData.getAbilityData(ability);
                                 for (String key : abilityEntry.getKeys(false)) {
                                     Object value = abilityEntry.get(key);
+                                    if (value == null)
+                                        throw new IllegalStateException("Invalid configuration index key: " + key);
                                     abilityData.setData(key, value);
                                 }
                             }
@@ -125,8 +129,8 @@ public class YamlStorageProvider extends StorageProvider {
             } catch (Exception e) {
                 Bukkit.getLogger().warning("There was an error loading player data for player " + player.getName() + " with UUID " + player.getUniqueId() + ", see below for details.");
                 e.printStackTrace();
-                PlayerData data = createNewPlayer(player);
-                data.setShouldSave(false);
+                PlayerData newPlayerData = createNewPlayer(player);
+                newPlayerData.setShouldSave(false);
                 sendErrorMessageToPlayer(player, e);
             }
         } else {
@@ -179,7 +183,7 @@ public class YamlStorageProvider extends StorageProvider {
             // Save unclaimed items
             List<KeyIntPair> unclaimedItems = playerData.getUnclaimedItems();
             config.set("unclaimed_items", null);
-            if (unclaimedItems != null && unclaimedItems.size() > 0) {
+            if (unclaimedItems.size() > 0) {
                 List<String> stringList = new ArrayList<>();
                 for (KeyIntPair unclaimedItem : unclaimedItems) {
                     stringList.add(unclaimedItem.getKey() + " " + unclaimedItem.getValue());
@@ -228,7 +232,11 @@ public class YamlStorageProvider extends StorageProvider {
                 }
                 sender.sendMessage(AureliumSkills.getPrefix(locale) + Lang.getMessage(CommandMessage.BACKUP_LOAD_LOADED, locale));
             } catch (Exception e) {
-                sender.sendMessage(AureliumSkills.getPrefix(locale) + TextUtil.replace(Lang.getMessage(CommandMessage.BACKUP_LOAD_ERROR, locale), "{error}", e.getMessage()));
+                String message = Lang.getMessage(CommandMessage.BACKUP_LOAD_ERROR, locale);
+                String m = e.getMessage();
+                if (m != null)
+                    message = TextUtil.replace(m, "{error}", m);
+                sender.sendMessage(AureliumSkills.getPrefix(locale) + message);
             }
         }
     }
@@ -268,7 +276,10 @@ public class YamlStorageProvider extends StorageProvider {
                                     double xp = config.getDouble(path + "xp");
                                     // Add to lists
                                     SkillValue skillLevel = new SkillValue(id, level, xp);
-                                    leaderboards.get(skill).add(skillLevel);
+                                    List<SkillValue> skillList = leaderboards.get(skill);
+                                    if (skillList == null)
+                                        throw new IllegalStateException("Invalid skill leaderboard skill index key: " + skill);
+                                    skillList.add(skillLevel);
 
                                     if (OptionL.isEnabled(skill)) {
                                         powerLevel += level;

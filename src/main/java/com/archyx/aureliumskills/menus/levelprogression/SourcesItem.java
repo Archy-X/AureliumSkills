@@ -34,7 +34,7 @@ public class SourcesItem extends AbstractItem implements SingleItemProvider {
             case "sources_desc":
                 return Lang.getMessage(MenuMessage.SOURCES_DESC, locale);
             case "sources_click":
-                Skill skill = (Skill) activeMenu.getProperty("skill");
+                Skill skill = getSkill(activeMenu);
                 return TextUtil.replace(Lang.getMessage(MenuMessage.SOURCES_CLICK, locale),
                         "{skill}", skill.getDisplayName(locale));
         }
@@ -44,10 +44,19 @@ public class SourcesItem extends AbstractItem implements SingleItemProvider {
     @Override
     public void onClick(Player player, InventoryClickEvent event, ItemStack item, SlotPos pos, ActiveMenu activeMenu) {
         Map<String, Object> properties = new HashMap<>();
-        properties.put("skill", activeMenu.getProperty("skill"));
+        properties.put("skill", getSkill(activeMenu));
         properties.put("items_per_page", 28);
         properties.put("sort_type", SorterItem.SortType.ASCENDING);
         properties.put("previous_menu", "level_progression");
         plugin.getMenuManager().openMenu(player, "sources", properties, 0);
     }
+
+    private Skill getSkill(ActiveMenu activeMenu) {
+        Object property = activeMenu.getProperty("skill");
+        if (!(property instanceof Skill)) {
+            throw new IllegalArgumentException("Could not get menu skill property");
+        }
+        return (Skill) property;
+    }
+
 }

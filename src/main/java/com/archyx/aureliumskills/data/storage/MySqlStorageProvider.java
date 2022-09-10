@@ -98,6 +98,7 @@ public class MySqlStorageProvider extends StorageProvider {
                         String statModifiers = result.getString("STAT_MODIFIERS");
                         if (statModifiers != null) {
                             JsonArray jsonModifiers = new Gson().fromJson(statModifiers, JsonArray.class);
+                            assert (null != jsonModifiers);
                             for (JsonElement modifierElement : jsonModifiers.getAsJsonArray()) {
                                 JsonObject modifierObject = modifierElement.getAsJsonObject();
                                 String name = modifierObject.get("name").getAsString();
@@ -105,8 +106,10 @@ public class MySqlStorageProvider extends StorageProvider {
                                 double value = modifierObject.get("value").getAsDouble();
                                 if (name != null && statName != null) {
                                     Stat stat = plugin.getStatRegistry().getStat(statName);
-                                    StatModifier modifier = new StatModifier(name, stat, value);
-                                    playerData.addStatModifier(modifier);
+                                    if (stat != null) {
+                                        StatModifier modifier = new StatModifier(name, stat, value);
+                                        playerData.addStatModifier(modifier);
+                                    }
                                 }
                             }
                         }
@@ -120,6 +123,7 @@ public class MySqlStorageProvider extends StorageProvider {
                         String abilityData = result.getString("ABILITY_DATA");
                         if (abilityData != null) {
                             JsonObject jsonAbilityData = new Gson().fromJson(abilityData, JsonObject.class);
+                            assert (null != jsonAbilityData);
                             for (Map.Entry<String, JsonElement> abilityEntry : jsonAbilityData.entrySet()) {
                                 String abilityName = abilityEntry.getKey();
                                 AbstractAbility ability = AbstractAbility.valueOf(abilityName.toUpperCase(Locale.ROOT));
@@ -127,13 +131,12 @@ public class MySqlStorageProvider extends StorageProvider {
                                     AbilityData data = playerData.getAbilityData(ability);
                                     JsonObject dataObject = abilityEntry.getValue().getAsJsonObject();
                                     for (Map.Entry<String, JsonElement> dataEntry : dataObject.entrySet()) {
-                                        String key = dataEntry.getKey();
+                                        String key = Objects.requireNonNull(dataEntry.getKey());
                                         JsonElement element = dataEntry.getValue();
                                         if (element.isJsonPrimitive()) {
-                                            Object value = parsePrimitive(dataEntry.getValue().getAsJsonPrimitive());
-                                            if (value != null) {
-                                                data.setData(key, value);
-                                            }
+                                            JsonPrimitive primitive = Objects.requireNonNull(dataEntry.getValue().getAsJsonPrimitive());
+                                            Object value = Objects.requireNonNull(parsePrimitive(primitive));
+                                            data.setData(key, value);
                                         }
                                     }
                                 }
@@ -246,7 +249,9 @@ public class MySqlStorageProvider extends StorageProvider {
                         statement.setInt(index++, playerData.getSkillLevel(skill));
                         statement.setDouble(index++, playerData.getSkillXp(skill));
                     }
-                    statement.setString(index++, playerData.getLocale().toString());
+                    Locale locale = playerData.getLocale();
+                    assert (null != locale);
+                    statement.setString(index++, locale.toString());
                     // Build stat modifiers json
                     StringBuilder modifiersJson = new StringBuilder();
                     if (playerData.getStatModifiers().size() > 0) {
@@ -299,10 +304,8 @@ public class MySqlStorageProvider extends StorageProvider {
                     // Unclaimed items
                     StringBuilder unclaimedItemsStringBuilder = new StringBuilder();
                     List<KeyIntPair> unclaimedItems = playerData.getUnclaimedItems();
-                    if (unclaimedItems != null) {
-                        for (KeyIntPair unclaimedItem : unclaimedItems) {
-                            unclaimedItemsStringBuilder.append(unclaimedItem.getKey()).append(" ").append(unclaimedItem.getValue()).append(",");
-                        }
+                    for (KeyIntPair unclaimedItem : unclaimedItems) {
+                        unclaimedItemsStringBuilder.append(unclaimedItem.getKey()).append(" ").append(unclaimedItem.getValue()).append(",");
                     }
                     if (unclaimedItemsStringBuilder.length() > 0) {
                         unclaimedItemsStringBuilder.deleteCharAt(unclaimedItemsStringBuilder.length() - 1);
@@ -363,8 +366,14 @@ public class MySqlStorageProvider extends StorageProvider {
                             int index = 2;
                             for (int i = 0; i < 2; i++) {
                                 for (Skill skill : Skills.getOrderedValues()) {
-                                    statement.setInt(index++, levels.get(skill));
-                                    statement.setDouble(index++, xpLevels.get(skill));
+                                    Integer level = levels.get(skill);
+                                    if (level == null)
+                                        throw new IllegalStateException("Invalid level for skill index key: " + skill.name());
+                                    statement.setInt(index++, level);
+                                    Double xpLevel = xpLevels.get(skill);
+                                    if (xpLevel == null)
+                                        throw new IllegalStateException("Invalid experience level for skill index key: " + skill.name());
+                                    statement.setDouble(index++, xpLevel);
                                 }
                             }
                             statement.executeUpdate();
@@ -373,7 +382,11 @@ public class MySqlStorageProvider extends StorageProvider {
                     }
                 }
             } catch (Exception e) {
-                sender.sendMessage(AureliumSkills.getPrefix(locale) + TextUtil.replace(Lang.getMessage(CommandMessage.BACKUP_LOAD_ERROR, locale), "{error}", e.getMessage()));
+                String message = Lang.getMessage(CommandMessage.BACKUP_LOAD_ERROR, locale);
+                String m = e.getMessage();
+                if (m != null)
+                    message = TextUtil.replace(m, "{error}", m);
+                sender.sendMessage(AureliumSkills.getPrefix(locale) + message);
             }
         }
     }

@@ -8,6 +8,7 @@ import com.archyx.aureliumskills.api.event.PlayerLootDropEvent;
 import com.archyx.aureliumskills.data.PlayerData;
 import com.archyx.aureliumskills.skills.Skills;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -38,7 +39,10 @@ public class FishingAbilities extends AbilityProvider implements Listener {
 				PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
 				if (playerData != null) {
 					if (r.nextDouble() < (getValue(Ability.LUCKY_CATCH, playerData) / 100)) {
-						Item item = (Item) event.getCaught();
+						Entity caught = event.getCaught();
+						if (caught == null)
+							return;
+						Item item = (Item) caught;
 						ItemStack drop = item.getItemStack();
 						if (drop.getMaxStackSize() > 1) {
 							drop.setAmount(drop.getAmount() * 2);
@@ -63,13 +67,16 @@ public class FishingAbilities extends AbilityProvider implements Listener {
 				if (playerData != null) {
 					Player player = event.getPlayer();
 					if (blockAbility(player)) return;
-					Vector vector = player.getLocation().toVector().subtract(event.getCaught().getLocation().toVector());
+					Entity caught = event.getCaught();
+					if (caught == null)
+						return;
+					Vector vector = player.getLocation().toVector().subtract(caught.getLocation().toVector());
 					Vector result = vector.multiply(0.004 + (getValue(Ability.GRAPPLER, playerData) / 25000));
 
 					if (isUnsafeVelocity(result)) { // Prevent excessive velocity warnings
 						return;
 					}
-					event.getCaught().setVelocity(result);
+					caught.setVelocity(result);
 				}
 			}
 		}

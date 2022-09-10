@@ -30,10 +30,11 @@ public class UnlockedManaAbilityItem extends AbstractManaAbilityItem implements 
     }
 
     @Override
-    public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu menu, PlaceholderType type, MAbility mAbility) {
-        Locale locale = plugin.getLang().getLocale(player);
+    public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu, PlaceholderType type, MAbility mAbility) {
         PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
-        if (playerData == null) return placeholder;
+        if (playerData == null)
+            return placeholder;
+        Locale locale = plugin.getLang().getLocale(player);
         switch (placeholder) {
             case "name":
                 return mAbility.getDisplayName(locale);
@@ -98,7 +99,7 @@ public class UnlockedManaAbilityItem extends AbstractManaAbilityItem implements 
 
     @Override
     public Set<MAbility> getDefinedContexts(Player player, ActiveMenu activeMenu) {
-        Skill skill = (Skill) activeMenu.getProperty("skill");
+        Skill skill = getSkill(activeMenu);
         PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
         Set<MAbility> unlockedManaAbilities = new HashSet<>();
         if (playerData != null) {
@@ -119,6 +120,14 @@ public class UnlockedManaAbilityItem extends AbstractManaAbilityItem implements 
         } else {
             return manager.getValue(mAbility, level);
         }
+    }
+
+    private Skill getSkill(ActiveMenu activeMenu) {
+        Object property = activeMenu.getProperty("skill");
+        if (!(property instanceof Skill)) {
+            throw new IllegalArgumentException("Could not get menu skill property");
+        }
+        return (Skill) property;
     }
 
 }

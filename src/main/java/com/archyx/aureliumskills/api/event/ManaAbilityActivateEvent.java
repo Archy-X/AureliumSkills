@@ -4,7 +4,6 @@ import com.archyx.aureliumskills.mana.MAbility;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.NotNull;
 
 public class ManaAbilityActivateEvent extends Event {
 
@@ -46,7 +45,6 @@ public class ManaAbilityActivateEvent extends Event {
         this.duration = duration;
     }
 
-    @NotNull
     @Override
     public HandlerList getHandlers() {
         return handlers;

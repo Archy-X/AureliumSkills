@@ -81,9 +81,11 @@ public class RequirementManager implements Listener {
             @Override
             public void run() {
                 for (UUID id : errorMessageTimer.keySet()) {
-                    int timer = errorMessageTimer.get(id);
+                    Integer timer = errorMessageTimer.get(id);
+                    if (timer == null)
+                        throw new IllegalStateException("Invalid requirements tick timer index key: " + id);
                     if (timer != 0) {
-                        errorMessageTimer.put(id, errorMessageTimer.get(id) - 1);
+                        errorMessageTimer.put(id, timer - 1);
                     }
                 }
             }

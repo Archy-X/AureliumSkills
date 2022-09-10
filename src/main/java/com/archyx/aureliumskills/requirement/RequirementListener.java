@@ -66,14 +66,17 @@ public class RequirementListener implements Listener {
         // Build requirements message that shows skills and levels
         StringBuilder requirementsString = new StringBuilder();
         Map<Skill, Integer> requirementMap = requirements.getRequirements(modifierType, item);
+        String m;
         for (Map.Entry<Skill, Integer> entry : requirementMap.entrySet()) {
-            requirementsString.append(TextUtil.replace(Lang.getMessage(entryMessage, locale),
-                    "{skill}", entry.getKey().getDisplayName(locale), "{level}", RomanNumber.toRoman(entry.getValue())));
+            m = TextUtil.replace(Lang.getMessage(entryMessage, locale),
+                    "{skill}", entry.getKey().getDisplayName(locale), "{level}", RomanNumber.toRoman(entry.getValue()));
+            requirementsString.append(m);
         }
         Map<Skill, Integer> globalRequirementMap = requirements.getGlobalRequirements(modifierType, item);
         for (Map.Entry<Skill, Integer> entry : globalRequirementMap.entrySet()) {
-            requirementsString.append(TextUtil.replace(Lang.getMessage(entryMessage, locale),
-                    "{skill}", entry.getKey().getDisplayName(locale), "{level}", RomanNumber.toRoman(entry.getValue())));
+            m = TextUtil.replace(Lang.getMessage(entryMessage, locale),
+                    "{skill}", entry.getKey().getDisplayName(locale), "{level}", RomanNumber.toRoman(entry.getValue()));
+            requirementsString.append(m);
         }
         if (requirementsString.length() >= 2) {
             requirementsString.delete(requirementsString.length() - 2, requirementsString.length());
@@ -140,7 +143,7 @@ public class RequirementListener implements Listener {
         ItemStack item = event.getItem();
         if (item == null) return;
         if (item.getType() == Material.AIR) return;
-        checkItemRequirements(event.getPlayer(), event.getItem(), event);
+        checkItemRequirements(event.getPlayer(), item, event);
     }
 
     private void checkItemRequirements(Player player, ItemStack item, Cancellable event) {

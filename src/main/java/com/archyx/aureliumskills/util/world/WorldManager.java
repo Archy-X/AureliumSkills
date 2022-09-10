@@ -46,6 +46,8 @@ public class WorldManager {
             return false;
         }
         World world = location.getWorld();
+        if (world == null)
+            return false;
         return disabledWorlds.contains(world.getName()) || blockedWorlds.contains(world.getName());
     }
 
@@ -54,6 +56,8 @@ public class WorldManager {
             return false;
         }
         World world = location.getWorld();
+        if (world == null)
+            return false;
         return disabledWorlds.contains(world.getName());
     }
 
@@ -62,6 +66,8 @@ public class WorldManager {
             return false;
         }
         World world = location.getWorld();
+        if (world == null)
+            return false;
         return blockedCheckBlockReplaceWorlds.contains(world.getName());
     }
 

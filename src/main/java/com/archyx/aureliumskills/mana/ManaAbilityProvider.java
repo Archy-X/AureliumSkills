@@ -14,7 +14,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 
@@ -28,7 +27,7 @@ public abstract class ManaAbilityProvider extends AbilityProvider implements Lis
     protected final ManaAbilityMessage activateMessage;
     protected final ManaAbilityMessage stopMessage;
 
-    public ManaAbilityProvider(AureliumSkills plugin, MAbility mAbility, ManaAbilityMessage activateMessage, @Nullable ManaAbilityMessage stopMessage) {
+    public ManaAbilityProvider(AureliumSkills plugin, MAbility mAbility, ManaAbilityMessage activateMessage, ManaAbilityMessage stopMessage) {
         super(plugin, mAbility.getSkill());
         this.plugin = plugin;
         this.manager = plugin.getManaAbilityManager();
@@ -78,7 +77,7 @@ public abstract class ManaAbilityProvider extends AbilityProvider implements Lis
         onStop(player, playerData); // Mana ability specific stop behavior is run
         manager.setPlayerCooldown(player, mAbility); // Apply cooldown
         // Send stop message if applicable
-        if (stopMessage != null) {
+        if (stopMessage != ManaAbilityMessage.NONE) {
             plugin.getAbilityManager().sendMessage(player, Lang.getMessage(stopMessage, plugin.getLang().getLocale(player)));
         }
     }

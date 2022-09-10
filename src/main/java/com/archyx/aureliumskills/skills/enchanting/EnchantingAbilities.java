@@ -59,7 +59,10 @@ public class EnchantingAbilities extends AbilityProvider implements Listener {
         LivingEntity entity = event.getEntity();
         if (entity.getKiller() != null) {
             Player player = entity.getKiller();
-            if (blockAbility(player)) return;
+            if (player == null)
+                return;
+            if (blockAbility(player))
+                return;
             PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
             if (playerData != null) {
                 if (playerData.getAbilityLevel(Ability.XP_WARRIOR) > 0 && event.getDroppedExp() > 0) {

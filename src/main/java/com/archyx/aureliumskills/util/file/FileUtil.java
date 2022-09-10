@@ -1,13 +1,11 @@
 package com.archyx.aureliumskills.util.file;
 
 import com.archyx.aureliumskills.util.math.NumberUtil;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 
 public class FileUtil {
 
-    @Nullable
     public static String renameNoDuplicates(File file, String resultName, File directory) {
         // Count duplicates
         int duplicates = 0;

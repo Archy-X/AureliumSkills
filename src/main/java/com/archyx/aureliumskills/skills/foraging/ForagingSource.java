@@ -8,7 +8,6 @@ import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.Nullable;
 
 public enum ForagingSource implements Source {
 
@@ -40,7 +39,7 @@ public enum ForagingSource implements Source {
 
     private String[] alternateMaterials;
     private String legacyMaterial;
-    private byte[] legacyData;
+    private byte[] legacyData = {};
     private boolean requiresBlockBelow;
     private boolean isTrunk;
     private boolean isLeaf;
@@ -91,7 +90,6 @@ public enum ForagingSource implements Source {
         this.isTrunk = isTrunk;
     }
 
-    @Nullable
     public String getLegacyMaterial() {
         return legacyMaterial;
     }
@@ -104,7 +102,6 @@ public enum ForagingSource implements Source {
         return requiresBlockBelow;
     }
 
-    @Nullable
     public String[] getAlternateMaterials() {
         return alternateMaterials;
     }
@@ -121,7 +118,8 @@ public enum ForagingSource implements Source {
     public boolean isMatch(BlockState blockState) {
         boolean matched = false;
         String materialName = blockState.getType().toString();
-        if (XMaterial.isNewVersion() || getLegacyMaterial() == null) { // Standard block handling
+        String legacyMaterial = getLegacyMaterial();
+        if (XMaterial.isNewVersion() || legacyMaterial == null) { // Standard block handling
             if (toString().equalsIgnoreCase(materialName)) {
                 matched = true;
             } else if (getAlternateMaterials() != null) {
@@ -135,12 +133,12 @@ public enum ForagingSource implements Source {
                 }
             }
         } else { // Legacy block handling
-            if (getLegacyData() == null) { // No data value
-                if (getLegacyMaterial().equalsIgnoreCase(materialName)) {
+            if (getLegacyData().length == 0) { // No data value
+                if (legacyMaterial.equalsIgnoreCase(materialName)) {
                     matched = true;
                 }
             } else { // With data value
-                if (getLegacyMaterial().equalsIgnoreCase(materialName) && byteArrayContains(legacyData, blockState.getRawData())) {
+                if (legacyMaterial.equalsIgnoreCase(materialName) && byteArrayContains(legacyData, blockState.getRawData())) {
                     matched = true;
                 }
             }
@@ -164,7 +162,6 @@ public enum ForagingSource implements Source {
         return Skills.FORAGING;
     }
 
-    @Nullable
     public static ForagingSource getSource(BlockState blockState) {
         for (ForagingSource source : values()) {
             if (source.isMatch(blockState)) {
@@ -174,7 +171,6 @@ public enum ForagingSource implements Source {
         return null;
     }
 
-    @Nullable
     public static ForagingSource getSource(Block block) {
         return getSource(block.getState());
     }

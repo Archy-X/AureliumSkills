@@ -99,6 +99,7 @@ public enum Ability implements AbstractAbility {
 		this.baseValue = baseValue;
 		this.valuePerLevel = valuePerLevel;
 		this.skill = skill;
+		this.options = new HashMap<>();
 	}
 
 	Ability(Supplier<Skill> skill, double baseValue, double valuePerLevel, String[] optionKeys, Object[] optionValues) {

@@ -15,26 +15,27 @@ public interface BlockSource {
     default boolean isMatch(Block block) {
         boolean matched = false;
         String materialName = block.getType().toString();
-        if (XMaterial.isNewVersion() || getLegacyMaterial() == null) { // Standard block handling
+        String legacyMaterial =  getLegacyMaterial();
+        if (XMaterial.isNewVersion() || legacyMaterial == null) { // Standard block handling
             if (toString().equalsIgnoreCase(materialName)) {
                 matched = true;
             }
         } else { // Legacy block handling
             if (getLegacyData() == (byte) -1) { // No data value
                 if (allowBothIfLegacy()) { // Allow both new and legacy material names
-                    if (getLegacyMaterial().equalsIgnoreCase(materialName) || toString().equalsIgnoreCase(materialName)) {
+                    if (legacyMaterial.equalsIgnoreCase(materialName) || toString().equalsIgnoreCase(materialName)) {
                         matched = true;
                     }
-                } else if (getLegacyMaterial().equalsIgnoreCase(materialName)) {
+                } else if (legacyMaterial.equalsIgnoreCase(materialName)) {
                     matched = true;
                 }
             } else { // With data value
                 if (allowBothIfLegacy()) { // Allow both new and legacy material names
-                    if ((getLegacyMaterial().equalsIgnoreCase(materialName) && getLegacyData() == block.getData()
+                    if ((legacyMaterial.equalsIgnoreCase(materialName) && getLegacyData() == block.getData()
                             || (toString().equalsIgnoreCase(materialName) && getLegacyData() == block.getData()))) {
                         matched = true;
                     }
-                } else if (getLegacyMaterial().equalsIgnoreCase(materialName) && getLegacyData() == block.getData()) {
+                } else if (legacyMaterial.equalsIgnoreCase(materialName) && getLegacyData() == block.getData()) {
                     matched = true;
                 }
             }

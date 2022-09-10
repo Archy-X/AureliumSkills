@@ -6,8 +6,6 @@ import com.archyx.aureliumskills.configuration.OptionL;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,17 +23,15 @@ public class PlayerManager {
         }
     }
 
-    @Nullable
     public PlayerData getPlayerData(Player player) {
         return playerData.get(player.getUniqueId());
     }
 
-    @Nullable
     public PlayerData getPlayerData(UUID id) {
         return this.playerData.get(id);
     }
 
-    public void addPlayerData(@NotNull PlayerData playerData) {
+    public void addPlayerData(PlayerData playerData) {
         this.playerData.put(playerData.getPlayer().getUniqueId(), playerData);
     }
 

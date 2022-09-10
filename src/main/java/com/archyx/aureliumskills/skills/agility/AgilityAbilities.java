@@ -106,6 +106,8 @@ public class AgilityAbilities extends AbilityProvider implements Listener {
                 if (item.getType() == Material.POTION) {
                     if (item.getItemMeta() instanceof PotionMeta) {
                         PotionMeta meta = (PotionMeta) item.getItemMeta();
+                        if (meta == null)
+                            return;
                         PotionData potion = meta.getBasePotionData();
                         double multiplier = 1 + (getValue(Ability.SUGAR_RUSH, playerData) / 100);
                         if (potion.getType() == PotionType.SPEED || potion.getType() == PotionType.JUMP) {

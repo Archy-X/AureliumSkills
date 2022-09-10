@@ -25,7 +25,7 @@ public class LockedAbilityItem extends AbstractAbilityItem {
     }
 
     @Override
-    public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu menu, PlaceholderType type, Ability ability) {
+    public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu, PlaceholderType type, Ability ability) {
         Locale locale = plugin.getLang().getLocale(player);
         switch (placeholder) {
             case "name":
@@ -33,10 +33,10 @@ public class LockedAbilityItem extends AbstractAbilityItem {
             case "locked_desc":
                 return TextUtil.replace(Lang.getMessage(MenuMessage.LOCKED_DESC, locale),
                         "{desc}", TextUtil.replace(ability.getDescription(locale),
-                                "{value}", NumberUtil.format1(plugin.getAbilityManager().getValue(ability, 1)),
-                                "{value_2}", NumberUtil.format1(plugin.getAbilityManager().getValue2(ability, 1))));
+                        "{value}", NumberUtil.format1(plugin.getAbilityManager().getValue(ability, 1)),
+                        "{value_2}", NumberUtil.format1(plugin.getAbilityManager().getValue2(ability, 1))));
             case "unlocked_at":
-                Skill skill = (Skill) menu.getProperty("skill");
+                Skill skill = getSkill(activeMenu);
                 return TextUtil.replace(Lang.getMessage(MenuMessage.UNLOCKED_AT, locale),
                         "{skill}", skill.getDisplayName(locale),
                         "{level}", RomanNumber.toRoman(plugin.getAbilityManager().getUnlock(ability)));
@@ -48,10 +48,10 @@ public class LockedAbilityItem extends AbstractAbilityItem {
 
     @Override
     public Set<Ability> getDefinedContexts(Player player, ActiveMenu activeMenu) {
-        Skill skill = (Skill) activeMenu.getProperty("skill");
-        PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
         Set<Ability> lockedAbilities = new HashSet<>();
+        PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
         if (playerData != null) {
+            Skill skill = getSkill(activeMenu);
             // Add abilities that player has not unlocked yet
             for (Supplier<Ability> abilitySupplier : skill.getAbilities()) {
                 Ability ability = abilitySupplier.get();
@@ -62,4 +62,13 @@ public class LockedAbilityItem extends AbstractAbilityItem {
         }
         return lockedAbilities;
     }
+
+    private Skill getSkill(ActiveMenu activeMenu) {
+        Object property = activeMenu.getProperty("skill");
+        if (!(property instanceof Skill)) {
+            throw new IllegalArgumentException("Could not get menu skill property");
+        }
+        return (Skill) property;
+    }
+
 }

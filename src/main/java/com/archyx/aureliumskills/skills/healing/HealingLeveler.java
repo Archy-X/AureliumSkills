@@ -51,6 +51,8 @@ public class HealingLeveler extends SkillLeveler implements Listener {
 			if (event.getItem().getType().equals(Material.POTION)) {
 				if (event.getItem().getItemMeta() instanceof PotionMeta) {
 					PotionMeta meta = (PotionMeta) event.getItem().getItemMeta();
+					if (meta == null)
+						return;
 					PotionData data = meta.getBasePotionData();
 					if (OptionL.getBoolean(Option.HEALING_EXCLUDE_NEGATIVE_POTIONS) && PotionUtil.isNegativePotion(data.getType())) {
 						return;
@@ -108,6 +110,8 @@ public class HealingLeveler extends SkillLeveler implements Listener {
 					if (event.getPotion().getItem().getItemMeta() instanceof PotionMeta) {
 						Player player = (Player) event.getEntity().getShooter();
 						PotionMeta meta = (PotionMeta) event.getPotion().getItem().getItemMeta();
+						if (player == null || meta == null)
+							return;
 						PotionData data = meta.getBasePotionData();
 						if (OptionL.getBoolean(Option.HEALING_EXCLUDE_NEGATIVE_POTIONS) && PotionUtil.isNegativePotion(data.getType())) {
 							return;
@@ -170,6 +174,8 @@ public class HealingLeveler extends SkillLeveler implements Listener {
 			if (!(lingeringPotion.getItem().getItemMeta() instanceof PotionMeta)) return;
 			meta = (PotionMeta) lingeringPotion.getItem().getItemMeta();
 		}
+		if (meta == null)
+			return;
 		PotionData data = meta.getBasePotionData();
 
 		if (OptionL.getBoolean(Option.HEALING_EXCLUDE_NEGATIVE_POTIONS) && PotionUtil.isNegativePotion(data.getType())) {

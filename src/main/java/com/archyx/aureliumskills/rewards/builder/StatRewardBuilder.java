@@ -4,7 +4,8 @@ import com.archyx.aureliumskills.AureliumSkills;
 import com.archyx.aureliumskills.rewards.Reward;
 import com.archyx.aureliumskills.rewards.StatReward;
 import com.archyx.aureliumskills.stats.Stat;
-import com.archyx.aureliumskills.util.misc.Validate;
+
+import java.util.Objects;
 
 public class StatRewardBuilder extends RewardBuilder {
 
@@ -28,7 +29,7 @@ public class StatRewardBuilder extends RewardBuilder {
 
     @Override
     public Reward build() {
-        Validate.notNull(stat, "You must specify a stat");
+        Objects.requireNonNull(stat, "You must specify a stat");
         return new StatReward(plugin, stat, value);
     }
 }

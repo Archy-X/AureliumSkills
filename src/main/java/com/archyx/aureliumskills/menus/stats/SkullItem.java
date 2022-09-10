@@ -32,7 +32,6 @@ public class SkullItem extends AbstractItem implements SingleItemProvider {
         }
         PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
         if (playerData != null) {
-            // Handle each stat entry
             Stat stat = plugin.getStatRegistry().getStat(placeholder);
             if (stat != null) {
                 return TextUtil.replace(Lang.getMessage(MenuMessage.PLAYER_STAT_ENTRY, locale),
@@ -49,8 +48,10 @@ public class SkullItem extends AbstractItem implements SingleItemProvider {
     public ItemStack onItemModify(ItemStack baseItem, Player player, ActiveMenu activeMenu) {
         if (baseItem.getItemMeta() instanceof SkullMeta) {
             SkullMeta meta = (SkullMeta) baseItem.getItemMeta();
-            meta.setOwningPlayer(Bukkit.getOfflinePlayer(player.getUniqueId()));
-            baseItem.setItemMeta(meta);
+            if (meta != null) {
+                meta.setOwningPlayer(Bukkit.getOfflinePlayer(player.getUniqueId()));
+                baseItem.setItemMeta(meta);
+            }
         }
         return baseItem;
     }

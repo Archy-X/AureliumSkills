@@ -27,7 +27,7 @@ public class RankItem extends AbstractItem implements SingleItemProvider {
     @Override
     public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu, PlaceholderType type) {
         Locale locale = plugin.getLang().getLocale(player);
-        Skill skill = (Skill) activeMenu.getProperty("skill");
+        Skill skill = getSkill(activeMenu);
         switch (placeholder) {
             case "your_ranking":
                 return Lang.getMessage(MenuMessage.YOUR_RANKING, locale);
@@ -73,4 +73,13 @@ public class RankItem extends AbstractItem implements SingleItemProvider {
     private int getSize(Skill skill, Player player) {
         return plugin.getLeaderboardManager().getLeaderboard(skill).size();
     }
+
+    private Skill getSkill(ActiveMenu activeMenu) {
+        Object property = activeMenu.getProperty("skill");
+        if (!(property instanceof Skill)) {
+            throw new IllegalArgumentException("Could not get menu skill property");
+        }
+        return (Skill) property;
+    }
+
 }

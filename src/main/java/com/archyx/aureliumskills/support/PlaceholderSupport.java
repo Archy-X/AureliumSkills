@@ -23,7 +23,7 @@ import java.util.Locale;
 public class PlaceholderSupport extends PlaceholderExpansion {
 
     private final AureliumSkills plugin;
-    private final String[] xpIdentifiers = new String[] {"xp_required_formatted_", "xp_required_", "xp_progress_int_", "xp_progress_1_", "xp_progress_", "xp_int_", "xp_formatted_", "xp_"};
+    private final String[] xpIdentifiers = {"xp_required_formatted_", "xp_required_", "xp_progress_int_", "xp_progress_1_", "xp_progress_", "xp_int_", "xp_formatted_", "xp_"};
 
     public PlaceholderSupport(AureliumSkills plugin) {
         this.plugin = plugin;
@@ -139,12 +139,13 @@ public class PlaceholderSupport extends PlaceholderExpansion {
 
         //Gets stat values
         for (Stat stat : plugin.getStatRegistry().getStats()) {
-            if (identifier.equals(stat.name().toLowerCase(Locale.ENGLISH))) {
+            String name = stat.name();
+            if (identifier.equals(name.toLowerCase(Locale.ENGLISH))) {
                 PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
                 if (playerData != null) {
                     return String.valueOf(playerData.getStatLevel(stat));
                 }
-            } else if (identifier.equals(stat.name().toLowerCase(Locale.ROOT) + "_int")) {
+            } else if (identifier.equals(name.toLowerCase(Locale.ROOT) + "_int")) {
                 PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
                 if (playerData != null) {
                     return String.valueOf(Math.round(playerData.getStatLevel(stat)));
@@ -265,7 +266,6 @@ public class PlaceholderSupport extends PlaceholderExpansion {
         for (String id : xpIdentifiers) {
             if (identifier.startsWith(id)) {
                 String skillName = TextUtil.replace(identifier, id, "");
-
                 Skill skill = plugin.getSkillRegistry().getSkill(skillName);
                 if (skill != null) {
                     PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);

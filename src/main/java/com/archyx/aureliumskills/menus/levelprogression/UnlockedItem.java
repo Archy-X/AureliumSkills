@@ -24,7 +24,7 @@ public class UnlockedItem extends SkillLevelItem {
     @Override
     public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu, PlaceholderType placeholderType, Integer position) {
         Locale locale = plugin.getLang().getLocale(player);
-        Skill skill = (Skill) activeMenu.getProperty("skill");
+        Skill skill = getSkill(activeMenu);
         int level = getLevel(activeMenu, position);
         switch (placeholder) {
             case "level_unlocked":
@@ -45,23 +45,30 @@ public class UnlockedItem extends SkillLevelItem {
 
     @Override
     public Set<Integer> getDefinedContexts(Player player, ActiveMenu activeMenu) {
+        Set<Integer> levels = new HashSet<>();
         PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
-        if (playerData != null) {
-            Skill skill = (Skill) activeMenu.getProperty("skill");
-            int level = playerData.getSkillLevel(skill);
-            int itemsPerPage = getItemsPerPage(activeMenu);
-            int currentPage = activeMenu.getCurrentPage();
-            Set<Integer> levels = new HashSet<>();
-            for (int i = 0; i < itemsPerPage; i++) {
-                if (2 + currentPage * itemsPerPage + i <= level) {
-                    levels.add(2 + i);
-                } else {
-                    break;
-                }
-            }
+        if (playerData == null)
             return levels;
+        Skill skill = getSkill(activeMenu);
+        int level = playerData.getSkillLevel(skill);
+        int itemsPerPage = getItemsPerPage(activeMenu);
+        int currentPage = activeMenu.getCurrentPage();
+        for (int i = 0; i < itemsPerPage; i++) {
+            if (2 + currentPage * itemsPerPage + i <= level) {
+                levels.add(2 + i);
+            } else {
+                break;
+            }
         }
-        return new HashSet<>();
+        return levels;
+    }
+
+    private Skill getSkill(ActiveMenu activeMenu) {
+        Object property = activeMenu.getProperty("skill");
+        if (!(property instanceof Skill)) {
+            throw new IllegalArgumentException("Could not get menu skill property");
+        }
+        return (Skill) property;
     }
 
 }

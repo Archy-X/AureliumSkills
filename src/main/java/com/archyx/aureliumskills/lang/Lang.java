@@ -54,6 +54,7 @@ public class Lang implements Listener {
 	}
 
 	public void loadEmbeddedMessages(PaperCommandManager commandManager) {
+        Objects.requireNonNull(commandManager);
 		// Loads default file from embedded resource
 		InputStream inputStream = plugin.getResource("messages/messages_en.yml");
 		if (inputStream != null) {
@@ -65,6 +66,7 @@ public class Lang implements Listener {
 	}
 
 	public void loadLanguages(PaperCommandManager commandManager) {
+        Objects.requireNonNull(commandManager);
 		Bukkit.getLogger().info("[AureliumSkills] Loading languages...");
 		long startTime = System.currentTimeMillis();
 		FileConfiguration pluginConfig = plugin.getConfig();
@@ -83,6 +85,8 @@ public class Lang implements Listener {
 		// Load languages
 		int languagesLoaded = 0;
 		for (String language : languages) {
+		    if (language == null)
+		        throw new IllegalStateException("Null value returned from configuration key: languages");
 			// Load file
 			try {
 				Locale locale = new Locale(language);
@@ -112,6 +116,9 @@ public class Lang implements Listener {
 	}
 
 	private void loadMessages(FileConfiguration config, Locale locale, PaperCommandManager commandManager) {
+        Objects.requireNonNull(config);
+        Objects.requireNonNull(locale);
+        Objects.requireNonNull(commandManager);
 		// Load units
 		Map<UnitMessage, String> units = new HashMap<>();
 		for (UnitMessage key : UnitMessage.values()) {
@@ -130,7 +137,9 @@ public class Lang implements Listener {
 				MessageKey key = null;
 				// Try to find message key
 				for (MessageKey messageKey : MessageKey.values()) {
-					if (messageKey.getPath().equals(path)) {
+					String keyPath = messageKey.getPath();
+					assert (null != keyPath);
+					if (keyPath.equals(path)) {
 						key = messageKey;
 					}
 				}
@@ -151,7 +160,11 @@ public class Lang implements Listener {
 		}
 		// Check that each message key has a value
 		for (MessageKey key : MessageKey.values()) {
-			String message = config.getString(key.getPath());
+			String path = key.getPath();
+			assert (null != path);
+			if (path.isEmpty())
+			    continue;
+			String message = config.getString(path);
 			if (message == null && locale.equals(Locale.ENGLISH)) {
 				plugin.getLogger().warning("[" + locale.toLanguageTag() + "] Message with path " + key.getPath() + " not found!");
 			}
@@ -261,21 +274,30 @@ public class Lang implements Listener {
 	}
 
 	public static String getMessage(MessageKey key, Locale locale) {
+        Objects.requireNonNull(key);
+		Map<MessageKey, String> localeMap;
 		// Set default locale if locale not present
 		if (!messages.containsKey(locale)) {
 			locale = getDefaultLanguage();
 		}
-		String message = messages.get(locale).get(key);
-		if (message != null) {
-			return message;
-		} else {
-			String defaultMessage = Lang.messages.get(getDefaultLanguage()).get(key);
-			if (defaultMessage != null) {
-				return defaultMessage;
-			} else {
-				return Lang.messages.get(Locale.ENGLISH).get(key);
-			}
+		// Try the requested locale
+		localeMap = messages.get(locale);
+		// Try falling back to the default configured language
+		if (localeMap == null) {
+			localeMap = Lang.messages.get(getDefaultLanguage());
 		}
+		// Try falling back to English
+		if (localeMap == null) {
+			localeMap = Lang.messages.get(Locale.ENGLISH);
+		}
+		// No valid locale
+		if (localeMap == null) {
+			throw new IllegalStateException("Failed to acquire a locale translation map");
+		}
+		String message = localeMap.get(key);
+		if (message == null)
+			throw new IllegalStateException("Missing translation for index key: " + key + " with locale: " + locale);
+		return message;
 	}
 
 	public static boolean hasLocale(Locale locale) {
@@ -295,6 +317,7 @@ public class Lang implements Listener {
 	}
 
 	private static void setDefaultLanguage(Locale language) {
+        Objects.requireNonNull(language);
 		defaultLanguage = language;
 	}
 
@@ -303,6 +326,7 @@ public class Lang implements Listener {
 	}
 
 	public Locale getLocale(Player player) {
+        Objects.requireNonNull(player);
 		PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
 		if (playerData != null) {
 			return playerData.getLocale();
@@ -346,6 +370,7 @@ public class Lang implements Listener {
 	}
 
 	private String applyColor(String message) {
+        Objects.requireNonNull(message);
 		Matcher matcher = hexPattern.matcher(message);
 		StringBuffer buffer = new StringBuffer(message.length() + 4 * 8);
 		while (matcher.find()) {

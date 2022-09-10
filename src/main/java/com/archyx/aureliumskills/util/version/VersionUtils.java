@@ -4,7 +4,6 @@ import com.archyx.aureliumskills.util.math.NumberUtil;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
-import org.jetbrains.annotations.Nullable;
 
 public class VersionUtils {
 
@@ -44,7 +43,7 @@ public class VersionUtils {
         return 0;
     }
 
-    public static String getVersionString(@Nullable String version) {
+    public static String getVersionString(String version) {
         if (version == null || version.equals("")) {
             return null;
         }

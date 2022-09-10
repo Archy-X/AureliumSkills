@@ -42,7 +42,8 @@ public abstract class AbstractSkillItem extends AbstractItem implements Template
     @Override
     public String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu, PlaceholderType type, Skill skill) {
         PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
-        if (playerData == null) return placeholder;
+        if (playerData == null)
+            return placeholder;
         Locale locale = playerData.getLocale();
         int skillLevel = playerData.getSkillLevel(skill);
 
@@ -122,8 +123,8 @@ public abstract class AbstractSkillItem extends AbstractItem implements Template
                                 , "{ability}", ability.getDisplayName(locale)
                                 , "{level}", RomanNumber.toRoman(playerData.getAbilityLevel(ability))
                                 , "{info}", TextUtil.replace(ability.getInfo(locale)
-                                        , "{value}", NumberUtil.format1(plugin.getAbilityManager().getValue(ability, abilityLevel))
-                                        , "{value_2}", NumberUtil.format1(plugin.getAbilityManager().getValue2(ability, abilityLevel)))));
+                                , "{value}", NumberUtil.format1(plugin.getAbilityManager().getValue(ability, abilityLevel))
+                                , "{value_2}", NumberUtil.format1(plugin.getAbilityManager().getValue2(ability, abilityLevel)))));
                     } else {
                         levelsMessage = TextUtil.replace(levelsMessage, "{ability_" + num + "}", TextUtil.replace(Lang.getMessage(MenuMessage.ABILITY_LEVEL_ENTRY_LOCKED, locale)
                                 , "{ability}", ability.getDisplayName(locale)));
