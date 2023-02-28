@@ -4,6 +4,7 @@ import com.archyx.aureliumskills.AureliumSkills;
 import com.archyx.aureliumskills.configuration.Option;
 import com.archyx.aureliumskills.configuration.OptionL;
 import com.archyx.aureliumskills.data.PlayerData;
+import com.archyx.aureliumskills.lang.CommandMessage;
 import com.archyx.aureliumskills.lang.Lang;
 import com.archyx.aureliumskills.modifier.ModifierType;
 import com.archyx.aureliumskills.modifier.Modifiers;
@@ -15,6 +16,10 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Locale;
 import java.util.UUID;
 
 public class AureliumAPI {
@@ -31,6 +36,49 @@ public class AureliumAPI {
             AureliumAPI.plugin = plugin;
         } else {
             throw new IllegalStateException("The AureliumSkills API is already registered");
+        }
+    }
+
+    /**
+     * Sets player level as if calling the @Command setSkillLevel
+     * @param player player to have level set
+     * @param skill null for all skills
+     * @param level must be greater than 0
+     * @param messagePlayer sends the player a message detailing level change
+     */
+    public static void setSkillLevel(Player player, @Nullable Skill skill, int level, boolean messagePlayer){
+        Locale locale = plugin.getLang().getLocale(player);
+        Collection<Skill> skills;
+        String message = AureliumSkills.getPrefix(locale) + Lang.getMessage(CommandMessage.SKILL_SETLEVEL_SET, locale)
+                .replace("{level}", String.valueOf(level))
+                .replace("{player}", player.getName());
+        if(skill == null) {
+            skills = plugin.getSkillRegistry().getSkills();
+            message = message.replace("{skill}", "*");
+        }else {
+            skills = Collections.singletonList(skill);
+            message = message.replace("{skill}", skill.getDisplayName(locale));
+        }
+        if (level > 0) {
+            skills.forEach(s -> {
+                PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
+                if (playerData == null) return;
+                int oldLevel = playerData.getSkillLevel(s);
+                playerData.setSkillLevel(s, level);
+                playerData.setSkillXp(s, 0);
+                plugin.getLeveler().updateStats(player);
+                plugin.getLeveler().updatePermissions(player);
+                plugin.getLeveler().applyRevertCommands(player, s, oldLevel, level);
+                plugin.getLeveler().applyLevelUpCommands(player, s, oldLevel, level);
+                plugin.getModifierManager().reloadPlayer(player);
+            });
+            if(messagePlayer) {
+                player.sendMessage(message);
+            }
+        } else {
+            if(messagePlayer) {
+                player.sendMessage(AureliumSkills.getPrefix(locale) + Lang.getMessage(CommandMessage.SKILL_SETLEVEL_AT_LEAST_ONE, locale));
+            }
         }
     }
 
