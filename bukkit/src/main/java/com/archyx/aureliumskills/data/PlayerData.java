@@ -11,6 +11,7 @@ import com.archyx.aureliumskills.modifier.Multiplier;
 import com.archyx.aureliumskills.modifier.StatModifier;
 import com.archyx.aureliumskills.skills.Skill;
 import com.archyx.aureliumskills.stats.Luck;
+import com.archyx.aureliumskills.stats.Speed;
 import com.archyx.aureliumskills.stats.Stat;
 import com.archyx.aureliumskills.stats.Stats;
 import com.archyx.aureliumskills.util.misc.KeyIntPair;
@@ -180,6 +181,8 @@ public class PlayerData {
                 plugin.getHealth().reload(player);
             } else if (modifier.getStat() == Stats.LUCK) {
                 new Luck(plugin).reload(player);
+            } else if (modifier.getStat() == Stats.SPEED) {
+                new Speed(plugin).reload(player);
             }
         }
         blank = false; // Mark as modified
@@ -200,6 +203,8 @@ public class PlayerData {
                 plugin.getHealth().reload(player);
             } else if (modifier.getStat() == Stats.LUCK) {
                 new Luck(plugin).reload(player);
+            } else if (modifier.getStat() == Stats.SPEED) {
+                new Speed(plugin).reload(player);
             }
         }
         return true;

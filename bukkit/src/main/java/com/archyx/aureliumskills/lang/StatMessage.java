@@ -30,7 +30,19 @@ public enum StatMessage implements MessageKey {
     TOUGHNESS_NAME,
     TOUGHNESS_DESC,
     TOUGHNESS_COLOR,
-    TOUGHNESS_SYMBOL;
+    TOUGHNESS_SYMBOL,
+    CRIT_CHANCE_NAME,
+    CRIT_CHANCE_DESC,
+    CRIT_CHANCE_COLOR,
+    CRIT_CHANCE_SYMBOL,
+    CRIT_DAMAGE_NAME,
+    CRIT_DAMAGE_DESC,
+    CRIT_DAMAGE_COLOR,
+    CRIT_DAMAGE_SYMBOL,
+    SPEED_NAME,
+    SPEED_DESC,
+    SPEED_COLOR,
+    SPEED_SYMBOL;
     
     private final Stat stat = Stats.valueOf(this.name().substring(0, this.name().lastIndexOf("_")));
     private final String path = "stats." + stat.toString().toLowerCase(Locale.ENGLISH) + "." + this.toString().substring(this.name().lastIndexOf("_") + 1).toLowerCase(Locale.ENGLISH);

@@ -15,12 +15,10 @@ import com.archyx.aureliumskills.util.text.TextUtil;
 import com.archyx.slate.item.provider.PlaceholderData;
 import com.archyx.slate.item.provider.TemplateItemProvider;
 import com.archyx.slate.menu.ActiveMenu;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 public class StatItem extends AbstractItem implements TemplateItemProvider<Stat> {
 
@@ -55,13 +53,13 @@ public class StatItem extends AbstractItem implements TemplateItemProvider<Stat>
             case "your_level":
                 return TextUtil.replace(Lang.getMessage(MenuMessage.YOUR_LEVEL, locale),
                         "{color}", stat.getColor(locale),
-                        "{level}", NumberUtil.format1(playerData.getStatLevel(stat)));
+                        "{level}", adjustAndFormatStatLevel(stat, playerData, player));
             case "descriptors":
                 switch (stat.name().toLowerCase(Locale.ROOT)) {
                     case "strength":
                         return getStrengthDescriptors(playerData, locale);
                     case "health":
-                        return getHealthDescriptors(playerData, locale);
+                        return getHealthDescriptors(playerData, locale, player);
                     case "regeneration":
                         return getRegenerationDescriptors(playerData, locale);
                     case "luck":
@@ -70,6 +68,12 @@ public class StatItem extends AbstractItem implements TemplateItemProvider<Stat>
                         return getWisdomDescriptors(playerData, locale);
                     case "toughness":
                         return getToughnessDescriptors(playerData, locale);
+                    case "crit_chance":
+                        return getCritChanceDescriptors(playerData, locale);
+                    case "crit_damage":
+                        return getCritDamageDescriptors(playerData, locale);
+                    case "speed":
+                        return getSpeedDescriptors(playerData, locale);
                     default:
                         return "";
                 }
@@ -103,8 +107,13 @@ public class StatItem extends AbstractItem implements TemplateItemProvider<Stat>
         return TextUtil.replace(Lang.getMessage(MenuMessage.ATTACK_DAMAGE, locale),"{value}", NumberUtil.format2(attackDamage));
     }
 
-    private String getHealthDescriptors(PlayerData playerData, Locale locale) {
-        double modifier = playerData.getStatLevel(Stats.HEALTH) * OptionL.getDouble(Option.HEALTH_MODIFIER);
+    private String getHealthDescriptors(PlayerData playerData, Locale locale, Player player) {
+        double modifier;
+        if (OptionL.getBoolean(Option.HEALTH_SHOW_TOTAL_HEALTH)) {
+            modifier = Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
+        } else {
+            modifier = playerData.getStatLevel(Stats.HEALTH) * OptionL.getDouble(Option.HEALTH_MODIFIER);
+        }
         double scaledHealth = modifier * OptionL.getDouble(Option.HEALTH_HP_INDICATOR_SCALING);
         return TextUtil.replace(Lang.getMessage(MenuMessage.HP, locale),"{value}", NumberUtil.format2(scaledHealth));
     }
@@ -146,6 +155,34 @@ public class StatItem extends AbstractItem implements TemplateItemProvider<Stat>
         double toughness = playerData.getStatLevel(Stats.TOUGHNESS) * OptionL.getDouble(Option.TOUGHNESS_NEW_MODIFIER);
         double damageReduction = (-1.0 * Math.pow(1.01, -1.0 * toughness) + 1) * 100;
         return TextUtil.replace(Lang.getMessage(MenuMessage.INCOMING_DAMAGE, locale),"{value}", NumberUtil.format2(damageReduction));
+    }
+
+    private String getCritChanceDescriptors(PlayerData playerData, Locale locale) {
+        double critChance = playerData.getStatLevel(Stats.CRIT_CHANCE);
+        if (critChance > 100) {
+            critChance = 100;
+        }
+        return TextUtil.replace(Lang.getMessage(MenuMessage.CRIT_CHANCE, locale), "{value}", NumberUtil.format2(critChance));
+    }
+
+    private String getCritDamageDescriptors(PlayerData playerData, Locale locale) {
+        double critDamage = playerData.getStatLevel(Stats.CRIT_DAMAGE);
+        return TextUtil.replace(Lang.getMessage(MenuMessage.CRIT_DAMAGE, locale), "{value}", NumberUtil.format2(critDamage));
+    }
+
+    private String getSpeedDescriptors(PlayerData playerData, Locale locale) {
+        double movementSpeed = playerData.getStatLevel(Stats.SPEED);
+        return TextUtil.replace(Lang.getMessage(MenuMessage.MOVEMENT_SPEED, locale), "{value}", NumberUtil.format2(movementSpeed));
+    }
+
+    public static String adjustAndFormatStatLevel(Stat stat, PlayerData playerData, Player player) {
+        if (stat == Stats.HEALTH && OptionL.getBoolean(Option.HEALTH_SHOW_TOTAL_HEALTH)) {
+            double attributeValue = Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
+            double scaledHealth = attributeValue * OptionL.getDouble(Option.HEALTH_HP_INDICATOR_SCALING);
+            return Lang.formatStatLevel(stat, scaledHealth);
+        } else {
+            return Lang.formatStatLevel(stat, playerData.getStatLevel(stat));
+        }
     }
 
 }

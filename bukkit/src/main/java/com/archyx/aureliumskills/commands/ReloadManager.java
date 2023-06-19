@@ -4,6 +4,7 @@ import com.archyx.aureliumskills.AureliumSkills;
 import com.archyx.aureliumskills.lang.CommandMessage;
 import com.archyx.aureliumskills.lang.Lang;
 import com.archyx.aureliumskills.stats.Luck;
+import com.archyx.aureliumskills.stats.Speed;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -53,9 +54,11 @@ public class ReloadManager {
         }
         // Recalculate health and luck stats
         Luck luck = new Luck(plugin);
+        Speed speed = new Speed(plugin);
         for (Player player : Bukkit.getOnlinePlayers()) {
             plugin.getHealth().reload(player);
             luck.reload(player);
+            speed.reload(player);
         }
         // Resets all action bars
         plugin.getActionBar().resetActionBars();

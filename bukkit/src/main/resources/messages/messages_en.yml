@@ -259,6 +259,11 @@ abilities:
       name: Lucky Table
       desc: 'Items you enchant using the enchantment\n&7  table have a {value}% chance of upgrading the enchantment\n&7  level by 1 if not max level'
       info: '{value}% Enchant Upgrade Chance'
+  sorcery:
+    sorcerer:
+      name: Sorcerer
+      desc: 'Earn {value}% more Sorcery XP'
+      info: '+{value}% XP'
   healing:
     life_essence:
       name: Life Essence
@@ -558,7 +563,7 @@ leveler:
   title: '&a{skill} Level Up'
   subtitle: '&6{old} ➜ {new}'
   level_up: '&3&m----------------------------------------\n&r &3Skill Level Up! &b&l{skill} &8{old}➜&3&l{new}\n \n &bRewards:{stat_level}{ability_unlock}{ability_level_up}{mana_ability_unlock}{mana_ability_level_up}{money_reward}\n&3&m----------------------------------------'
-  stat_level: '\n  {color}+{num}{symbol} {stat}'
+  stat_level: '\n  {color}+{num} {symbol} {stat}'
   ability_unlock: '\n  &aAbility Unlock! &6&l{ability} &7has been unlocked'
   ability_level_up: '\n  &aAbility Level Up! &6&l{ability} &7is now level &6{level}'
   mana_ability_unlock: '\n  &dMana Ability Unlock! &9&l{mana_ability} &7has been unlocked'
@@ -623,8 +628,8 @@ menus:
   stats_menu:
     stats_menu_title: Your Stats
     player_stat_entry: ' {color}{symbol} {stat} &f{level}'
-    skills: '\n&7Skills: &f{skills}'
-    your_level: '&7Your Level: {color}{level}'
+    skills: '\n\n&7Skills: &f{skills}'
+    your_level: '\n&7Your Level: {color}{level}'
     attack_damage: '&4+{value}% Attack Damage'
     hp: '&c+{value} ❤'
     saturated_regen: '&6+{value} Saturated Regen'
@@ -637,6 +642,9 @@ menus:
     anvil_cost_reduction: '&9Anvil Cost Reduction: {value}%'
     max_mana: '&9Max Mana: {value}'
     incoming_damage: '&5-{value}% Incoming Damage'
+    crit_chance: '&b{value}% Critical Hit Chance'
+    crit_damage: '&3+{value}% Critical Attack Damage'
+    movement_speed: '&f+{value}% Movement Speed'
   unclaimed_items:
     unclaimed_items_title: 'Claim Items'
     inventory_full: '&eYou do not have enough space in your inventory to claim that item'
@@ -1068,6 +1076,21 @@ stats:
     desc: '&7Toughness increases the amount of\n&7damage reduced from enemy attacks'
     color: '&5'
     symbol: '✦'
+  crit_chance:
+    name: Crit Chance
+    desc: '&7Crit Chance increases the chance of\n&7landing a critical hit'
+    color: '&b'
+    symbol: '⚶'
+  crit_damage:
+    name: Crit Damage
+    desc: '&7Crit Damage increases the amount of\n&7damage done on a critical hit'
+    color: '&3'
+    symbol: '⚔'
+  speed:
+    name: Speed
+    desc: '&7Speed increases your movement speed'
+    color: '&f'
+    symbol: '☄'
 units:
   mana: Mana
   hp: HP

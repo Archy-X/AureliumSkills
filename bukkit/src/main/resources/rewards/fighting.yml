@@ -6,9 +6,9 @@ patterns:
       start: 2
       interval: 1
   - type: stat
-    stat: regeneration
-    value: 1
+    stat: crit_damage
+    value: 2
     pattern:
       start: 2
-      interval: 2
+      interval: 1
 levels:

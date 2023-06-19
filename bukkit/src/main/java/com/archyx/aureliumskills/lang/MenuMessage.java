@@ -75,6 +75,9 @@ public enum MenuMessage implements MessageKey {
     ANVIL_COST_REDUCTION(3),
     MAX_MANA(3),
     INCOMING_DAMAGE(3),
+    CRIT_CHANCE(3),
+    CRIT_DAMAGE(3),
+    MOVEMENT_SPEED(3),
     // Unclaimed items menu
     UNCLAIMED_ITEMS_TITLE(4),
     INVENTORY_FULL(4),

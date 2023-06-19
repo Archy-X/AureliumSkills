@@ -7,7 +7,7 @@ patterns:
       interval: 1
   - type: stat
     stat: health
-    value: 1
+    value: 0.5
     pattern:
       start: 2
       interval: 2

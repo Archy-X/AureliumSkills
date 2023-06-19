@@ -373,12 +373,10 @@ public class AbilityManager {
     public List<Ability> getAbilities(Skill skill, int level) {
         ImmutableList<Supplier<Ability>> skillAbilities = skill.getAbilities();
         List<Ability> abilities = new ArrayList<>();
-        if (skillAbilities.size() == 5) {
-            for (Supplier<Ability> abilitySupplier : skillAbilities) {
-                Ability ability = abilitySupplier.get();
-                if (level >= getUnlock(ability) && (level - getUnlock(ability)) % getLevelUp(ability) == 0) {
-                    abilities.add(ability);
-                }
+        for (Supplier<Ability> abilitySupplier : skillAbilities) {
+            Ability ability = abilitySupplier.get();
+            if (level >= getUnlock(ability) && (level - getUnlock(ability)) % getLevelUp(ability) == 0) {
+                abilities.add(ability);
             }
         }
         return abilities;

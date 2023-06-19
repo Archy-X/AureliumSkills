@@ -8,7 +8,6 @@ import com.archyx.aureliumskills.lang.MenuMessage;
 import com.archyx.aureliumskills.skills.Skill;
 import com.archyx.aureliumskills.stats.Stat;
 import com.archyx.aureliumskills.stats.StatLeveler;
-import com.archyx.aureliumskills.util.math.NumberUtil;
 import com.archyx.aureliumskills.util.text.TextUtil;
 import org.bukkit.entity.Player;
 
@@ -46,7 +45,7 @@ public class StatReward extends Reward {
     public String getMenuMessage(Player player, Locale locale, Skill skill, int level) {
         return TextUtil.replace(Lang.getMessage(MenuMessage.REWARDS_ENTRY, locale),
                 "{color}", stat.getColor(locale),
-                "{num}", NumberUtil.format1(value),
+                "{num}", Lang.formatStatLevel(stat, value),
                 "{symbol}", stat.getSymbol(locale),
                 "{stat}", stat.getDisplayName(locale));
     }
@@ -55,7 +54,7 @@ public class StatReward extends Reward {
     public String getChatMessage(Player player, Locale locale, Skill skill, int level) {
         return TextUtil.replace(Lang.getMessage(LevelerMessage.STAT_LEVEL, locale),
                 "{color}", stat.getColor(locale),
-                "{num}", NumberUtil.format1(value),
+                "{num}", Lang.formatStatLevel(stat, value),
                 "{symbol}", stat.getSymbol(locale),
                 "{stat}", stat.getDisplayName(locale));
     }

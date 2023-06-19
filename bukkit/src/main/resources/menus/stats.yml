@@ -1,5 +1,5 @@
 title: '{stats_menu_title}'
-size: 3
+size: 4
 fill:
   enabled: true
   material: black_stained_glass_pane
@@ -15,9 +15,12 @@ items:
       - '{luck}'
       - '{wisdom}'
       - '{toughness}'
+      - '{crit_chance}'
+      - '{crit_damage}'
+      - '{speed}'
   back:
     material: arrow
-    pos: 2,4
+    pos: 3,0
     display_name: '{back}'
     lore:
       - '{back_click}'
@@ -41,11 +44,18 @@ templates:
     toughness:
       pos: 1,7
       material: purple_stained_glass_pane
+    crit_chance:
+      pos: 2,3
+      material: light_blue_stained_glass_pane
+    crit_damage:
+      pos: 2,4
+      material: cyan_stained_glass_pane
+    speed:
+      pos: 2,5
+      material: white_stained_glass_pane
     display_name: '{color}{stat}'
     lore:
-      - '{stat_desc}'
-      - '{skills}'
-      - ' '
+      - '{stat_desc}{skills}'
       - '{your_level}'
       - ' '
       - '{descriptors}'

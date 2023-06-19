@@ -14,6 +14,7 @@ import com.archyx.aureliumskills.skills.farming.FarmingAbilities;
 import com.archyx.aureliumskills.skills.fighting.FightingAbilities;
 import com.archyx.aureliumskills.skills.foraging.ForagingAbilities;
 import com.archyx.aureliumskills.skills.mining.MiningAbilities;
+import com.archyx.aureliumskills.stats.Stats;
 import com.archyx.aureliumskills.stats.Strength;
 import com.archyx.aureliumskills.stats.Toughness;
 import com.archyx.aureliumskills.util.mechanics.DamageType;
@@ -39,7 +40,7 @@ public class DamageListener implements Listener {
     private final DefenseAbilities defenseAbilities;
 
     public DamageListener(AureliumSkills plugin, DefenseAbilities defenseAbilities, FightingAbilities fightingAbilities) {
-        strength = new Strength();
+        this.strength = plugin.getStatRegistry().getProvider(Stats.STRENGTH, Strength.class);
         this.plugin = plugin;
         this.critical = new Critical(plugin);
         this.excavationAbilities = new ExcavationAbilities(plugin);

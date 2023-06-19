@@ -185,7 +185,6 @@ requirement:
         global:
 
 critical:
-    base-multiplier: 1.5
     enabled:
         sword: true
         bow: true
@@ -298,7 +297,7 @@ forging:
 
 # Stat Options
 health:
-    modifier: 0.4
+    modifier: 1
     health-scaling: true
     hearts:
         '10': 20
@@ -316,6 +315,7 @@ health:
     update-delay: 0
     force-base-health: false
     keep-full-on-increase: false
+    show-total-health: false
 
 strength:
     modifier: 0.5
@@ -323,6 +323,7 @@ strength:
     bow-damage: true
     display-damage-with-health-scaling: true
     use-percent: true
+    show-effective-value: false
 toughness:
     new-modifier: 0.3
 regeneration:

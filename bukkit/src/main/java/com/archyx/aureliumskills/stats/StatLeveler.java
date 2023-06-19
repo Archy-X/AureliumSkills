@@ -15,13 +15,11 @@ public class StatLeveler {
 	}
 
 	public void reloadStat(Player player, Stat stat) {
-		if (stat.equals(Stats.HEALTH)) {
+		if (stat == Stats.HEALTH) {
 			plugin.getHealth().reload(player);
-		}
-		else if (stat.equals(Stats.LUCK)) {
+		} else if (stat == Stats.LUCK) {
 			new Luck(plugin).reload(player);
-		}
-		else if (stat.equals(Stats.WISDOM)) {
+		} else if (stat == Stats.WISDOM) {
 			if (!OptionL.getBoolean(Option.WISDOM_ALLOW_OVER_MAX_MANA)) {
 				PlayerData playerData = plugin.getPlayerManager().getPlayerData(player);
 				if (playerData == null) return;
@@ -29,6 +27,8 @@ public class StatLeveler {
 					playerData.setMana(playerData.getMaxMana());
 				}
 			}
+		} else if (stat == Stats.SPEED) {
+			new Speed(plugin).reload(player);
 		}
 	}
 	

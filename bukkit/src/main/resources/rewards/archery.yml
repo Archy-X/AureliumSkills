@@ -1,6 +1,6 @@
 patterns:
   - type: stat
-    stat: luck
+    stat: crit_chance
     value: 1
     pattern:
       start: 2

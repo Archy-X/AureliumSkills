@@ -3,6 +3,7 @@ package com.archyx.aureliumskills.skills.sorcery;
 import com.archyx.aureliumskills.AureliumSkills;
 import com.archyx.aureliumskills.configuration.Option;
 import com.archyx.aureliumskills.configuration.OptionL;
+import com.archyx.aureliumskills.ability.Ability;
 import com.archyx.aureliumskills.leveler.SkillLeveler;
 import com.archyx.aureliumskills.skills.Skills;
 import org.bukkit.block.Block;
@@ -15,7 +16,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 public class SorceryLeveler extends SkillLeveler implements Listener {
 
     public SorceryLeveler(AureliumSkills plugin) {
-        super(plugin, Skills.SORCERY);
+        super(plugin, Ability.SORCERER);
     }
 
     public void level(Player player, double manaUsed) {

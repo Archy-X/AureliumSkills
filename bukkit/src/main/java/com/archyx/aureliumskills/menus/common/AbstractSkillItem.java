@@ -98,15 +98,15 @@ public abstract class AbstractSkillItem extends AbstractItem implements Template
     private String getAbilityLevels(Skill skill, PlayerData playerData) {
         Locale locale = playerData.getLocale();
         StringBuilder abilityLevelsLore = new StringBuilder();
-        if (skill.getAbilities().size() == 5) {
-            String levelsMessage = Lang.getMessage(MenuMessage.ABILITY_LEVELS, locale);
-            int num = 1;
-            List<Ability> abilities = new ArrayList<>();
-            for (Supplier<Ability> abilitySupplier : skill.getAbilities()) {
-                abilities.add(abilitySupplier.get());
-            }
-            abilities.sort(Comparator.comparingInt(a -> plugin.getAbilityManager().getUnlock(a)));
-            for (Ability ability : abilities) {
+        String levelsMessage = Lang.getMessage(MenuMessage.ABILITY_LEVELS, locale);
+        List<Ability> abilities = new ArrayList<>();
+        for (Supplier<Ability> abilitySupplier : skill.getAbilities()) {
+            abilities.add(abilitySupplier.get());
+        }
+        abilities.sort(Comparator.comparingInt(a -> plugin.getAbilityManager().getUnlock(a)));
+        for (int num = 1; num <= 5; num++) {
+            if (num <= abilities.size()) {
+                Ability ability = abilities.get(num - 1);
                 if (plugin.getAbilityManager().isEnabled(ability)) {
                     if (playerData.getAbilityLevel(ability) > 0) {
                         int abilityLevel = playerData.getAbilityLevel(ability);
@@ -125,10 +125,12 @@ public abstract class AbstractSkillItem extends AbstractItem implements Template
                             , "\n  {ability_" + num + "}", ""
                             , "{ability_" + num + "}", "");
                 }
-                num++;
+            } else {
+                levelsMessage = TextUtil.replace(levelsMessage, "\\n  {ability_" + num + "}", ""
+                        , "{ability_" + num + "}", "");
             }
-            abilityLevelsLore.append(levelsMessage);
         }
+        abilityLevelsLore.append(levelsMessage);
         return abilityLevelsLore.toString();
     }
 

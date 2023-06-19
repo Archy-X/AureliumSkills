@@ -101,26 +101,24 @@ public abstract class SkillLevelItem extends AbstractItem implements TemplateIte
 
     protected String getAbilityLore(Skill skill, int level, Locale locale) {
         StringBuilder abilityLore = new StringBuilder();
-        if (skill.getAbilities().size() == 5) {
-            AbilityManager manager = plugin.getAbilityManager();
-            for (Ability ability : manager.getAbilities(skill, level)) {
-                if (manager.isEnabled(ability)) {
-                    if (level == manager.getUnlock(ability)) {
-                        abilityLore.append(TextUtil.replace(Lang.getMessage(MenuMessage.ABILITY_UNLOCK, locale)
+        AbilityManager manager = plugin.getAbilityManager();
+        for (Ability ability : manager.getAbilities(skill, level)) {
+            if (manager.isEnabled(ability)) {
+                if (level == manager.getUnlock(ability)) {
+                    abilityLore.append(TextUtil.replace(Lang.getMessage(MenuMessage.ABILITY_UNLOCK, locale)
+                            , "{ability}", ability.getDisplayName(locale)
+                            , "{desc}", TextUtil.replace(ability.getDescription(locale)
+                                    , "{value_2}", NumberUtil.format1(manager.getValue2(ability, 1))
+                                    , "{value}", NumberUtil.format1(manager.getValue(ability, 1)))));
+                } else {
+                    int abilityLevel = ((level - manager.getUnlock(ability)) / manager.getLevelUp(ability)) + 1;
+                    if (abilityLevel <= manager.getMaxLevel(ability) || manager.getMaxLevel(ability) == 0) { // Check max level
+                        abilityLore.append(TextUtil.replace(Lang.getMessage(MenuMessage.ABILITY_LEVEL, locale)
                                 , "{ability}", ability.getDisplayName(locale)
+                                , "{level}", RomanNumber.toRoman(abilityLevel)
                                 , "{desc}", TextUtil.replace(ability.getDescription(locale)
-                                        , "{value_2}", NumberUtil.format1(manager.getValue2(ability, 1))
-                                        , "{value}", NumberUtil.format1(manager.getValue(ability, 1)))));
-                    } else {
-                        int abilityLevel = ((level - manager.getUnlock(ability)) / manager.getLevelUp(ability)) + 1;
-                        if (abilityLevel <= manager.getMaxLevel(ability) || manager.getMaxLevel(ability) == 0) { // Check max level
-                            abilityLore.append(TextUtil.replace(Lang.getMessage(MenuMessage.ABILITY_LEVEL, locale)
-                                    , "{ability}", ability.getDisplayName(locale)
-                                    , "{level}", RomanNumber.toRoman(abilityLevel)
-                                    , "{desc}", TextUtil.replace(ability.getDescription(locale)
-                                            , "{value_2}", NumberUtil.format1(manager.getValue2(ability, abilityLevel))
-                                            , "{value}", NumberUtil.format1(manager.getValue(ability, abilityLevel)))));
-                        }
+                                        , "{value_2}", NumberUtil.format1(manager.getValue2(ability, abilityLevel))
+                                        , "{value}", NumberUtil.format1(manager.getValue(ability, abilityLevel)))));
                     }
                 }
             }

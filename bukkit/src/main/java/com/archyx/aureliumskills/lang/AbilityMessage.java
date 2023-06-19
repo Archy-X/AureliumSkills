@@ -87,9 +87,6 @@ public enum AbilityMessage implements MessageKey {
     LUCKY_SPADES_DESC,
     LUCKY_SPADES_INFO,
     // Archery
-    CRIT_CHANCE_NAME,
-    CRIT_CHANCE_DESC,
-    CRIT_CHANCE_INFO,
     ARCHER_NAME,
     ARCHER_DESC,
     ARCHER_INFO,
@@ -119,9 +116,6 @@ public enum AbilityMessage implements MessageKey {
     NO_DEBUFF_DESC,
     NO_DEBUFF_INFO,
     // Fighting
-    CRIT_DAMAGE_NAME,
-    CRIT_DAMAGE_DESC,
-    CRIT_DAMAGE_INFO,
     FIGHTER_NAME,
     FIGHTER_DESC,
     FIGHTER_INFO,
@@ -205,6 +199,10 @@ public enum AbilityMessage implements MessageKey {
     LUCKY_TABLE_NAME,
     LUCKY_TABLE_DESC,
     LUCKY_TABLE_INFO,
+    // Sorcery
+    SORCERER_NAME,
+    SORCERER_DESC,
+    SORCERER_INFO,
     // Healing
     LIFE_ESSENCE_NAME,
     LIFE_ESSENCE_DESC,
